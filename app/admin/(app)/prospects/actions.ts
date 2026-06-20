@@ -28,6 +28,7 @@ import {
   markOutreachSent,
   deleteOutreachMessage,
 } from "@/lib/outreach";
+import { sendOutreachEmail, emailConfigured } from "@/lib/email";
 import { SITE_URL } from "@/lib/seo";
 import {
   PROSPECT_STATUSES,
@@ -277,6 +278,41 @@ export async function markOutreachSentAction(
     const current = PROSPECT_STATUSES.indexOf(prospect.status);
     const contacted = PROSPECT_STATUSES.indexOf("contacted");
     if (current < contacted) await updateProspectStatus(prospect.id, "contacted");
+  }
+  return { ok: true };
+}
+
+/**
+ * Actually SEND a drafted outreach email to the prospect (autonomous acquisition).
+ * Dispatches via Resend when configured + the prospect has an email, then marks the
+ * message sent and advances to `contacted`. Falls back with a clear error otherwise
+ * (operator can still "Mark sent" after sending by hand) — the funnel never blocks.
+ */
+export async function dispatchOutreachAction(
+  messageId: string
+): Promise<{ ok: boolean; error?: string }> {
+  const org = await requireOrg();
+  const message = await getOutreachRecord(messageId);
+  if (!message || message.orgId !== org.id) return { ok: false, error: "Message not found." };
+  if (message.channel !== "email") return { ok: false, error: "Only email can be auto-sent." };
+
+  const prospect = await ownedProspect(message.prospectId, org.id);
+  if (!prospect) return { ok: false, error: "Prospect not found." };
+  if (!prospect.email) return { ok: false, error: "No prospect email on file — add one or mark sent manually." };
+  if (!emailConfigured) return { ok: false, error: "Email not configured (set RESEND_API_KEY) — mark sent manually." };
+
+  const sent = await sendOutreachEmail({
+    to: prospect.email,
+    subject: message.subject || `A quick idea for ${prospect.name}`,
+    body: message.body,
+    fromName: org.name,
+  });
+  if (!sent) return { ok: false, error: "Send failed — try again or mark sent manually." };
+
+  await markOutreachSent(messageId);
+  const current = PROSPECT_STATUSES.indexOf(prospect.status);
+  if (current < PROSPECT_STATUSES.indexOf("contacted")) {
+    await updateProspectStatus(prospect.id, "contacted");
   }
   return { ok: true };
 }

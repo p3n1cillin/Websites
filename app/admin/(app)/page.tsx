@@ -103,6 +103,15 @@ export default async function CommandCenterPage() {
     0
   );
 
+  // ---- Goal: £1000/mo recurring ----------------------------------------------
+  // Recurring revenue is modelled (won clients × a typical monthly retainer) since
+  // client subscriptions aren't billed through this app — clearly an estimate.
+  const MONTHLY_RETAINER_PENCE = 3900; // £39/mo typical care plan
+  const TARGET_PENCE = 100_000; // £1,000/mo
+  const recurringPence = wonProspects.length * MONTHLY_RETAINER_PENCE;
+  const goalPct = Math.min(100, Math.round((recurringPence / TARGET_PENCE) * 100));
+  const clientsToGoal = Math.max(0, Math.ceil((TARGET_PENCE - recurringPence) / MONTHLY_RETAINER_PENCE));
+
   // ---- AI performance ---------------------------------------------------------
   const finished = runs.filter((r) => r.status === "completed" || r.status === "failed");
   const successRate = finished.length
@@ -131,6 +140,33 @@ export default async function CommandCenterPage() {
           Find businesses →
         </Link>
       </div>
+
+      {/* GOAL — progress to £1,000/mo recurring. */}
+      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+        <div className="flex flex-wrap items-end justify-between gap-2">
+          <div>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Goal · £1,000/mo recurring</h2>
+            <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+              {gbp(recurringPence)}<span className="text-base font-normal text-slate-400">/mo</span>
+              <span className="ml-2 text-sm font-medium text-slate-500">{goalPct}%</span>
+            </p>
+          </div>
+          <p className="text-sm text-slate-500">
+            {clientsToGoal === 0
+              ? "🎯 Target hit — push for the next £1k."
+              : `${clientsToGoal} more client${clientsToGoal === 1 ? "" : "s"} at £39/mo to hit £1,000.`}
+          </p>
+        </div>
+        <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
+          <div
+            className={`h-full rounded-full ${goalPct >= 100 ? "bg-emerald-500" : "bg-slate-900"}`}
+            style={{ width: `${Math.max(2, goalPct)}%` }}
+          />
+        </div>
+        <p className="mt-2 text-xs text-slate-400">
+          Modelled at £39/mo per won client ({wonProspects.length} won). Plus {gbp(wonValuePence)} in one-off build fees booked.
+        </p>
+      </section>
 
       {/* REVENUE — the headline metric. */}
       <section>

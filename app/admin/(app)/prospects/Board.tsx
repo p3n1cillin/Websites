@@ -19,6 +19,7 @@ import {
   generatePreviewAction,
   draftOutreachAction,
   markOutreachSentAction,
+  dispatchOutreachAction,
   deleteOutreachAction,
   revokePreviewAction,
   setPreviewPasswordAction,
@@ -522,15 +523,29 @@ export default function Board({
                             )}
                             <div className="mt-1.5 flex items-center gap-2">
                               {latestMsg.status === "draft" && (
-                                <button
-                                  onClick={() =>
-                                    run(`out-${p.id}`, () => markOutreachSentAction(latestMsg.id))
-                                  }
-                                  disabled={busyCard}
-                                  className="rounded-md bg-slate-900 px-2 py-1 text-[11px] font-medium text-white hover:bg-slate-700 disabled:opacity-50"
-                                >
-                                  Mark sent
-                                </button>
+                                <>
+                                  {latestMsg.channel === "email" && (
+                                    <button
+                                      onClick={() =>
+                                        run(`out-${p.id}`, () => dispatchOutreachAction(latestMsg.id))
+                                      }
+                                      disabled={busyCard}
+                                      title="Email this to the prospect now (needs RESEND_API_KEY + their email)"
+                                      className="rounded-md bg-emerald-600 px-2 py-1 text-[11px] font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
+                                    >
+                                      Send now
+                                    </button>
+                                  )}
+                                  <button
+                                    onClick={() =>
+                                      run(`out-${p.id}`, () => markOutreachSentAction(latestMsg.id))
+                                    }
+                                    disabled={busyCard}
+                                    className="rounded-md bg-slate-900 px-2 py-1 text-[11px] font-medium text-white hover:bg-slate-700 disabled:opacity-50"
+                                  >
+                                    Mark sent
+                                  </button>
+                                </>
                               )}
                               <button
                                 onClick={() =>

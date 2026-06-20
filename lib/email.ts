@@ -59,6 +59,38 @@ export async function sendLeadNotification(lead: LeadEmail): Promise<void> {
   }
 }
 
+/**
+ * Send a drafted outreach message to a PROSPECT (acquisition). Returns true only
+ * when Resend accepted it. No key / no recipient → false (caller falls back to the
+ * manual "mark sent" flow), so the funnel still works without email configured.
+ */
+export async function sendOutreachEmail(input: {
+  to: string;
+  subject: string;
+  body: string;
+  fromName?: string;
+}): Promise<boolean> {
+  if (!RESEND_API_KEY || !input.to) return false;
+  const from = input.fromName ? `${input.fromName} <onboarding@resend.dev>` : FROM;
+  // Plain-text body → simple HTML (preserve line breaks).
+  const html = input.body.split(/\n{2,}/).map((p) => `<p>${esc(p).replace(/\n/g, "<br/>")}</p>`).join("\n");
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from, to: [input.to], subject: input.subject, html, text: input.body }),
+    });
+    if (!res.ok) {
+      console.error("[email] outreach send failed:", res.status, await safeText(res));
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("[email] outreach send threw:", err);
+    return false;
+  }
+}
+
 function esc(s: string): string {
   return s
     .replace(/&/g, "&amp;")
