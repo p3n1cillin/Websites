@@ -139,6 +139,10 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
       }
     }
 
+    // Email enrichment: if we don't have a contact email but scraped one from their
+    // own site, capture it so outreach has a real recipient (never invented).
+    const enrichedEmail = !p.email?.trim() && audit?.contactEmail ? audit.contactEmail : undefined;
+
     const applied = ctx.autonomy === "auto";
     if (applied) {
       await updateProspectAnalysis(p.id, {
@@ -146,6 +150,7 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
         presenceScore: scores.presenceScore,
         opportunityScore: scores.opportunityScore,
         valueEstimate: scores.valueEstimate,
+        email: enrichedEmail,
         // Advance the pipeline only from the initial state.
         status: p.status === "discovered" ? "analysed" : undefined,
       });

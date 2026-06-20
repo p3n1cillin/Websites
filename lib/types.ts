@@ -399,6 +399,8 @@ export interface WebsiteAudit {
     /** Rough count of on-page testimonial/review blocks. */
     testimonialCount: number;
   };
+  /** A contact email scraped from the homepage (mailto/text), or null — never invented. */
+  contactEmail?: string | null;
   /** Plain-language weaknesses — the sales ammunition. */
   issues: string[];
   at: string;

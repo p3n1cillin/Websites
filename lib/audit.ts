@@ -97,6 +97,36 @@ function extractReputation(html: string): NonNullable<WebsiteAudit["reputation"]
   return { platforms: [...platforms], onPageRating, testimonialCount };
 }
 
+/** Junk patterns that look like emails but aren't a real business inbox. */
+const EMAIL_JUNK = /(example\.|sentry\.|wix|\.png|\.jpg|\.jpeg|\.gif|\.webp|@2x|@3x|your-?email|name@|email@example)/i;
+
+/**
+ * Extract a plausible contact email from the homepage — `mailto:` links first
+ * (most reliable), then visible text. Conservative: filters junk/asset strings and
+ * prefers an address on the site's own domain. Returns null when nothing credible
+ * is found (we never invent one). This is what makes auto-outreach possible.
+ */
+export function extractEmail(html: string, siteHost?: string): string | null {
+  const candidates: string[] = [];
+  for (const m of html.matchAll(/href=["']mailto:([^"'?]+)/gi)) {
+    if (m[1]) candidates.push(m[1].trim());
+  }
+  const text = html.replace(/<[^>]+>/g, " ");
+  for (const m of text.matchAll(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi)) {
+    candidates.push(m[0]);
+  }
+  const seen = new Set<string>();
+  const clean = candidates
+    .map((e) => e.toLowerCase().replace(/^mailto:/, "").trim())
+    .filter((e) => e.includes("@") && !EMAIL_JUNK.test(e))
+    .filter((e) => (seen.has(e) ? false : (seen.add(e), true)));
+  if (clean.length === 0) return null;
+  // Prefer an address on the business's own domain (e.g. info@theirsite.co.uk).
+  const domain = siteHost?.replace(/^www\./, "");
+  const onDomain = domain ? clean.find((e) => e.endsWith(`@${domain}`)) : undefined;
+  return onDomain ?? clean[0];
+}
+
 /** Pull recognised social-profile labels linked from the homepage HTML. */
 function extractSocials(html: string): string[] {
   const hrefs = html.match(/href=["']([^"']+)["']/gi) ?? [];
@@ -165,6 +195,9 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
   const builder = BUILDERS.find((b) => b.re.test(lower))?.id ?? null;
   const socials = extractSocials(html);
   const reputation = extractReputation(html);
+  let host: string | undefined;
+  try { host = new URL(finalUrl).host; } catch { /* ignore */ }
+  const contactEmail = extractEmail(html, host);
 
   penalise(!hasViewport, 20, "Not mobile-friendly (no viewport tag) — loses mobile customers.");
   penalise(!https, 14, "No HTTPS — browsers flag the site as 'Not secure'.");
@@ -218,6 +251,7 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
       socials,
     },
     reputation,
+    contactEmail,
     issues,
     at: new Date().toISOString(),
   };
