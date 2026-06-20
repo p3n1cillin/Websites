@@ -14,6 +14,7 @@ import {
   discoverAction,
   discoverLiveAction,
   discoverCampaignAction,
+  autoBuildDemosAction,
 } from "./actions";
 
 const gbp = (pence: number) => `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
@@ -23,11 +24,12 @@ export const dynamic = "force-dynamic";
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: { found?: string; seen?: string };
+  searchParams: { found?: string; seen?: string; built?: string };
 }) {
   const org = await requireOrg();
   const found = searchParams?.found;
   const seen = searchParams?.seen;
+  const built = searchParams?.built;
   const [prospects, previews, outreach, portals, proposals, previewStats] = await Promise.all([
     getProspectsForOrg(org.id),
     getPreviewsForOrg(org.id),
@@ -106,6 +108,46 @@ export default async function ProspectsPage({
               : "No businesses found there — try a larger area, a nearby town, or check the spelling."}
         </p>
       )}
+
+      {built !== undefined && (
+        <p
+          className={`rounded-lg px-3 py-2 text-sm ${
+            built === "0" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {built !== "0"
+            ? `Built ${built} demo${built === "1" ? "" : "s"} + drafted outreach for your top opportunities — review and send them below.`
+            : "No demos built — every top prospect already has one, or the spend cap was hit."}
+        </p>
+      )}
+
+      {/* Auto-build — one click turns the best discovered prospects into demos. */}
+      <form
+        action={autoBuildDemosAction}
+        className="flex flex-wrap items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50/50 p-4"
+      >
+        <div className="flex-1">
+          <h2 className="text-sm font-semibold text-slate-800">⚡ Auto-build demos for top opportunities</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Runs the full prep chain — analyse → build a demo site → draft first-touch outreach — for
+            your highest-opportunity prospects that don&apos;t have a demo yet.
+          </p>
+        </div>
+        <label className="text-xs text-slate-600">
+          How many
+          <input
+            name="count"
+            type="number"
+            min={1}
+            max={10}
+            defaultValue={5}
+            className="mt-1 block w-20 rounded-md border border-slate-300 px-3 py-2 text-sm"
+          />
+        </label>
+        <button className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700">
+          Auto-build
+        </button>
+      </form>
 
       {/* Live discovery — pull real local businesses from OpenStreetMap. */}
       <form

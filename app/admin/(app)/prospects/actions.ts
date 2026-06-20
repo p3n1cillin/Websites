@@ -6,6 +6,7 @@ import {
   createProspect,
   deleteProspect,
   getProspectRecord,
+  getProspectsForOrg,
   normalizeCategory,
   updateProspectStatus,
 } from "@/lib/prospects";
@@ -220,6 +221,64 @@ export async function discoverCampaignAction(formData: FormData): Promise<void> 
   });
   const created = res.output?.created ?? 0;
   redirect(`/admin/prospects?found=${created}&seen=${candidates.length}`);
+}
+
+// ---------------------------------------------------------------------------
+// Auto-build demos — one click takes the top-opportunity prospects with no demo
+// yet and runs the whole prep chain for each: analyse (Market) → build demo
+// (Prospecting) → draft first-touch outreach (Sales). The operator wakes up to
+// sellable demos + ready messages. Every step is a runAgent call, so per-agent
+// autonomy gates + spend caps still apply; one failure never stops the batch.
+// ---------------------------------------------------------------------------
+export async function autoBuildDemosAction(formData: FormData): Promise<void> {
+  const org = await requireOrg();
+  const count = Math.min(Math.max(Number(formData.get("count")) || 5, 1), 10);
+
+  const [prospects, previews] = await Promise.all([
+    getProspectsForOrg(org.id), // ordered opportunity desc — best first
+    getPreviewsForOrg(org.id),
+  ]);
+  const hasActivePreview = new Set(
+    previews.filter((p) => p.status === "active").map((p) => p.prospectId)
+  );
+  const targets = prospects
+    .filter((p) => p.status !== "won" && p.status !== "lost" && !hasActivePreview.has(p.id))
+    .slice(0, count);
+
+  let built = 0;
+  for (const p of targets) {
+    try {
+      await runAgent({
+        kind: "market",
+        orgId: org.id,
+        actorUserId: org.ownerUserId,
+        autonomyOverride: "auto",
+        input: { prospect: p } as MarketAgentInput,
+      });
+      // Re-read so the freshly-written analysis feeds the demo build.
+      const fresh = (await ownedProspect(p.id, org.id)) ?? p;
+      const res = await runAgent<ProspectingAgentOutput>({
+        kind: "prospecting",
+        orgId: org.id,
+        actorUserId: org.ownerUserId,
+        autonomyOverride: "auto",
+        input: { prospect: fresh } as ProspectingAgentInput,
+      });
+      if (res.status !== "completed") continue;
+      built += 1;
+      const previewUrl = await latestPreviewUrl(p.id, org.id);
+      await runAgent({
+        kind: "sales",
+        orgId: org.id,
+        actorUserId: org.ownerUserId,
+        autonomyOverride: "auto",
+        input: { prospect: fresh, previewUrl, channel: "email" } as SalesAgentInput,
+      });
+    } catch {
+      /* one prospect failing must not stop the batch */
+    }
+  }
+  redirect(`/admin/prospects?built=${built}`);
 }
 
 // ---------------------------------------------------------------------------
