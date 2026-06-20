@@ -12,6 +12,7 @@
 
 import { aiConfigured } from "../ai/client";
 import { createOutreachSequence } from "../outreach";
+import { getWinningPatterns } from "../knowledge";
 import type { OutreachChannel, OutreachIntent, Prospect } from "../types";
 import type { AgentDefinition } from "./types";
 
@@ -76,6 +77,13 @@ export const salesAgent: AgentDefinition<SalesAgentInput, SalesAgentOutput> = {
     let ai = false;
 
     if (aiConfigured) {
+      // Self-improving loop (read side): openers that have won deals in this
+      // industry, fed back as guidance so outreach sharpens with every close.
+      const industry = p.source?.industry?.trim() || p.category;
+      const winners = await getWinningPatterns(ctx.orgId, industry, "outreach_initial");
+      const winGuidance = winners.length
+        ? ` Openers that have WON deals with ${industry}s before — adapt the angle, write fresh (never copy verbatim): "${winners.slice(0, 2).join('" || "')}".`
+        : "";
       const { value } = await ctx.ai.completeJson<{
         steps: { intent: OutreachIntent; subject: string; body: string }[];
       }>({
@@ -85,7 +93,7 @@ export const salesAgent: AgentDefinition<SalesAgentInput, SalesAgentOutput> = {
           "You are a friendly, low-pressure B2B salesperson for a local web-design agency. Write a 3-message email FOLLOW-UP SEQUENCE to a small business: (1) intent 'initial' — lead with a concrete benefit and the free demo link if provided; (2) intent 'follow_up' — a short, warm nudge; (3) intent 'final' — a graceful last check-in that leaves the door open. Each under 110 words, sign off '[Your name]'. No hype, no fake urgency, no invented facts.",
         prompt: `Prospect: ${p.name}, a ${p.category} in ${p.city || "an unknown town"}. Winning angle: ${
           p.analysis?.angle || "modern, conversion-focused website"
-        }. ${input.previewUrl ? `Free demo link: ${input.previewUrl}` : "No demo link available."} Return the 3 messages in order.`,
+        }. ${input.previewUrl ? `Free demo link: ${input.previewUrl}` : "No demo link available."}${winGuidance} Return the 3 messages in order.`,
         schema: {
           type: "object",
           properties: {

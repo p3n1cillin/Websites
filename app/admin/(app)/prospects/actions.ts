@@ -24,11 +24,14 @@ import {
   updateProposalStatus,
 } from "@/lib/proposals";
 import {
+  getOutreachForOrg,
   getOutreachRecord,
   markOutreachSent,
   deleteOutreachMessage,
 } from "@/lib/outreach";
 import { sendOutreachEmail, emailConfigured } from "@/lib/email";
+import { recordWinningPattern } from "@/lib/knowledge";
+import type { Prospect } from "@/lib/types";
 import { SITE_URL } from "@/lib/seo";
 import {
   PROSPECT_STATUSES,
@@ -40,6 +43,26 @@ import {
 async function ownedProspect(id: string, orgId: string) {
   const p = await getProspectRecord(id);
   return p && p.orgId === orgId ? p : null;
+}
+
+/**
+ * Self-improving loop (Phase 10): when a deal is WON, bank the opener that worked
+ * as a winning pattern for that industry. The Sales agent reads these back as
+ * guidance, so outreach gets sharper with every close. Best-effort; never blocks.
+ */
+async function recordWinFeedback(prospect: Prospect): Promise<void> {
+  try {
+    const industry = prospect.source?.industry?.trim() || prospect.category;
+    const msgs = await getOutreachForOrg(prospect.orgId);
+    const opener =
+      msgs.find((m) => m.prospectId === prospect.id && m.intent === "initial") ??
+      msgs.find((m) => m.prospectId === prospect.id);
+    if (opener?.body) {
+      await recordWinningPattern(prospect.orgId, industry, "outreach_initial", opener.body);
+    }
+  } catch {
+    /* learning is best-effort */
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -191,6 +214,7 @@ export async function setProspectStatusAction(
   const prospect = await ownedProspect(id, org.id);
   if (!prospect) return { ok: false, error: "Prospect not found." };
   await updateProspectStatus(id, status);
+  if (status === "won") await recordWinFeedback(prospect);
   return { ok: true };
 }
 
@@ -409,6 +433,8 @@ export async function markProposalAcceptedAction(
 
   await updateProposalStatus(proposalId, "accepted");
   await advanceProspect(proposal.prospectId, "won");
+  const wonProspect = await ownedProspect(proposal.prospectId, org.id);
+  if (wonProspect) await recordWinFeedback(wonProspect);
   return { ok: true };
 }
 
