@@ -3,7 +3,8 @@
 import { getProposalByToken, updateProposalStatus, setProposalSession } from "@/lib/proposals";
 import { getProspectRecord, updateProspectStatus } from "@/lib/prospects";
 import { ensureRetainerForWonDeal } from "@/lib/retainers";
-import { stripeConfigured, createProposalCheckout } from "@/lib/stripe";
+import { stripeConfigured, createRetainerCheckout } from "@/lib/stripe";
+import { DEFAULT_RETAINER_PENCE } from "@/lib/retainers";
 import { SITE_URL } from "@/lib/seo";
 
 /**
@@ -51,9 +52,10 @@ export async function payProposalAction(
 
   const prospect = await getProspectRecord(proposal.prospectId);
   try {
-    const session = await createProposalCheckout({
-      amountPence: proposal.pricePence,
-      productName: proposal.title || "Website build",
+    const session = await createRetainerCheckout({
+      buildFeePence: proposal.pricePence,
+      monthlyPence: DEFAULT_RETAINER_PENCE,
+      productName: proposal.title || "Website",
       proposalId: proposal.id,
       orgId: proposal.orgId,
       customerEmail: prospect?.email ?? null,

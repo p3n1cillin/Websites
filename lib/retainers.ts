@@ -102,11 +102,15 @@ export interface EnsureRetainerInput {
   prospectId?: string | null;
   businessId?: string | null;
   monthlyPence?: number;
+  /** When paid via Stripe Checkout subscription, link the real subscription. */
+  stripeSubscriptionId?: string | null;
+  stripeCustomerId?: string | null;
 }
 
 /**
  * Idempotent: open a retainer for a won deal, or return the existing one for that
  * prospect. Called from every "deal won" path — best-effort, never blocks the win.
+ * If a Stripe subscription id is supplied, links it (best-effort; needs 0015).
  */
 export async function ensureRetainerForWonDeal(
   input: EnsureRetainerInput
@@ -115,7 +119,11 @@ export async function ensureRetainerForWonDeal(
   try {
     if (input.prospectId) {
       const existing = await getRetainerForProspect(input.prospectId);
-      if (existing) return existing;
+      if (existing) {
+        // Already exists — attach the subscription if this win came with one.
+        if (input.stripeSubscriptionId) await linkSubscription(existing.id, input);
+        return existing;
+      }
     }
     const row = await sbInsert<Row>("client_retainers", {
       org_id: input.orgId,
@@ -125,9 +133,36 @@ export async function ensureRetainerForWonDeal(
       monthly_pence: Math.max(0, Math.round(input.monthlyPence ?? DEFAULT_RETAINER_PENCE)),
       status: "active",
     });
+    if (input.stripeSubscriptionId) await linkSubscription(row.id, input);
     revalidatePath("/admin/customers");
     revalidatePath("/admin");
     return toRetainer(row);
+  } catch {
+    return null;
+  }
+}
+
+/** Best-effort: attach a Stripe subscription/customer to a retainer (needs 0015). */
+async function linkSubscription(id: string, input: EnsureRetainerInput): Promise<void> {
+  try {
+    await sbUpdate("client_retainers", `id=eq.${encodeURIComponent(id)}`, {
+      stripe_subscription_id: input.stripeSubscriptionId,
+      stripe_customer_id: input.stripeCustomerId ?? null,
+    });
+  } catch {
+    /* columns may not exist until migration 0015 — non-fatal */
+  }
+}
+
+/** Find a retainer by its linked Stripe subscription id (for webhook churn sync). */
+export async function getRetainerBySubscriptionId(subId: string): Promise<ClientRetainer | null> {
+  if (!subId) return null;
+  try {
+    const rows = await sbSelect<Row>({
+      query: `client_retainers?${COLS}&stripe_subscription_id=eq.${encodeURIComponent(subId)}&limit=1`,
+      tier: "service",
+    });
+    return rows[0] ? toRetainer(rows[0]) : null;
   } catch {
     return null;
   }

@@ -9,19 +9,34 @@ import { ensureRetainerForWonDeal } from "./retainers";
  * retainer. Idempotent (safe to call from BOTH the success redirect and the webhook).
  * Never fabricates payment — callers only invoke this once Stripe confirms `paid`.
  */
-export async function closePaidProposal(proposalId: string, amountPence: number): Promise<void> {
+export interface PaymentLink {
+  /** Stripe subscription started for the care plan (when paid via subscription). */
+  subscriptionId?: string | null;
+  customerId?: string | null;
+  monthlyPence?: number;
+}
+
+export async function closePaidProposal(
+  proposalId: string,
+  link: PaymentLink = {}
+): Promise<void> {
   const proposal = await getProposalRecord(proposalId);
   if (!proposal) return;
 
-  await markProposalPaid(proposal.id, amountPence || proposal.pricePence);
+  // "Collected" records the one-off build fee; the recurring care plan is the retainer.
+  await markProposalPaid(proposal.id, proposal.pricePence);
 
   const prospect = await getProspectRecord(proposal.prospectId);
-  if (prospect && prospect.status !== "won") {
-    await updateProspectStatus(prospect.id, "won");
+  if (prospect) {
+    if (prospect.status !== "won") await updateProspectStatus(prospect.id, "won");
+    // Idempotent — opens the retainer (or links the subscription to an existing one).
     await ensureRetainerForWonDeal({
       orgId: prospect.orgId,
       name: prospect.name,
       prospectId: prospect.id,
+      monthlyPence: link.monthlyPence,
+      stripeSubscriptionId: link.subscriptionId,
+      stripeCustomerId: link.customerId,
     });
   }
 }
@@ -37,10 +52,17 @@ export async function confirmProposalPaymentBySession(
   try {
     const session = await getCheckoutSession(sessionId);
     const meta = session.metadata ?? {};
-    if (session.payment_status !== "paid" || meta.kind !== "proposal" || !meta.proposalId) {
+    // Subscription checkouts report payment_status "paid" or "no_payment_required";
+    // either is fine once the session has a subscription/payment confirmed.
+    const settled = session.payment_status === "paid" || session.subscription !== null;
+    if (!settled || meta.kind !== "proposal" || !meta.proposalId) {
       return { ok: false };
     }
-    await closePaidProposal(meta.proposalId, session.amount_total ?? 0);
+    await closePaidProposal(meta.proposalId, {
+      subscriptionId: session.subscription,
+      customerId: session.customer,
+      monthlyPence: Number(meta.monthlyPence) || undefined,
+    });
     return { ok: true, proposalId: meta.proposalId };
   } catch {
     return { ok: false };

@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { acceptProposalAction, payProposalAction } from "./actions";
+import { PRICING, gbp } from "@/lib/brand";
 
 /**
  * Customer-facing actions for a public proposal. When card payment is enabled the
@@ -71,7 +72,10 @@ export default function AcceptForm({
           >
             {pending ? "Confirming…" : "Or accept now and pay later"}
           </button>
-          <p className="text-xs text-slate-400">Secure card payment via Stripe. Cancel anytime.</p>
+          <p className="text-xs text-slate-400">
+            Secure checkout via Stripe — pays your one-off build fee and starts the {gbp(PRICING.carePlanPence)}/mo
+            care plan. Cancel the plan anytime.
+          </p>
         </>
       ) : (
         <>

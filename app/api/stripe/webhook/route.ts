@@ -6,6 +6,7 @@ import {
   recordInvoice,
 } from "@/lib/orgs";
 import { closePaidProposal } from "@/lib/payments";
+import { getRetainerBySubscriptionId, setRetainerStatus } from "@/lib/retainers";
 
 /**
  * Stripe webhook — the source of truth for subscription state.
@@ -30,8 +31,15 @@ export async function POST(req: Request): Promise<Response> {
         const s = event.data.object;
 
         // Client paying an agency PROPOSAL (our revenue) — close the deal + bank it.
-        if (s.metadata?.kind === "proposal" && s.metadata?.proposalId && s.payment_status === "paid") {
-          await closePaidProposal(s.metadata.proposalId, s.amount_total ?? 0);
+        // Subscription checkouts settle with a subscription id (payment_status may be
+        // "paid" or "no_payment_required"); either closes the deal.
+        if (s.metadata?.kind === "proposal" && s.metadata?.proposalId &&
+            (s.payment_status === "paid" || s.subscription)) {
+          await closePaidProposal(s.metadata.proposalId, {
+            subscriptionId: s.subscription ?? null,
+            customerId: s.customer ?? null,
+            monthlyPence: Number(s.metadata.monthlyPence) || undefined,
+          });
           break; // not an org-subscription event
         }
 
@@ -59,6 +67,16 @@ export async function POST(req: Request): Promise<Response> {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
         const sub = event.data.object;
+
+        // Client CARE-PLAN subscription? Keep the retainer's status (and thus MRR) honest.
+        const retainer = await getRetainerBySubscriptionId(sub.id);
+        if (retainer) {
+          const active = sub.status === "active" || sub.status === "trialing";
+          const next = active ? "active" : sub.status === "canceled" ? "cancelled" : "paused";
+          if (retainer.status !== next) await setRetainerStatus(retainer.id, next);
+          break; // a client retainer, not an org SaaS subscription
+        }
+
         const org = await getOrgByStripeCustomerId(sub.customer);
         if (org) {
           const plan = planForPriceId(sub.items?.data?.[0]?.price?.id) ?? undefined;
@@ -73,6 +91,14 @@ export async function POST(req: Request): Promise<Response> {
 
       case "customer.subscription.deleted": {
         const sub = event.data.object;
+
+        // Client care-plan cancelled → cancel the retainer (drops MRR honestly).
+        const retainer = await getRetainerBySubscriptionId(sub.id);
+        if (retainer) {
+          if (retainer.status !== "cancelled") await setRetainerStatus(retainer.id, "cancelled");
+          break;
+        }
+
         const org = await getOrgByStripeCustomerId(sub.customer);
         if (org) {
           // Keep the plan label for history; status gates access.
