@@ -1,6 +1,7 @@
 import type { Business } from "@/lib/types";
 import { Section, Container, Eyebrow, Heading } from "@/components/site/primitives";
 import Reveal from "@/components/Reveal";
+import { offerCopy } from "@/lib/site-copy";
 
 /**
  * Industry-specific feature grid (practice areas, treatments, product categories,
@@ -16,7 +17,7 @@ export default function Highlights({ business }: { business: Business }) {
         <div className="max-w-2xl">
           <Eyebrow>What we offer</Eyebrow>
           <Heading className="mt-2 text-3xl sm:text-4xl">
-            {h.heading ?? `Our ${business.primaryService.toLowerCase()} services`}
+            {h.heading ?? offerCopy(business).heading}
           </Heading>
         </div>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

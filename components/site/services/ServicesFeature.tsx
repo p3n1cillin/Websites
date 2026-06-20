@@ -4,21 +4,19 @@ import type { DesignDNA } from "@/lib/design/types";
 import Reveal from "@/components/Reveal";
 import { ServiceIconSvg, ArrowRightIcon } from "@/components/Icons";
 import { Section, Container, Eyebrow, Heading } from "../primitives";
+import { offerCopy } from "@/lib/site-copy";
 
 /** Services variant: large two-column feature blocks on a muted surface. */
 export default function ServicesFeature({ business }: { business: Business; dna: DesignDNA }) {
   const services = business.services.slice(0, 4);
+  const copy = offerCopy(business);
   return (
     <Section tone="muted">
       <Container>
         <div className="mx-auto max-w-2xl text-center">
-          <Eyebrow>What we do</Eyebrow>
-          <Heading className="mt-2 text-3xl sm:text-4xl">
-            {`${business.categoryLabel} services, done properly`}
-          </Heading>
-          <p className="mt-4 text-lg text-[rgb(var(--ink-muted))]">
-            {`The work ${business.address.city} relies on us for — clear pricing, no surprises.`}
-          </p>
+          <Eyebrow>{copy.eyebrow}</Eyebrow>
+          <Heading className="mt-2 text-3xl sm:text-4xl">{copy.heading}</Heading>
+          <p className="mt-4 text-lg text-[rgb(var(--ink-muted))]">{copy.subheading}</p>
         </div>
 
         <div className="mt-12 grid gap-[var(--gap)] sm:grid-cols-2">
@@ -59,7 +57,7 @@ export default function ServicesFeature({ business }: { business: Business; dna:
             href={`/${business.slug}/services`}
             className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-brand px-6 py-3 text-base font-semibold text-brand-fg shadow-sm transition-transform hover:scale-[1.03]"
           >
-            View all services
+            {copy.viewAll}
             <ArrowRightIcon className="h-5 w-5" />
           </Link>
         </div>

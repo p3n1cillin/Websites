@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import type { Business } from "@/lib/types";
-import { telHref, hasPhone } from "@/lib/utils";
+import { resolveCtas } from "@/lib/site-copy";
 import { PhoneIcon, ArrowRightIcon } from "@/components/Icons";
 
 /**
@@ -92,22 +92,22 @@ export function CallButton({
       ? "bg-white text-gray-900"
       : "bg-brand text-brand-fg";
 
-  // No verified phone → never show a fake number. Fall back to the enquiry CTA so
-  // there's still a primary conversion action.
-  if (!hasPhone(business)) {
-    const href = business.enableBooking ? `/${business.slug}/book` : `/${business.slug}/contact`;
+  // Primary CTA: call when there's a verified phone, otherwise the booking/enquiry
+  // action. Never a fake number. The secondary (ActionButton) is guaranteed to differ.
+  const { primary } = resolveCtas(business);
+  if (primary.isTel) {
     return (
-      <Link href={href} className={`${base} ${skin} ${className}`}>
-        {business.enableBooking ? "Book Online" : "Get a Free Quote"}
-        <ArrowRightIcon className={`h-5 w-5 ${variant === "light" ? "text-brand" : ""}`} />
-      </Link>
+      <a href={primary.href} className={`${base} ${skin} ${className}`}>
+        <PhoneIcon className={`h-5 w-5 ${variant === "light" ? "text-brand" : ""}`} />
+        {primary.label}
+      </a>
     );
   }
   return (
-    <a href={telHref(business.phone)} className={`${base} ${skin} ${className}`}>
-      <PhoneIcon className={`h-5 w-5 ${variant === "light" ? "text-brand" : ""}`} />
-      Call {business.phone}
-    </a>
+    <Link href={primary.href} className={`${base} ${skin} ${className}`}>
+      {primary.label}
+      <ArrowRightIcon className={`h-5 w-5 ${variant === "light" ? "text-brand" : ""}`} />
+    </Link>
   );
 }
 
@@ -122,10 +122,11 @@ export function ActionButton({
   tone?: "brand" | "outline" | "light";
   className?: string;
 }) {
-  const href = business.enableBooking
-    ? `/${business.slug}/book`
-    : `/${business.slug}/contact`;
-  const label = business.enableBooking ? "Book Online" : "Get a Free Quote";
+  // Secondary CTA — always a different path from the primary (CallButton), so the
+  // two buttons are never identical even when there's no phone.
+  const { secondary } = resolveCtas(business);
+  const href = secondary.href;
+  const label = secondary.label;
   const base =
     "inline-flex items-center justify-center gap-2 rounded-[var(--radius-pill)] px-6 py-3.5 text-base font-semibold transition-colors";
   const skin =

@@ -11,6 +11,8 @@ interface ServicesGridProps {
   subheading?: string;
   /** Show a "View all services" link when limited. */
   showViewAll?: boolean;
+  /** Label for the view-all link (defaults to a trade-style "View all services"). */
+  viewAllLabel?: string;
 }
 
 function ServiceCard({
@@ -59,6 +61,7 @@ export default function ServicesGrid({
   heading,
   subheading,
   showViewAll = false,
+  viewAllLabel,
 }: ServicesGridProps) {
   const services = limit ? business.services.slice(0, limit) : business.services;
 
@@ -94,7 +97,7 @@ export default function ServicesGrid({
             href={`/${business.slug}/services`}
             className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-base font-semibold text-brand-fg shadow-sm transition-transform hover:scale-[1.03]"
           >
-            View all {business.primaryService.toLowerCase()} services
+            {viewAllLabel ?? `View all ${business.primaryService.toLowerCase()} services`}
             <ArrowRightIcon className="h-5 w-5" />
           </Link>
         </Reveal>

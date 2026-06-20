@@ -4,21 +4,19 @@ import type { DesignDNA } from "@/lib/design/types";
 import Reveal from "@/components/Reveal";
 import { ServiceIconSvg, ArrowRightIcon } from "@/components/Icons";
 import { Section, Container, Eyebrow, Heading } from "../primitives";
+import { offerCopy } from "@/lib/site-copy";
 
 /** Services variant: a numbered, full-width list — calmer, editorial feel. */
 export default function ServicesRows({ business }: { business: Business; dna: DesignDNA }) {
   const services = business.services.slice(0, 6);
+  const copy = offerCopy(business);
   return (
     <Section tone="surface">
       <Container>
         <div className="max-w-2xl">
-          <Eyebrow>What we do</Eyebrow>
-          <Heading className="mt-2 text-3xl sm:text-4xl">
-            {`Our ${business.primaryService.toLowerCase()} services`}
-          </Heading>
-          <p className="mt-4 text-lg text-[rgb(var(--ink-muted))]">
-            {`Trusted ${business.categoryLabel.toLowerCase()} services across ${business.address.city} and the surrounding areas.`}
-          </p>
+          <Eyebrow>{copy.eyebrow}</Eyebrow>
+          <Heading className="mt-2 text-3xl sm:text-4xl">{copy.heading}</Heading>
+          <p className="mt-4 text-lg text-[rgb(var(--ink-muted))]">{copy.subheading}</p>
         </div>
 
         <ul className="mt-10 divide-y divide-[rgb(var(--border))] border-y border-[rgb(var(--border))]">
@@ -56,7 +54,7 @@ export default function ServicesRows({ business }: { business: Business; dna: De
             href={`/${business.slug}/services`}
             className="inline-flex items-center gap-2 rounded-[var(--radius-pill)] bg-brand px-6 py-3 text-base font-semibold text-brand-fg shadow-sm transition-transform hover:scale-[1.03]"
           >
-            View all {business.primaryService.toLowerCase()} services
+            {copy.viewAll}
             <ArrowRightIcon className="h-5 w-5" />
           </Link>
         </div>

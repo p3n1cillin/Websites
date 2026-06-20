@@ -141,41 +141,77 @@ export default async function CommandCenterPage() {
         </Link>
       </div>
 
-      {/* GOAL — progress to £1,000/mo recurring. */}
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Goal · £1,000/mo recurring</h2>
-            <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
-              {gbp(recurringPence)}<span className="text-base font-normal text-slate-400">/mo</span>
-              <span className="ml-2 text-sm font-medium text-slate-500">{goalPct}%</span>
+      {/* GOAL — progress to £1,000/mo recurring. Honest: £0 actual reads as £0. */}
+      {recurringPence === 0 && wonValuePence === 0 ? (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Revenue · £0 so far</h2>
+          <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+            No clients won yet — you&apos;re at the start.
+          </p>
+          <p className="mt-2 text-sm text-slate-500">
+            Nothing here is earned until a deal closes. The path to your first £1,000/mo:
+          </p>
+          <ol className="mt-4 grid gap-2 sm:grid-cols-5">
+            {[
+              { n: 1, label: "Find businesses", done: prospects.length > 0 },
+              { n: 2, label: "Build demos", done: demos > 0 },
+              { n: 3, label: "Send outreach", done: outreachSent > 0 },
+              { n: 4, label: "Send proposals", done: proposalsSent > 0 },
+              { n: 5, label: "Close a deal", done: false },
+            ].map((s) => (
+              <li
+                key={s.n}
+                className={`rounded-xl border p-3 text-sm ${
+                  s.done ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-slate-200 text-slate-500"
+                }`}
+              >
+                <span className="font-semibold">{s.done ? "✓" : s.n}</span> {s.label}
+              </li>
+            ))}
+          </ol>
+          <Link
+            href="/admin/prospects"
+            className="mt-4 inline-block rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
+          >
+            {prospects.length === 0 ? "Find your first businesses →" : "Work your pipeline →"}
+          </Link>
+        </section>
+      ) : (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Goal · £1,000/mo recurring</h2>
+              <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
+                {gbp(recurringPence)}<span className="text-base font-normal text-slate-400">/mo</span>
+                <span className="ml-2 text-sm font-medium text-slate-500">{goalPct}%</span>
+              </p>
+            </div>
+            <p className="text-sm text-slate-500">
+              {clientsToGoal === 0
+                ? "🎯 Target hit — push for the next £1k."
+                : `${clientsToGoal} more client${clientsToGoal === 1 ? "" : "s"} at £39/mo to hit £1,000.`}
             </p>
           </div>
-          <p className="text-sm text-slate-500">
-            {clientsToGoal === 0
-              ? "🎯 Target hit — push for the next £1k."
-              : `${clientsToGoal} more client${clientsToGoal === 1 ? "" : "s"} at £39/mo to hit £1,000.`}
+          <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className={`h-full rounded-full ${goalPct >= 100 ? "bg-emerald-500" : "bg-slate-900"}`}
+              style={{ width: `${Math.max(2, goalPct)}%` }}
+            />
+          </div>
+          <p className="mt-2 text-xs text-slate-400">
+            Projected at £39/mo per won client ({wonProspects.length} won) — not yet billed here. Plus {gbp(wonValuePence)} in one-off build fees booked.
           </p>
-        </div>
-        <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
-          <div
-            className={`h-full rounded-full ${goalPct >= 100 ? "bg-emerald-500" : "bg-slate-900"}`}
-            style={{ width: `${Math.max(2, goalPct)}%` }}
-          />
-        </div>
-        <p className="mt-2 text-xs text-slate-400">
-          Modelled at £39/mo per won client ({wonProspects.length} won). Plus {gbp(wonValuePence)} in one-off build fees booked.
-        </p>
-      </section>
+        </section>
+      )}
 
       {/* REVENUE — the headline metric. */}
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Revenue</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Open pipeline" value={gbp(openPipelinePence)} hint={`${open.length} live deals`} accent="indigo" />
-          <Stat label="Won (signed)" value={gbp(wonValuePence)} hint={`${accepted.length} deal${accepted.length === 1 ? "" : "s"} closed`} accent="emerald" />
+          <Stat label="Earned (signed)" value={gbp(wonValuePence)} hint={`${accepted.length} deal${accepted.length === 1 ? "" : "s"} closed`} accent="emerald" />
+          <Stat label="Open pipeline (potential)" value={gbp(openPipelinePence)} hint={`${open.length} live deals — not earned`} accent="indigo" />
           <Stat label="Avg deal size" value={accepted.length ? gbp(avgDealPence) : "—"} hint="accepted proposals" />
-          <Stat label="Client revenue uplift" value={clientUpliftPence ? `${gbp(clientUpliftPence)}/mo` : "—"} hint="modelled across won clients" accent="amber" />
+          <Stat label="Est. client uplift" value={clientUpliftPence ? `${gbp(clientUpliftPence)}/mo` : "—"} hint="projected for won clients" accent="amber" />
         </div>
       </section>
 
