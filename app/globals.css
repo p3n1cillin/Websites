@@ -1,0 +1,139 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Neutral brand fallback (overridden per-business on the [business] layout).
+     Values are space-separated RGB channels for Tailwind alpha support. */
+  --brand: 29 78 216;
+  --brand-fg: 255 255 255;
+  --brand-dark: 23 37 84;
+  --brand-light: 219 234 254;
+  --accent: 14 165 233;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-white text-gray-900 antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Respect users who prefer reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Avoid the mobile sticky call bar overlapping page-bottom content. */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4.5rem;
+  }
+}
+
+/* Subtle, on-brand focus ring for keyboard users. */
+:focus-visible {
+  outline: 2px solid rgb(var(--brand));
+  outline-offset: 2px;
+}
+
+/* Admin shell typographic polish — confident, tightly-tracked headings across
+   every dashboard page (taste rule 4.1), applied once rather than per page. */
+.admin-shell h1 {
+  letter-spacing: -0.022em;
+}
+.admin-shell h2 {
+  letter-spacing: -0.012em;
+}
+.admin-shell {
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===========================================================================
+   Admin dark theme. Scoped to `.admin-root.dark` (the toggle adds `.dark` to the
+   admin wrapper), so it never touches the public tenant sites — they theme
+   themselves via DesignDNA. One coherent dark palette across every page (taste:
+   "all sections dark, no light sandwich"); the locked accent shifts slate→blue so
+   primary buttons + active nav stay legible on dark. Centralised here so all 14
+   pages are themed at once rather than per-component.
+   ========================================================================= */
+.admin-root.dark {
+  background-color: #0b1222;
+  color: #e2e8f0;
+}
+/* Surfaces */
+.admin-root.dark .bg-white {
+  background-color: #0f172a;
+}
+.admin-root.dark .bg-slate-50,
+.admin-root.dark .bg-slate-50\/40,
+.admin-root.dark .bg-slate-50\/60,
+.admin-root.dark .bg-white\/85,
+.admin-root.dark .bg-white\/90 {
+  background-color: #0b1222;
+}
+.admin-root.dark .bg-slate-100 {
+  background-color: #1e293b;
+}
+/* Tinted status panels → one subtle dark tint (their coloured text stays). */
+.admin-root.dark .bg-indigo-50,
+.admin-root.dark .bg-indigo-50\/40,
+.admin-root.dark .bg-indigo-50\/60,
+.admin-root.dark .bg-emerald-50,
+.admin-root.dark .bg-amber-50,
+.admin-root.dark .bg-violet-50,
+.admin-root.dark .bg-sky-50,
+.admin-root.dark .bg-red-50 {
+  background-color: #16203a;
+}
+/* Text ramp */
+.admin-root.dark .text-slate-900 {
+  color: #f1f5f9;
+}
+.admin-root.dark .text-slate-800,
+.admin-root.dark .text-slate-700 {
+  color: #e2e8f0;
+}
+.admin-root.dark .text-slate-600 {
+  color: #cbd5e1;
+}
+.admin-root.dark .text-slate-500 {
+  color: #94a3b8;
+}
+.admin-root.dark .text-slate-400 {
+  color: #64748b;
+}
+/* Borders */
+.admin-root.dark .border-slate-200,
+.admin-root.dark .border-slate-100 {
+  border-color: #1e293b;
+}
+.admin-root.dark .border-slate-300 {
+  border-color: #334155;
+}
+/* Primary / active → accent (slate-900 + white text is illegible on dark). */
+.admin-root.dark .bg-slate-900 {
+  background-color: #2563eb;
+}
+.admin-root.dark .hover\:bg-slate-700:hover {
+  background-color: #1d4ed8;
+}
+.admin-root.dark .hover\:bg-slate-100:hover {
+  background-color: #1e293b;
+}
+/* Inputs read on dark surfaces. */
+.admin-root.dark input,
+.admin-root.dark textarea,
+.admin-root.dark select {
+  background-color: #0b1222;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+.admin-root.dark input::placeholder,
+.admin-root.dark textarea::placeholder {
+  color: #64748b;
+}

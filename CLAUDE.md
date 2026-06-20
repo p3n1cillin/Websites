@@ -1,0 +1,48 @@
+# Project guide
+
+Multi-tenant Next.js 14 (App Router) + TypeScript + Tailwind SaaS that generates local-business websites, with an "Agency OS" of 10 collaborating AI agents on top (discover → analyse → build → demo → sell → onboard → grow).
+
+## Commands
+- `npm run dev` — dev server (http://localhost:3000)
+- `npm run build` — production build
+- `npm run typecheck` — `tsc --noEmit`
+
+## Key conventions
+- **Zero runtime deps for integrations.** Supabase via PostgREST over `fetch` (lib/supabase/client.ts); Anthropic via a zero-dep REST client (lib/ai/client.ts); Stripe over REST. Don't add SDKs.
+- **The `Business` object is the single source of truth** — every generated site renders from one `Business` (lib/types.ts). Agents emit data, never per-site code.
+- **Every agent runs through `runAgent`** (lib/agents/runner.ts): audit (`agent_runs`) + cost ledger + autonomy gating (off/suggest/approve/auto) + spend caps. Side-effecting agents persist only on `ctx.autonomy === "auto"`; interactive UI actions pass `autonomyOverride: "auto"`.
+- **Graceful degradation.** Without Supabase the app runs on bundled demo data (lib/data); public routes must 404 (notFound), never 500, when a service-tier read can't run. Without `ANTHROPIC_API_KEY` the AI client runs in STUB mode (zero cost, clearly-flagged placeholder) — see `aiConfigured`.
+- **Security.** `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `STRIPE_*`, `CRON_SECRET`, `AI_*_CAP_PENCE` are server-only — never `NEXT_PUBLIC_`-prefixed. Service-role writes bypass RLS, so every mutation confirms org ownership at the app layer. Public preview/portal tokens are opaque, capability-based, server-read only.
+- **Universal industry.** Not limited to fixed trades: `normalizeCategory` defaults to `"other"` (never a wrong trade); raw industry is kept in `Business.industryLabel`; the Prospecting agent's AI Industry Profiler generates tailored content for any business type.
+
+## Layout
+- `app/` — routes. `app/[business]` = public SSG tenant sites; `app/admin/(app)` = the agency dashboard; `app/preview/[token]` + `app/portal/[token]` = public tokenised sales/customer surfaces.
+- `lib/` — data layers + the agent substrate (`lib/agents`, `lib/ai`, `lib/design`).
+- `supabase/migrations/` — schema, applied in order `0001`–`0008`.
+
+## Working efficiently (token economy — follow every session)
+This file is the only thing auto-loaded each session. Use it + the map below to locate code instead of re-exploring.
+- **Locate, don't sweep.** Grep for a symbol, then `Read` with `offset`/`limit`. Never read a whole file you only need a slice of, and never re-read a file you just edited (Edit/Write already confirm success).
+- **Batch** independent tool calls in one message; don't serialise what can run in parallel.
+- **Edit, don't rewrite**; keep `old_string` minimal-but-unique.
+- **Verify once per change-set:** a single `npm run typecheck` then `npm run build` at the end — not after each edit. Comment/doc-only edits need neither.
+- **Reuse established facts (below)** instead of re-deriving them; keep replies tight; link files, don't paste their contents back.
+- When you add a notable file, add a one-line entry to the map.
+
+### Established facts (verified — don't re-derive)
+- Node/npm are NOT on PATH. Prefix: `$env:Path = "C:\Users\lukem\nodejs;$env:Path"`, then `npm run typecheck` / `npm run build`.
+- PowerShell tool quirks: `$pid` is reserved (use other names); keep `Remove-Item` in its own call; avoid `\n` or slash-paths like `/preview` inside command text (guard false-positives).
+- `.env.local` has live Supabase + Anthropic keys + spend caps. New migrations must be applied in the Supabase SQL editor (latest: `0008_knowledge.sql`).
+- Public token routes (`/preview/[token]`, `/portal/[token]`) must 404 (notFound), never 500, when a service-tier read fails.
+- Every agent call goes through `runAgent` (autonomy + spend caps enforce safety). AI optional via `aiConfigured` (STUB when no key).
+
+## File map (jump here before searching)
+- **Agents** `lib/agents/`: `runner.ts` (audited/cost/autonomy envelope), `registry.ts` (kind→def), `types.ts` (AgentKind/Autonomy/AgentDefinition). 1 `discovery.ts`, 2 `market.ts` (+website audit), 3 `design.ts`, 4 `qa.ts`, 5 `seo-growth.ts`, 6 `conversion.ts` (A/B + learning loop B), 7 `prospecting.ts` (AI Industry Profiler + learning loop A), 8 `sales.ts`, 9 `onboarding.ts`, 10 `success.ts`.
+- **Domain/data** `lib/`: `types.ts` (Business + all domain types), `businesses.ts`, `prospects.ts` (scoring, `normalizeCategory`→"other", `matchKnownCategory`), `previews.ts` (`site_previews` + `draftBusinessFromProspect` + `CATEGORY_DRAFT`), `outreach.ts` (`createOutreachSequence` — intent/step follow-up sequences), `proposals.ts` (`buildProposalDraft` + proposals data layer + `getProposalByToken`), `customers.ts` (portals), `change-requests.ts`, `reports.ts` (`buildCustomerReport`), `experiments.ts` (A/B + `analyseExperiment`), `workflows.ts` + `workflow-engine.ts`, `knowledge.ts` (learning store), `audit.ts` (website audit), `comparison.ts` (before/after), `discovery-sources/` (overpass + registry), `leads.ts`, `blog.ts` (`runSeoGeneration`), `seo.ts` (`SITE_URL`), `branding.ts` (`getPalette`, `CATEGORY_HUES`), `utils.ts` (`heroImageFor`, `CATEGORY_HERO`).
+- **AI** `lib/ai/`: `client.ts` (`completeJson`, `aiConfigured`), `models.ts` (fast/smart/max tiers), `cost.ts`, `cache.ts` (`getAiCache`/`setAiCache`/`aiCacheKey` — content-addressed AI-result reuse, best-effort, wired into the Prospecting profiler). Settings/audit: `lib/agent-settings.ts`, `lib/agent-runs.ts`, `lib/approvals.ts`.
+- **Data integrity ("never fake")**: drafts never invent facts — `draftBusinessFromProspect` leaves unverified phone/email/rating/testimonials empty + sets `Business.verification` provenance. Render guards via `lib/utils` predicates (`hasPhone/hasEmail/hasRating/hasReviews/hasAddress`); QA `scoreIntegrity` HARD-fails fabrication. `lib/lead-intel.ts` (`buildLeadIntelReport`) = prospect pitch from audit+scores; `lib/preview-analytics.ts` = tokenised-demo events + optional password (best-effort).
+- **Design** `lib/design/`: `dna.ts` (`generateDesignDNA`), `personalities.ts` (`CATEGORY_PERSONALITY`), `variants.ts`, `qa.ts` (`scoreSite` — runs the taste linter), `tokens.ts`, `taste.ts` (anti-slop copy rules `TASTE_COPY_RULES` + `tasteFindings` linter, distilled from the `design-taste-frontend` skill; wired into prospecting/design agents + QA), `types.ts`.
+- **Render** `components/site/`: `HomeSections.tsx` (the stack), `registry.ts` (hero/services/trust/testimonials/cta variants), `primitives.tsx`, `ThemeProvider.tsx`, `ExperimentText.tsx` (SSG-safe A/B), `sections/{Highlights,Faqs,Menu}.tsx`.
+- **Admin** `app/admin/(app)/`: `layout.tsx` (sidebar shell) + `AdminNav.tsx` (grouped sidebar/mobile nav, active-state); prospects, factory, customers, growth, workflows, agents, knowledge, businesses, leads, blog, billing (each = `page.tsx` + `actions.ts` [+ a client component]).
+- **Public/API** `app/`: `[business]` (SSG), `preview/[token]` (+ `PreviewAnalytics` beacon + `PreviewGate` password), `portal/[token]`, `proposal/[token]`, `api/{enquiry,experiments/active,experiments/track,preview/track,jobs/tick,cron/seo,stripe/webhook,revalidate}`.
+- **Migrations**: 0001 init · 0002 agency_os · 0003 prospects · 0004 sales · 0005 onboarding · 0006 experiments · 0007 workflows · 0008 knowledge · 0009 proposals · 0010 preview analytics (`preview_events` + `site_previews.password`) · 0011 ai cache (`ai_cache`). **0010 + 0011 must be applied in the Supabase SQL editor; code degrades gracefully (analytics/password/cache simply inert) until then.**

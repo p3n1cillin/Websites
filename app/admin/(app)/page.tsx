@@ -1,0 +1,202 @@
+import Link from "next/link";
+import { requireOrg } from "@/lib/auth";
+import { getProspectsForOrg } from "@/lib/prospects";
+import { getProposalsForOrg } from "@/lib/proposals";
+import { getLeadsForOrg } from "@/lib/leads";
+import { getPreviewsForOrg } from "@/lib/previews";
+import { getPreviewStatsForOrg } from "@/lib/preview-analytics";
+import { getOutreachForOrg } from "@/lib/outreach";
+import { getCostToday, getCostThisMonth } from "@/lib/ai/cost";
+import { getRecentAgentRuns } from "@/lib/agent-runs";
+import { buildLeadIntelReport } from "@/lib/lead-intel";
+import { PROSPECT_STATUSES, type ProspectStatus } from "@/lib/types";
+
+/**
+ * Agency Command Center — the single screen optimised around one metric: revenue.
+ * Three lenses over the whole funnel, assembled from the existing data layers:
+ *   • Lead Pipeline  — discovery → demo → outreach → proposal → won
+ *   • Revenue        — open pipeline, won value, avg deal, client revenue uplift
+ *   • AI Performance  — spend, cost-per-lead/demo, agent success rate, demo engagement
+ * Everything degrades gracefully (zeros) without Supabase / before migrations.
+ */
+export const dynamic = "force-dynamic";
+
+const gbp = (pence: number) =>
+  `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
+
+const STAGE_LABEL: Record<ProspectStatus, string> = {
+  discovered: "Discovered",
+  analysed: "Analysed",
+  previewed: "Demoed",
+  contacted: "Contacted",
+  responded: "Responded",
+  negotiating: "Negotiating",
+  won: "Won",
+  lost: "Lost",
+};
+
+function Stat({
+  label,
+  value,
+  hint,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  hint?: string;
+  accent?: "emerald" | "indigo" | "amber" | "slate";
+}) {
+  const ring =
+    accent === "emerald"
+      ? "text-emerald-600"
+      : accent === "indigo"
+        ? "text-indigo-600"
+        : accent === "amber"
+          ? "text-amber-600"
+          : "text-slate-900";
+  return (
+    <div className="rounded-2xl border border-slate-200 bg-white p-5">
+      <div className={`text-2xl font-semibold tracking-tight ${ring}`}>{value}</div>
+      <div className="mt-1 text-sm font-medium text-slate-700">{label}</div>
+      {hint && <div className="text-xs text-slate-400">{hint}</div>}
+    </div>
+  );
+}
+
+export default async function CommandCenterPage() {
+  const org = await requireOrg();
+
+  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs] =
+    await Promise.all([
+      getProspectsForOrg(org.id),
+      getProposalsForOrg(org.id),
+      getLeadsForOrg(org.id),
+      getPreviewsForOrg(org.id),
+      getPreviewStatsForOrg(org.id),
+      getOutreachForOrg(org.id),
+      getCostToday(org.id),
+      getCostThisMonth(org.id),
+      getRecentAgentRuns(org.id, 200),
+    ]);
+
+  // ---- Pipeline ---------------------------------------------------------------
+  const byStage: Record<ProspectStatus, number> = {
+    discovered: 0, analysed: 0, previewed: 0, contacted: 0,
+    responded: 0, negotiating: 0, won: 0, lost: 0,
+  };
+  for (const p of prospects) byStage[p.status] += 1;
+  const open = prospects.filter((p) => p.status !== "won" && p.status !== "lost");
+  const wonProspects = prospects.filter((p) => p.status === "won");
+  const demos = previews.filter((pv) => pv.status === "active").length;
+  const outreachSent = outreach.filter((m) => m.status === "sent").length;
+  const proposalsSent = proposals.filter((pr) => pr.status === "sent" || pr.status === "accepted").length;
+  const accepted = proposals.filter((pr) => pr.status === "accepted");
+
+  // ---- Revenue ----------------------------------------------------------------
+  const openPipelinePence = open.reduce((s, p) => s + p.valueEstimate, 0);
+  const wonValuePence = accepted.reduce((s, pr) => s + pr.pricePence, 0);
+  const avgDealPence = accepted.length ? Math.round(wonValuePence / accepted.length) : 0;
+  // "Revenue generated for clients": modelled monthly uplift across won customers
+  // (their lead-intel missed-revenue estimate — clearly an estimate, see Phase 2).
+  const clientUpliftPence = wonProspects.reduce(
+    (s, p) => s + buildLeadIntelReport(p).roi.estMissedValuePence,
+    0
+  );
+
+  // ---- AI performance ---------------------------------------------------------
+  const finished = runs.filter((r) => r.status === "completed" || r.status === "failed");
+  const successRate = finished.length
+    ? Math.round((runs.filter((r) => r.status === "completed").length / finished.length) * 100)
+    : null;
+  const costPerProspect = prospects.length ? Math.round(costMonth / prospects.length) : 0;
+  const costPerDemo = previews.length ? Math.round(costMonth / previews.length) : 0;
+  const demoOpens = Object.values(previewStats).reduce((s, st) => s + st.views, 0);
+  const demoActions = Object.values(previewStats).reduce((s, st) => s + st.conversions, 0);
+
+  const maxStage = Math.max(1, ...PROSPECT_STATUSES.map((s) => byStage[s]));
+
+  return (
+    <div className="space-y-8">
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold text-slate-900">Command Center</h1>
+          <p className="mt-1 text-sm text-slate-500">
+            {org.name} — the whole funnel, optimised around revenue.
+          </p>
+        </div>
+        <Link
+          href="/admin/prospects"
+          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700 active:translate-y-px"
+        >
+          Find businesses →
+        </Link>
+      </div>
+
+      {/* REVENUE — the headline metric. */}
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Revenue</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat label="Open pipeline" value={gbp(openPipelinePence)} hint={`${open.length} live deals`} accent="indigo" />
+          <Stat label="Won (signed)" value={gbp(wonValuePence)} hint={`${accepted.length} deal${accepted.length === 1 ? "" : "s"} closed`} accent="emerald" />
+          <Stat label="Avg deal size" value={accepted.length ? gbp(avgDealPence) : "—"} hint="accepted proposals" />
+          <Stat label="Client revenue uplift" value={clientUpliftPence ? `${gbp(clientUpliftPence)}/mo` : "—"} hint="modelled across won clients" accent="amber" />
+        </div>
+      </section>
+
+      {/* LEAD PIPELINE — the funnel. */}
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Lead pipeline</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <Stat label="Prospects" value={prospects.length} hint={`${byStage.discovered} new`} />
+          <Stat label="Demos built" value={demos} hint="active preview links" accent="indigo" />
+          <Stat label="Outreach sent" value={outreachSent} hint={`${outreach.length} drafted`} />
+          <Stat label="Proposals" value={proposalsSent} hint="sent or accepted" />
+          <Stat label="Deals won" value={byStage.won} hint={`${byStage.lost} lost`} accent="emerald" />
+        </div>
+
+        {/* Compact stage funnel. */}
+        <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="space-y-2">
+            {PROSPECT_STATUSES.filter((s) => s !== "lost").map((s) => (
+              <div key={s} className="flex items-center gap-3">
+                <span className="w-24 shrink-0 text-xs font-medium text-slate-500">{STAGE_LABEL[s]}</span>
+                <div className="h-5 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-slate-900"
+                    style={{ width: `${(byStage[s] / maxStage) * 100}%` }}
+                  />
+                </div>
+                <span className="w-8 shrink-0 text-right text-xs font-semibold text-slate-700">{byStage[s]}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* AI PERFORMANCE — unit economics. */}
+      <section>
+        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">AI performance</h2>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <Stat label="AI spend (30d)" value={gbp(costMonth)} hint={`${gbp(costToday)} today`} />
+          <Stat label="Cost / prospect" value={prospects.length ? gbp(costPerProspect) : "—"} hint="30d spend ÷ prospects" />
+          <Stat label="Cost / demo" value={previews.length ? gbp(costPerDemo) : "—"} hint="30d spend ÷ demos" />
+          <Stat label="Agent success" value={successRate === null ? "—" : `${successRate}%`} hint={`${finished.length} runs`} accent="emerald" />
+        </div>
+        <p className="mt-3 text-xs text-slate-400">
+          Demo engagement: {demoOpens} open{demoOpens === 1 ? "" : "s"}
+          {demoActions > 0 ? ` · ${demoActions} conversion action${demoActions === 1 ? "" : "s"}` : ""}
+          {leads.length > 0 ? ` · ${leads.length} site lead${leads.length === 1 ? "" : "s"} captured` : ""}.
+          {" "}AI cost-per-lead and demo analytics fill in once migrations 0010/0011 are applied.
+        </p>
+      </section>
+
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 text-sm text-slate-600">
+        On the <span className="font-medium capitalize">{org.plan}</span> plan.
+        {org.plan === "trial" && org.trialEndsAt
+          ? ` Trial ends ${new Date(org.trialEndsAt).toLocaleDateString("en-GB")}.`
+          : ""}{" "}
+        <Link href="/admin/billing" className="font-medium text-slate-900 hover:underline">Manage billing →</Link>
+      </div>
+    </div>
+  );
+}
