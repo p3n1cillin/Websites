@@ -12,7 +12,23 @@ import { buildLeadIntelReport } from "@/lib/lead-intel";
 import { getRetainersForOrg, activeMrrPence, DEFAULT_RETAINER_PENCE } from "@/lib/retainers";
 import { getPortalsForOrg } from "@/lib/customers";
 import { buildCrmStates, needsAttention } from "@/lib/crm";
+import { getBusinessesForOrg } from "@/lib/businesses";
+import { buildBusinessGraph } from "@/lib/discovery-graph";
 import { PROSPECT_STATUSES, type OutreachMessage, type Proposal, type ProspectStatus, type SitePreview } from "@/lib/types";
+import Nexus, { type NexusData, type NexusAgent } from "./Nexus";
+
+const AGENT_LABELS: Record<string, string> = {
+  discovery: "Discovery",
+  market: "Intelligence",
+  design: "Design",
+  qa: "QA",
+  "seo-growth": "SEO",
+  conversion: "Conversion",
+  prospecting: "Architect",
+  sales: "Sales",
+  onboarding: "Onboarding",
+  success: "Success",
+};
 
 /**
  * Agency Command Center — the single screen optimised around one metric: revenue.
@@ -69,7 +85,7 @@ function Stat({
 export default async function CommandCenterPage() {
   const org = await requireOrg();
 
-  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers, portals] =
+  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers, portals, businesses] =
     await Promise.all([
       getProspectsForOrg(org.id),
       getProposalsForOrg(org.id),
@@ -82,6 +98,7 @@ export default async function CommandCenterPage() {
       getRecentAgentRuns(org.id, 200),
       getRetainersForOrg(org.id),
       getPortalsForOrg(org.id),
+      getBusinessesForOrg(org.id),
     ]);
 
   // ---- Pipeline ---------------------------------------------------------------
@@ -156,25 +173,99 @@ export default async function CommandCenterPage() {
     onboardedProspectIds,
   });
   const prospectById = new Map(prospects.map((p) => [p.id, p]));
-  const attention = needsAttention(Object.values(crmStates)).slice(0, 6);
+  const allAttention = needsAttention(Object.values(crmStates));
+  const attention = allAttention.slice(0, 6);
   const URGENCY_DOT = { high: "bg-red-500", medium: "bg-amber-500", low: "bg-slate-300" } as const;
 
+  // ---- NEXUS: the agency as a living station, every node a real entity ----------
+  const now = Date.now();
+  const within = (iso: string, ms: number) => now - new Date(iso).getTime() <= ms;
+  const DAY = 86_400_000;
+  const discoveryLast7d = prospects.filter((p) => within(p.createdAt, 7 * DAY)).length;
+  const throughput24h = runs.filter((r) => within(r.createdAt, DAY)).length;
+
+  const publishedBusinesses = businesses.filter((b) => b.status === "published");
+  const draftBusinesses = businesses.filter((b) => b.status !== "published");
+  const customDomainCount = businesses.filter((b) => b.customDomain).length;
+  const auditedCount = prospects.filter((p) => p.analysis?.audit).length;
+  const analysedCount = prospects.filter((p) => p.analysis).length;
+  const activePortals = portals.filter((p) => p.status === "active").length;
+
+  const graph = buildBusinessGraph(prospects);
+  const nexusClusters = graph.clusters.slice(0, 4).map((c) => ({
+    label: `${c.category} · ${c.city}`,
+    size: c.size,
+    dominationScore: c.dominationScore,
+  }));
+
+  // Agent units — state from real recent runs (active if it ran in the last 24h).
+  const agents: NexusAgent[] = Object.keys(AGENT_LABELS).map((kind) => {
+    const mine = runs.filter((r) => r.kind === kind);
+    const runs24h = mine.filter((r) => within(r.createdAt, DAY)).length;
+    const latest = mine[0]; // getRecentAgentRuns is newest-first
+    const state: NexusAgent["state"] =
+      runs24h > 0 ? "active" : latest?.status === "failed" ? "failed" : "idle";
+    return { kind, label: AGENT_LABELS[kind], state, runs24h };
+  });
+
+  const proposalValuePence = proposals
+    .filter((pr) => pr.status === "sent")
+    .reduce((s, pr) => s + pr.pricePence, 0);
+  const ltvPence = recurringPence * 24 + wonValuePence; // modelled 24-month client value
+
+  // Composite health (0–100) from real signals; light penalty for neglected leads.
+  const cGoal = goalPct;
+  const cSuccess = successRate ?? 60;
+  const cActivity = Math.min(100, throughput24h * 8 + discoveryLast7d * 4);
+  const cPipeline = Math.min(100, open.length * 5);
+  const cDemos = Math.min(100, demos * 12);
+  const health = Math.max(
+    0,
+    Math.min(
+      100,
+      Math.round(
+        cGoal * 0.3 + cSuccess * 0.25 + cActivity * 0.2 + cPipeline * 0.15 + cDemos * 0.1
+      ) - Math.min(15, allAttention.length * 3)
+    )
+  );
+
+  const nexusData: NexusData = {
+    health,
+    mrrPence: recurringPence,
+    targetPence: TARGET_PENCE,
+    pipelinePence: openPipelinePence,
+    proposalValuePence,
+    wonValuePence,
+    ltvPence,
+    throughput24h,
+    discoveryVelocity7d: discoveryLast7d,
+    successRate,
+    discovery: { total: prospects.length, last7d: discoveryLast7d, clusters: nexusClusters },
+    intelligence: { analysed: analysedCount, audited: auditedCount },
+    factory: { building: draftBusinesses.length, demos, live: publishedBusinesses.length },
+    sales: { outreachSent, proposalsSent, responded: byStage.responded, won: byStage.won },
+    deployment: { published: publishedBusinesses.length, customDomains: customDomainCount },
+    success: {
+      clients: activePortals,
+      thriving: Math.max(0, activePortals - allAttention.filter((a) => a.stage === "won").length),
+      attention: allAttention.length,
+    },
+  };
+
   return (
-    <div className="space-y-8">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Command Center</h1>
-          <p className="mt-1 text-sm text-slate-500">
-            {org.name} — the whole funnel, optimised around revenue.
-          </p>
-        </div>
-        <Link
-          href="/admin/prospects"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700 active:translate-y-px"
-        >
-          Find businesses →
-        </Link>
-      </div>
+    <div className="space-y-6">
+      {/* THE NEXUS — the agency as a living operations station (primary view). */}
+      <Nexus data={nexusData} agents={agents} orgName={org.name} />
+
+      {/* Classic readouts remain available as a secondary, detailed view. */}
+      <details className="group">
+        <summary className="flex cursor-pointer select-none items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50">
+          <span className="font-mono text-xs uppercase tracking-widest text-slate-400 group-open:hidden">▸</span>
+          <span className="hidden font-mono text-xs uppercase tracking-widest text-slate-400 group-open:inline">▾</span>
+          Operational readouts (classic metrics)
+        </summary>
+
+        <div className="mt-6 space-y-8">
 
       {/* GOAL — progress to £1,000/mo recurring. Honest: £0 actual reads as £0. */}
       {recurringPence === 0 && wonValuePence === 0 ? (
@@ -347,6 +438,8 @@ export default async function CommandCenterPage() {
           : ""}{" "}
         <Link href="/admin/billing" className="font-medium text-slate-900 hover:underline">Manage billing →</Link>
       </div>
+        </div>
+      </details>
     </div>
   );
 }
