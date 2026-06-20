@@ -57,7 +57,7 @@ export async function payProposalAction(
       proposalId: proposal.id,
       orgId: proposal.orgId,
       customerEmail: prospect?.email ?? null,
-      successUrl: `${SITE_URL}/proposal/${token}?paid=1`,
+      successUrl: `${SITE_URL}/proposal/${token}/paid?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${SITE_URL}/proposal/${token}`,
     });
     await setProposalSession(proposal.id, session.id);

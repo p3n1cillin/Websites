@@ -150,6 +150,11 @@ export async function getSubscription(id: string): Promise<StripeSubscription> {
   return stripeRequest<StripeSubscription>(`/subscriptions/${id}`, undefined, "GET");
 }
 
+/** Retrieve a Checkout session — used to confirm payment on the success redirect. */
+export async function getCheckoutSession(id: string): Promise<StripeCheckoutSession> {
+  return stripeRequest<StripeCheckoutSession>(`/checkout/sessions/${id}`, undefined, "GET");
+}
+
 // ---------------------------------------------------------------------------
 // Webhook signature verification.
 // ---------------------------------------------------------------------------
@@ -208,4 +213,11 @@ export interface StripeSubscription {
   customer: string;
   status: string;
   items: { data: Array<{ price: { id: string } }> };
+}
+
+export interface StripeCheckoutSession {
+  id: string;
+  payment_status: string;
+  amount_total: number | null;
+  metadata: Record<string, string> | null;
 }
