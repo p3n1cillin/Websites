@@ -153,3 +153,44 @@ export async function updateProposalStatus(id: string, status: ProposalStatus): 
   await sbUpdate("proposals", `id=eq.${encodeURIComponent(id)}`, { status });
   revalidatePath("/admin/prospects");
 }
+
+/** Record the Stripe session opened for a proposal (best-effort; needs 0014). */
+export async function setProposalSession(id: string, sessionId: string): Promise<void> {
+  try {
+    await sbUpdate("proposals", `id=eq.${encodeURIComponent(id)}`, { stripe_session_id: sessionId });
+  } catch {
+    /* column may not exist until migration 0014 — non-fatal */
+  }
+}
+
+/**
+ * Mark a proposal PAID (real cash collected via Stripe) — also flips it to accepted.
+ * Best-effort on the paid_* columns so it still closes the deal before 0014.
+ */
+export async function markProposalPaid(id: string, paidPence: number): Promise<void> {
+  try {
+    await sbUpdate("proposals", `id=eq.${encodeURIComponent(id)}`, {
+      status: "accepted",
+      paid_pence: paidPence,
+      paid_at: new Date().toISOString(),
+    });
+  } catch {
+    // Fall back to just closing it if the paid_* columns aren't there yet.
+    await sbUpdate("proposals", `id=eq.${encodeURIComponent(id)}`, { status: "accepted" });
+  }
+  revalidatePath("/admin/prospects");
+  revalidatePath("/admin");
+}
+
+/** Total real cash collected across paid proposals, pence. Returns 0 on any failure. */
+export async function getCollectedTotalForOrg(orgId: string): Promise<number> {
+  try {
+    const rows = await sbSelect<{ paid_pence: number | null }>({
+      query: `proposals?select=paid_pence&org_id=eq.${encodeURIComponent(orgId)}&paid_at=not.is.null`,
+      tier: "service",
+    });
+    return rows.reduce((s, r) => s + (r.paid_pence ?? 0), 0);
+  } catch {
+    return 0;
+  }
+}

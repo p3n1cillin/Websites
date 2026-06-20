@@ -610,6 +610,9 @@ export interface Proposal {
   priceNote?: string | null;
   timeline?: string | null;
   status: ProposalStatus;
+  /** Real cash collected via Stripe, pence — distinct from a free "accept" click. */
+  paidPence?: number | null;
+  paidAt?: string | null;
   createdAt: string;
   updatedAt: string;
 }

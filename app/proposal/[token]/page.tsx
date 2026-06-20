@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getProposalByToken } from "@/lib/proposals";
+import { stripeConfigured } from "@/lib/stripe";
 import AcceptForm from "./AcceptForm";
 
 /**
@@ -20,11 +21,18 @@ function formatPrice(pence: number): string {
   }).format(pence / 100);
 }
 
-export default async function ProposalPage({ params }: { params: { token: string } }) {
+export default async function ProposalPage({
+  params,
+  searchParams,
+}: {
+  params: { token: string };
+  searchParams: { paid?: string };
+}) {
   const proposal = await getProposalByToken(params.token);
   if (!proposal) notFound();
 
   const accepted = proposal.status === "accepted";
+  const justPaid = searchParams?.paid === "1";
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-12">
@@ -34,9 +42,11 @@ export default async function ProposalPage({ params }: { params: { token: string
         <p className="mt-3 text-slate-600">{proposal.summary}</p>
       </header>
 
-      {accepted && (
+      {(accepted || justPaid) && (
         <p className="mt-6 rounded-lg bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
-          Thanks — you've accepted this proposal. We'll be in touch to get started right away.
+          {justPaid
+            ? "Payment received — thank you! Your build is now in our queue and we'll be in touch right away."
+            : "Thanks — you've accepted this proposal. We'll be in touch to get started right away."}
         </p>
       )}
 
@@ -71,7 +81,7 @@ export default async function ProposalPage({ params }: { params: { token: string
 
       {!accepted && (
         <section className="mt-8">
-          <AcceptForm token={proposal.token} />
+          <AcceptForm token={proposal.token} canPay={stripeConfigured} price={formatPrice(proposal.pricePence)} />
         </section>
       )}
     </main>

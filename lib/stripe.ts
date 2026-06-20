@@ -99,6 +99,43 @@ export async function createCheckoutSession(input: {
   });
 }
 
+/**
+ * One-off Checkout for a CLIENT paying an agency proposal's build fee. Uses inline
+ * `price_data` (mode=payment) so it needs NO pre-created Stripe price — just the
+ * secret key. Metadata lets the webhook tie the payment back to the proposal.
+ */
+export async function createProposalCheckout(input: {
+  amountPence: number;
+  productName: string;
+  proposalId: string;
+  orgId: string;
+  customerEmail?: string | null;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<{ id: string; url: string }> {
+  return stripeRequest("/checkout/sessions", {
+    mode: "payment",
+    customer_email: input.customerEmail || undefined,
+    client_reference_id: input.orgId,
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "gbp",
+          unit_amount: input.amountPence,
+          product_data: { name: input.productName },
+        },
+      },
+    ],
+    payment_intent_data: {
+      metadata: { kind: "proposal", proposalId: input.proposalId, orgId: input.orgId },
+    },
+    metadata: { kind: "proposal", proposalId: input.proposalId, orgId: input.orgId },
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+  });
+}
+
 export async function createPortalSession(
   customerId: string,
   returnUrl: string

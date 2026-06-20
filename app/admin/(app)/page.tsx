@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireOrg } from "@/lib/auth";
 import { getProspectsForOrg } from "@/lib/prospects";
-import { getProposalsForOrg } from "@/lib/proposals";
+import { getProposalsForOrg, getCollectedTotalForOrg } from "@/lib/proposals";
 import { getLeadsForOrg } from "@/lib/leads";
 import { getPreviewsForOrg } from "@/lib/previews";
 import { getPreviewStatsForOrg } from "@/lib/preview-analytics";
@@ -87,7 +87,7 @@ function Stat({
 export default async function CommandCenterPage() {
   const org = await requireOrg();
 
-  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers, portals, businesses] =
+  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers, portals, businesses, collectedPence] =
     await Promise.all([
       getProspectsForOrg(org.id),
       getProposalsForOrg(org.id),
@@ -101,6 +101,7 @@ export default async function CommandCenterPage() {
       getRetainersForOrg(org.id),
       getPortalsForOrg(org.id),
       getBusinessesForOrg(org.id),
+      getCollectedTotalForOrg(org.id),
     ]);
 
   // ---- Pipeline ---------------------------------------------------------------
@@ -424,7 +425,8 @@ export default async function CommandCenterPage() {
       <section>
         <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">Revenue</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Stat label="Earned (signed)" value={gbp(wonValuePence)} hint={`${accepted.length} deal${accepted.length === 1 ? "" : "s"} closed`} accent="emerald" />
+          <Stat label="Collected (paid)" value={gbp(collectedPence)} hint={collectedPence > 0 ? "real cash via Stripe" : "no card payments yet"} accent="emerald" />
+          <Stat label="Signed (agreed)" value={gbp(wonValuePence)} hint={`${accepted.length} deal${accepted.length === 1 ? "" : "s"} accepted`} />
           <Stat label="Open pipeline (potential)" value={gbp(openPipelinePence)} hint={`${open.length} live deals — not earned`} accent="indigo" />
           <Stat label="Avg deal size" value={accepted.length ? gbp(avgDealPence) : "—"} hint="accepted proposals" />
           <Stat label="Est. client uplift" value={clientUpliftPence ? `${gbp(clientUpliftPence)}/mo` : "—"} hint="projected for won clients" accent="amber" />

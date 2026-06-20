@@ -1,8 +1,10 @@
 "use server";
 
-import { getProposalByToken, updateProposalStatus } from "@/lib/proposals";
+import { getProposalByToken, updateProposalStatus, setProposalSession } from "@/lib/proposals";
 import { getProspectRecord, updateProspectStatus } from "@/lib/prospects";
 import { ensureRetainerForWonDeal } from "@/lib/retainers";
+import { stripeConfigured, createProposalCheckout } from "@/lib/stripe";
+import { SITE_URL } from "@/lib/seo";
 
 /**
  * Public accept action for /proposal/[token]. Capability-by-token: the prospect
@@ -30,4 +32,37 @@ export async function acceptProposalAction(
     });
   }
   return { ok: true };
+}
+
+/**
+ * Start a real Stripe Checkout for the proposal's build fee — money in the bank, not
+ * just a click. Returns a URL the client component redirects to. The webhook closes
+ * the deal on payment. Returns an error when Stripe isn't configured.
+ */
+export async function payProposalAction(
+  token: string
+): Promise<{ ok: boolean; url?: string; error?: string }> {
+  if (!stripeConfigured) {
+    return { ok: false, error: "Card payment isn't enabled yet — use Accept instead." };
+  }
+  const proposal = await getProposalByToken(token);
+  if (!proposal) return { ok: false, error: "Proposal not found." };
+  if (proposal.status === "accepted") return { ok: false, error: "Already accepted." };
+
+  const prospect = await getProspectRecord(proposal.prospectId);
+  try {
+    const session = await createProposalCheckout({
+      amountPence: proposal.pricePence,
+      productName: proposal.title || "Website build",
+      proposalId: proposal.id,
+      orgId: proposal.orgId,
+      customerEmail: prospect?.email ?? null,
+      successUrl: `${SITE_URL}/proposal/${token}?paid=1`,
+      cancelUrl: `${SITE_URL}/proposal/${token}`,
+    });
+    await setProposalSession(proposal.id, session.id);
+    return { ok: true, url: session.url };
+  } catch {
+    return { ok: false, error: "Couldn't start checkout — please try again." };
+  }
 }

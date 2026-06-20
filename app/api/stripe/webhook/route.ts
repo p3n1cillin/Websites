@@ -5,6 +5,9 @@ import {
   updateOrgSubscription,
   recordInvoice,
 } from "@/lib/orgs";
+import { getProposalRecord, markProposalPaid } from "@/lib/proposals";
+import { getProspectRecord, updateProspectStatus } from "@/lib/prospects";
+import { ensureRetainerForWonDeal } from "@/lib/retainers";
 
 /**
  * Stripe webhook — the source of truth for subscription state.
@@ -27,6 +30,25 @@ export async function POST(req: Request): Promise<Response> {
     switch (event.type) {
       case "checkout.session.completed": {
         const s = event.data.object;
+
+        // Client paying an agency PROPOSAL (our revenue) — close the deal + bank it.
+        if (s.metadata?.kind === "proposal" && s.metadata?.proposalId && s.payment_status === "paid") {
+          const proposal = await getProposalRecord(s.metadata.proposalId);
+          if (proposal) {
+            await markProposalPaid(proposal.id, s.amount_total ?? proposal.pricePence);
+            const prospect = await getProspectRecord(proposal.prospectId);
+            if (prospect && prospect.status !== "won") {
+              await updateProspectStatus(prospect.id, "won");
+              await ensureRetainerForWonDeal({
+                orgId: prospect.orgId,
+                name: prospect.name,
+                prospectId: prospect.id,
+              });
+            }
+          }
+          break; // not an org-subscription event
+        }
+
         const orgId: string | undefined = s.client_reference_id ?? s.metadata?.orgId;
         const customerId: string | undefined = s.customer;
         const subscriptionId: string | undefined = s.subscription;
