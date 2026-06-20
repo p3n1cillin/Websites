@@ -12,6 +12,8 @@ import type {
 } from "./types";
 import type { DesignDNA } from "./design/types";
 import { sbSelect, sbInsert, sbUpdate, sbDelete } from "./supabase/client";
+import { verticalFromParts, type Vertical } from "./site-copy";
+import type { Highlight } from "./types";
 
 /**
  * Site-preview data layer + the Business-draft scaffolder (Agency OS sales side).
@@ -269,6 +271,69 @@ const CATEGORY_DRAFT: Record<BusinessCategory, CategoryTemplate> = {
   },
 };
 
+/**
+ * Vertical-flavoured "what we're known for" highlights — template marketing copy
+ * (a clearly-editable draft, never a factual claim), so the rich Highlights section
+ * renders on every demo instead of being blank. Keyed by the coarse vertical.
+ */
+const VERTICAL_HIGHLIGHTS: Record<Vertical, { heading: string; items: Highlight[] }> = {
+  hospitality: {
+    heading: "What we're known for",
+    items: [
+      { title: "Freshly Cooked Food", description: "Pub classics, light bites and seasonal specials, prepared to order." },
+      { title: "Cask Ales & Craft Beer", description: "A rotating line-up of real ales, lagers and craft beers on tap." },
+      { title: "Live Sport", description: "The big games shown across the bar — a proper match-day atmosphere." },
+      { title: "Function Room", description: "Space for celebrations, parties and gatherings, big or small." },
+      { title: "Dog & Family Friendly", description: "Well-behaved dogs and families always welcome." },
+      { title: "Beer Garden", description: "A relaxed outdoor space for sunny days and summer evenings." },
+    ],
+  },
+  trade: {
+    heading: "Why customers choose us",
+    items: [
+      { title: "Free, No-Obligation Quotes", description: "Know the price before any work starts — no surprises on the bill." },
+      { title: "Fully Insured & Guaranteed", description: "Workmanship backed by a guarantee and full public-liability cover." },
+      { title: "Local & Reliable", description: "We turn up when we say we will and keep you updated throughout." },
+      { title: "Tidy, Respectful Work", description: "We treat your property with care and clear up after every job." },
+    ],
+  },
+  "personal-care": {
+    heading: "The experience",
+    items: [
+      { title: "Fully Qualified Team", description: "Skilled, trained professionals who put you at ease." },
+      { title: "Relaxing Space", description: "A calm, welcoming setting to sit back and enjoy." },
+      { title: "Easy Online Booking", description: "Book the slot that suits you in a few taps, any time." },
+      { title: "Tailored To You", description: "Every appointment shaped around what you actually want." },
+    ],
+  },
+  retail: {
+    heading: "Why shop with us",
+    items: [
+      { title: "Hand-Picked Range", description: "A carefully curated selection you won't find on the high street." },
+      { title: "Expert, Friendly Advice", description: "Staff who know the products and give honest recommendations." },
+      { title: "Order & Collect", description: "Reserve online or by phone and pick up when it suits you." },
+      { title: "Support Local", description: "An independent business that reinvests in the community." },
+    ],
+  },
+  generic: {
+    heading: "Why customers choose us",
+    items: [
+      { title: "Friendly Local Service", description: "A real local team that genuinely cares about getting it right." },
+      { title: "Fair, Honest Pricing", description: "Clear prices and straight talk — no hidden extras." },
+      { title: "Quality You Can Trust", description: "Dependable work and attention to the details that matter." },
+    ],
+  },
+};
+
+/** Hospitality offerings for businesses that fall in a broad bucket (e.g. a pub
+ *  classified as "other") — replaces the generic baseline so the demo reads true. */
+const HOSPITALITY_SERVICES: Service[] = [
+  { name: "Food Served Daily", description: "Pub classics, light bites and Sunday roasts, cooked fresh.", price: "See menu", icon: "star" },
+  { name: "Drinks & Bar", description: "Cask ales, craft beer, wines and spirits behind a well-stocked bar.", price: "At the bar", icon: "leaf" },
+  { name: "Sunday Roast", description: "A proper roast every Sunday, served while it lasts.", price: "Sundays", icon: "sparkles" },
+  { name: "Private Hire & Events", description: "Book the function room for birthdays, wakes and celebrations.", price: "Enquire", icon: "shield" },
+];
+
 /** A URL-safe slug from a business name (deduplicated by the prospect id tail). */
 function slugifyName(name: string, suffix: string): string {
   const base = name
@@ -302,6 +367,12 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
   const label = broad && rawIndustry ? titleCase(rawIndustry) : t.label;
   const primary = broad && rawIndustry ? titleCase(rawIndustry) : t.primary;
 
+  // Coarse vertical drives which template content reads true for this business.
+  const vertical = verticalFromParts(prospect.category, `${rawIndustry ?? ""} ${label}`);
+  // A pub/cafe/bar lands in the broad "other" bucket → its generic services read
+  // wrong. Swap in hospitality offerings; keep proper restaurant template otherwise.
+  const services = vertical === "hospitality" && broad ? HOSPITALITY_SERVICES : t.services;
+
   const about = `${prospect.name} is a trusted ${primary.toLowerCase()} serving ${city} and the surrounding area. ${t.pitch} We're proud to be a local business that treats every customer the way we'd want to be treated.`;
 
   // DATA INTEGRITY ("never fake"). Facts come ONLY from the prospect record
@@ -327,8 +398,11 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
     email,
     address: { line1: "", city: prospect.city?.trim() || "", postcode: "" },
     serviceAreas: townKnown ? [prospect.city!.trim()] : [],
-    services: t.services,
+    services,
     openingHours: STANDARD_HOURS,
+    // Rich "what we're known for" section — template marketing draft per vertical
+    // (the AI Industry Profiler tailors it further when a key is configured).
+    highlights: VERTICAL_HIGHLIGHTS[vertical],
     // Never fabricate social proof: no invented testimonials, no aggregate rating.
     testimonials: [],
     // rating intentionally omitted (no real reviews) — see Business.rating.

@@ -18,14 +18,22 @@ const PERSONAL = new Set(["barber", "beauty-salon", "dentist"]);
 const HOSPITALITY_RE =
   /\b(pub|bar|tavern|inn|restaurant|cafe|café|coffee|bistro|eatery|diner|grill|kitchen|brewery|brasserie|takeaway|deli|bakery|teahouse|gastro)\b/i;
 
+/**
+ * Core classifier from raw parts — shared by the render layer (verticalOf) and the
+ * draft generator (which only has a prospect's category + industry text, no Business).
+ */
+export function verticalFromParts(category: string, industryText?: string): Vertical {
+  const label = `${industryText ?? ""} ${category}`;
+  if (category === "restaurant" || HOSPITALITY_RE.test(label)) return "hospitality";
+  if (TRADE.has(category)) return "trade";
+  if (PERSONAL.has(category)) return "personal-care";
+  if (category === "retail") return "retail";
+  return "generic";
+}
+
 /** Classify a business into a coarse vertical that drives copy + CTA wording. */
 export function verticalOf(b: Business): Vertical {
-  const label = `${b.industryLabel ?? ""} ${b.categoryLabel}`;
-  if (b.category === "restaurant" || HOSPITALITY_RE.test(label)) return "hospitality";
-  if (TRADE.has(b.category)) return "trade";
-  if (PERSONAL.has(b.category)) return "personal-care";
-  if (b.category === "retail") return "retail";
-  return "generic";
+  return verticalFromParts(b.category, `${b.industryLabel ?? ""} ${b.categoryLabel}`);
 }
 
 export interface OfferCopy {
