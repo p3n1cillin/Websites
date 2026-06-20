@@ -29,6 +29,7 @@ import {
   markProposalAcceptedAction,
 } from "./actions";
 import { buildLeadIntelReport } from "@/lib/lead-intel";
+import { buildBusinessIntelligence } from "@/lib/business-intel";
 
 const STATUS_LABEL: Record<ProspectStatus, string> = {
   discovered: "Discovered",
@@ -104,7 +105,66 @@ const gbp = (pence: number) => `£${Math.round(pence / 100).toLocaleString()}`;
  * the website audit + scores + category economics (lib/lead-intel). Collapsed by
  * default; £ figures are clearly-labelled estimates, never claimed as fact.
  */
-function LeadIntelPanel({ prospect }: { prospect: Prospect }) {
+const SCORE_BAR = (v: number) => (v >= 70 ? "bg-emerald-500" : v >= 40 ? "bg-amber-500" : "bg-red-500");
+const LEAK_DOT: Record<"high" | "medium" | "low", string> = {
+  high: "text-red-600",
+  medium: "text-amber-600",
+  low: "text-slate-500",
+};
+
+/** Structured Business Intelligence (§4) — sub-scores + money-linked leaks + competitor gap. */
+function IntelBlock({ prospect, peers }: { prospect: Prospect; peers: Prospect[] }) {
+  const bi = buildBusinessIntelligence(prospect, peers);
+  const subs: [string, number][] = [
+    ["SEO", bi.scores.seo],
+    ["UX", bi.scores.ux],
+    ["Conversion", bi.scores.conversion],
+  ];
+  return (
+    <div className="space-y-2 rounded-md bg-white p-2">
+      <p className="font-semibold text-slate-700">Business intelligence</p>
+
+      <div className="space-y-1">
+        {subs.map(([label, v]) => (
+          <div key={label} className="flex items-center gap-2">
+            <span className="w-16 shrink-0 text-[11px] text-slate-500">{label}</span>
+            <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <div className={`h-full rounded-full ${SCORE_BAR(v)}`} style={{ width: `${Math.max(3, v)}%` }} />
+            </div>
+            <span className="w-7 shrink-0 text-right text-[11px] font-medium text-slate-600">{v}</span>
+          </div>
+        ))}
+      </div>
+
+      {bi.revenueLeaks.length > 0 && (
+        <div>
+          <p className="text-[11px] font-semibold text-slate-600">Revenue leaks</p>
+          <ul className="mt-0.5 space-y-0.5">
+            {bi.revenueLeaks.slice(0, 4).map((l, idx) => (
+              <li key={idx} className="flex justify-between gap-2">
+                <span><span className={LEAK_DOT[l.severity]}>•</span> {l.label}</span>
+                <span className="shrink-0 font-medium text-red-600">{gbp(l.impactPence)}/mo</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <p className="text-[11px] text-slate-500">
+        Modelled loss: <span className="font-medium text-red-600">{gbp(bi.revenueLossRange.lowPence)}–{gbp(bi.revenueLossRange.highPence)}/mo</span>
+        {" · "}~{bi.estMonthlyLeadLoss} lost enquiries/mo
+      </p>
+
+      {bi.competitorGap && (
+        <p className={`text-[11px] ${bi.competitorGap.behind ? "text-red-600" : "text-emerald-600"}`}>
+          {bi.competitorGap.summary}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function LeadIntelPanel({ prospect, peers }: { prospect: Prospect; peers: Prospect[] }) {
   const r = buildLeadIntelReport(prospect);
   return (
     <details className="rounded-lg bg-slate-50 p-2 text-xs text-slate-600">
@@ -122,6 +182,8 @@ function LeadIntelPanel({ prospect }: { prospect: Prospect }) {
             ~{r.roi.estMonthlyLeads} potential enquiries/mo · capturing ~{r.roi.capturedPct}% today
           </p>
         </div>
+
+        <IntelBlock prospect={prospect} peers={peers} />
 
         {r.currentSite.problems.length > 0 && (
           <div>
@@ -370,7 +432,7 @@ export default function Board({
                       )}
 
                       <div className="mt-2">
-                        <LeadIntelPanel prospect={p} />
+                        <LeadIntelPanel prospect={p} peers={prospects} />
                       </div>
 
                       <div className="mt-2.5 flex items-center gap-1">

@@ -457,6 +457,49 @@ export interface LeadIntelReport {
   at: string;
 }
 
+/** A single money-linked revenue leak (§4 Business Intelligence Engine). */
+export interface RevenueLeak {
+  label: string;
+  /** Modelled monthly revenue lost to this leak, pence. */
+  impactPence: number;
+  severity: "high" | "medium" | "low";
+}
+
+/**
+ * Structured Business Intelligence profile (Agency OS — §4). Deterministic, money-
+ * linked breakdown of a prospect's digital weakness: sub-scores (SEO/UX/conversion),
+ * ranked revenue leaks, a competitor-gap read, and a modelled loss range. Built from
+ * the website audit + scores + category economics (lib/business-intel) — every £ is
+ * an explicit MODEL, never a measured fact (data-integrity rule).
+ */
+export interface BusinessIntelligence {
+  prospectId: string;
+  scores: {
+    /** Overall current web presence 0–100 (low = big opportunity). */
+    presence: number;
+    seo: number;
+    ux: number;
+    conversion: number;
+  };
+  /** Ranked, money-linked leaks (highest impact first). */
+  revenueLeaks: RevenueLeak[];
+  /** How this business compares to nearby same-industry competitors. */
+  competitorGap: {
+    peers: number;
+    avgPeerScore: number;
+    yourScore: number;
+    /** True when nearby competitors are, on average, stronger online. */
+    behind: boolean;
+    summary: string;
+  } | null;
+  /** Modelled web enquiries lost per month. */
+  estMonthlyLeadLoss: number;
+  /** Modelled monthly revenue loss band, pence. */
+  revenueLossRange: { lowPence: number; highPence: number };
+  assumptions: string[];
+  at: string;
+}
+
 export interface Prospect {
   id: string;
   orgId: string;

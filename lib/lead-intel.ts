@@ -15,7 +15,7 @@ import type { BusinessCategory, LeadIntelReport, Prospect, WebsiteAudit } from "
  */
 
 /** Per-category economics for the ROI model: typical monthly web enquiries + avg job value (pence). */
-const ECONOMICS: Record<BusinessCategory, { leads: number; jobValuePence: number }> = {
+export const ECONOMICS: Record<BusinessCategory, { leads: number; jobValuePence: number }> = {
   dentist: { leads: 30, jobValuePence: 25_000 },
   roofer: { leads: 18, jobValuePence: 250_000 },
   plumber: { leads: 35, jobValuePence: 18_000 },
