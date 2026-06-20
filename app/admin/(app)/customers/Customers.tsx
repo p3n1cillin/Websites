@@ -10,6 +10,7 @@ import {
   type CustomerReport,
 } from "@/lib/types";
 import type { RetentionRec } from "@/lib/retention";
+import type { LaunchChecklist } from "@/lib/fulfillment";
 import {
   runReportAction,
   setChangeRequestStatusAction,
@@ -29,6 +30,8 @@ export interface CustomerView {
   /** Top upsell/retention recommendations for this live client (expansion revenue). */
   growth: RetentionRec[];
   growthAddonPence: number;
+  /** Launch-readiness checklist (fulfillment → QA → deploy). */
+  launch: LaunchChecklist;
 }
 
 const gbpMoney = (pence: number) => `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
@@ -156,6 +159,45 @@ export default function Customers({ customers }: { customers: CustomerView[] }) 
                 )}
               </div>
             )}
+
+            {/* Launch readiness — fulfillment → QA → deploy. Blockers gate go-live. */}
+            <details className="mt-4 rounded-xl border border-slate-200 bg-slate-50/60 p-3" open={!c.launch.live}>
+              <summary className="flex cursor-pointer select-none items-center justify-between gap-2">
+                <span className="text-sm font-semibold text-slate-700">
+                  Launch readiness
+                  <span className="ml-2 text-xs font-normal text-slate-500">{c.launch.progressPct}% complete</span>
+                </span>
+                <span
+                  className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                    c.launch.live
+                      ? "bg-emerald-100 text-emerald-700"
+                      : c.launch.readyToLaunch
+                        ? "bg-sky-100 text-sky-700"
+                        : "bg-amber-100 text-amber-700"
+                  }`}
+                >
+                  {c.launch.live
+                    ? "Live"
+                    : c.launch.readyToLaunch
+                      ? "Ready to publish"
+                      : `${c.launch.blockersRemaining} blocker${c.launch.blockersRemaining === 1 ? "" : "s"}`}
+                </span>
+              </summary>
+              <ul className="mt-2 space-y-1">
+                {c.launch.items.map((it) => (
+                  <li key={it.label} className="flex items-start gap-2 text-xs">
+                    <span className={it.done ? "text-emerald-600" : it.blocker ? "text-red-500" : "text-slate-300"}>
+                      {it.done ? "✓" : it.blocker ? "✗" : "○"}
+                    </span>
+                    <span className={it.done ? "text-slate-500 line-through" : "text-slate-700"}>
+                      {it.label}
+                      {it.blocker && !it.done && <span className="ml-1 text-[10px] font-semibold uppercase text-red-500">blocker</span>}
+                      {!it.done && it.hint && <span className="block text-[11px] text-slate-400">{it.hint}</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </details>
 
             {/* Growth opportunities — upsells that grow the retainer (Retention Engine). */}
             {c.growth.length > 0 && (
