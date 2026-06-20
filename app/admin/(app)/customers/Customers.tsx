@@ -9,6 +9,7 @@ import {
   type CustomerPortalStatus,
   type CustomerReport,
 } from "@/lib/types";
+import type { RetentionRec } from "@/lib/retention";
 import {
   runReportAction,
   setChangeRequestStatusAction,
@@ -25,7 +26,12 @@ export interface CustomerView {
   published: boolean;
   liveUrl: string;
   requests: ChangeRequest[];
+  /** Top upsell/retention recommendations for this live client (expansion revenue). */
+  growth: RetentionRec[];
+  growthAddonPence: number;
 }
+
+const gbpMoney = (pence: number) => `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
 
 const CR_BADGE: Record<ChangeRequestStatus, string> = {
   open: "bg-amber-100 text-amber-700",
@@ -148,6 +154,39 @@ export default function Customers({ customers }: { customers: CustomerView[] }) 
                     ))}
                   </ul>
                 )}
+              </div>
+            )}
+
+            {/* Growth opportunities — upsells that grow the retainer (Retention Engine). */}
+            {c.growth.length > 0 && (
+              <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50/40 p-3">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-sm font-semibold text-slate-700">Growth opportunities</h3>
+                  <span className="text-xs font-medium text-emerald-700">
+                    +{gbpMoney(c.growthAddonPence)}/mo potential
+                  </span>
+                </div>
+                <ul className="mt-2 space-y-1.5">
+                  {c.growth.map((g) => (
+                    <li key={g.service} className="flex items-start justify-between gap-3 text-xs">
+                      <div className="min-w-0">
+                        <p className="font-medium text-slate-800">
+                          {g.title}
+                          {g.priority === "high" && (
+                            <span className="ml-1.5 rounded-full bg-emerald-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                              top pick
+                            </span>
+                          )}
+                        </p>
+                        <p className="text-slate-500">{g.rationale}</p>
+                      </div>
+                      <span className="shrink-0 text-right text-slate-600">
+                        <span className="font-medium">{gbpMoney(g.addonPence)}/mo</span>
+                        <span className="block text-[10px] text-slate-400">~{gbpMoney(g.estUpliftPence)}/mo value</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 

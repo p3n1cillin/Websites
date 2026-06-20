@@ -10,7 +10,9 @@ import { getCostToday, getCostThisMonth } from "@/lib/ai/cost";
 import { getRecentAgentRuns } from "@/lib/agent-runs";
 import { buildLeadIntelReport } from "@/lib/lead-intel";
 import { getRetainersForOrg, activeMrrPence, DEFAULT_RETAINER_PENCE } from "@/lib/retainers";
-import { PROSPECT_STATUSES, type ProspectStatus } from "@/lib/types";
+import { getPortalsForOrg } from "@/lib/customers";
+import { buildCrmStates, needsAttention } from "@/lib/crm";
+import { PROSPECT_STATUSES, type OutreachMessage, type Proposal, type ProspectStatus, type SitePreview } from "@/lib/types";
 
 /**
  * Agency Command Center — the single screen optimised around one metric: revenue.
@@ -67,7 +69,7 @@ function Stat({
 export default async function CommandCenterPage() {
   const org = await requireOrg();
 
-  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers] =
+  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers, portals] =
     await Promise.all([
       getProspectsForOrg(org.id),
       getProposalsForOrg(org.id),
@@ -79,6 +81,7 @@ export default async function CommandCenterPage() {
       getCostThisMonth(org.id),
       getRecentAgentRuns(org.id, 200),
       getRetainersForOrg(org.id),
+      getPortalsForOrg(org.id),
     ]);
 
   // ---- Pipeline ---------------------------------------------------------------
@@ -128,6 +131,33 @@ export default async function CommandCenterPage() {
   const demoActions = Object.values(previewStats).reduce((s, st) => s + st.conversions, 0);
 
   const maxStage = Math.max(1, ...PROSPECT_STATUSES.map((s) => byStage[s]));
+
+  // ---- CRM: next action + staleness so no lead goes quiet -----------------------
+  const previewByProspect: Record<string, SitePreview> = {};
+  for (const pv of previews) {
+    if (pv.status !== "active") continue;
+    const cur = previewByProspect[pv.prospectId];
+    if (!cur || pv.createdAt > cur.createdAt) previewByProspect[pv.prospectId] = pv;
+  }
+  const outreachByProspect: Record<string, OutreachMessage[]> = {};
+  for (const m of outreach) (outreachByProspect[m.prospectId] ??= []).push(m);
+  const proposalByProspect: Record<string, Proposal> = {};
+  for (const pr of proposals) {
+    const cur = proposalByProspect[pr.prospectId];
+    if (!cur || pr.createdAt > cur.createdAt) proposalByProspect[pr.prospectId] = pr;
+  }
+  const onboardedProspectIds = new Set(
+    portals.map((p) => p.prospectId).filter((id): id is string => Boolean(id))
+  );
+  const crmStates = buildCrmStates(prospects, {
+    previewByProspect,
+    outreachByProspect,
+    proposalByProspect,
+    onboardedProspectIds,
+  });
+  const prospectById = new Map(prospects.map((p) => [p.id, p]));
+  const attention = needsAttention(Object.values(crmStates)).slice(0, 6);
+  const URGENCY_DOT = { high: "bg-red-500", medium: "bg-amber-500", low: "bg-slate-300" } as const;
 
   return (
     <div className="space-y-8">
@@ -211,6 +241,44 @@ export default async function CommandCenterPage() {
               : `Projected at £39/mo per won client (${wonProspects.length} won) — open a retainer in Customers to track real MRR.`}{" "}
             Plus {gbp(wonValuePence)} in one-off build fees booked.
           </p>
+        </section>
+      )}
+
+      {/* NEEDS ATTENTION — the CRM safety net: no lead goes quiet without a reason. */}
+      {attention.length > 0 && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-5">
+          <div className="flex items-end justify-between gap-2">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+              Needs attention
+            </h2>
+            <Link href="/admin/prospects" className="text-xs font-medium text-slate-500 hover:text-slate-900">
+              Work pipeline →
+            </Link>
+          </div>
+          <ul className="mt-3 divide-y divide-slate-100">
+            {attention.map((s) => {
+              const p = prospectById.get(s.prospectId);
+              if (!p) return null;
+              return (
+                <li key={s.prospectId} className="flex items-center gap-3 py-2">
+                  <span className={`h-2 w-2 shrink-0 rounded-full ${URGENCY_DOT[s.urgency]}`} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-slate-800">
+                      {p.name}
+                      <span className="ml-2 text-xs font-normal capitalize text-slate-400">{STAGE_LABEL[s.stage]}</span>
+                    </p>
+                    <p className="truncate text-xs text-slate-500">
+                      {s.nextAction}
+                      {s.reason ? ` · ${s.reason}` : ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 text-xs text-slate-400">
+                    {s.daysSinceActivity === 0 ? "today" : `${s.daysSinceActivity}d ago`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </section>
       )}
 

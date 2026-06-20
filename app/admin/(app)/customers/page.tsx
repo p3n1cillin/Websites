@@ -3,6 +3,7 @@ import { getPortalsForOrg } from "@/lib/customers";
 import { getBusinessesForOrg } from "@/lib/businesses";
 import { getChangeRequestsForOrg } from "@/lib/change-requests";
 import { getRetainersForOrg } from "@/lib/retainers";
+import { buildRetentionPlan } from "@/lib/retention";
 import { SITE_URL } from "@/lib/seo";
 import type { ChangeRequest } from "@/lib/types";
 import Customers, { type CustomerView } from "./Customers";
@@ -27,6 +28,7 @@ export default async function CustomersPage() {
     .map((portal) => {
       const biz = bizById.get(portal.businessId);
       if (!biz) return null;
+      const plan = buildRetentionPlan(biz.data, { businessId: biz.id });
       return {
         portalId: portal.id,
         portalUrl: `${SITE_URL}/portal/${portal.token}`,
@@ -36,6 +38,8 @@ export default async function CustomersPage() {
         published: biz.status === "published",
         liveUrl: biz.customDomain ? `https://${biz.customDomain}` : `${SITE_URL}/${biz.slug}`,
         requests: reqByBusiness[biz.id] ?? [],
+        growth: plan.recs.slice(0, 3),
+        growthAddonPence: plan.recs.slice(0, 3).reduce((s, r) => s + r.addonPence, 0),
       } satisfies CustomerView;
     })
     .filter((c): c is CustomerView => c !== null);

@@ -30,6 +30,7 @@ import {
 } from "./actions";
 import { buildLeadIntelReport } from "@/lib/lead-intel";
 import { buildBusinessIntelligence } from "@/lib/business-intel";
+import { crmStateFor } from "@/lib/crm";
 
 const STATUS_LABEL: Record<ProspectStatus, string> = {
   discovered: "Discovered",
@@ -312,6 +313,12 @@ export default function Board({
                   const portalUrl = portalUrlByProspect[p.id];
                   const proposal = proposalByProspect[p.id];
                   const proposalUrl = proposal ? `${siteUrl}/proposal/${proposal.token}` : null;
+                  const crm = crmStateFor(p, {
+                    preview,
+                    outreach: messages,
+                    proposal,
+                    onboarded: Boolean(portalUrl),
+                  });
                   const busyCard =
                     busy[`move-${p.id}`] ||
                     busy[`qa-${p.id}`] ||
@@ -361,6 +368,28 @@ export default function Board({
                         )}
                         {p.phone && <span>{p.phone}</span>}
                       </div>
+
+                      {crm.nextActionKind !== "none" && (
+                        <div
+                          className={`mt-2 flex items-center gap-2 rounded-lg px-2 py-1 text-xs ${
+                            crm.stale || crm.urgency === "high"
+                              ? "bg-red-50 text-red-700"
+                              : "bg-slate-50 text-slate-600"
+                          }`}
+                        >
+                          <span
+                            className={`h-1.5 w-1.5 shrink-0 rounded-full ${
+                              crm.urgency === "high" ? "bg-red-500" : crm.urgency === "medium" ? "bg-amber-500" : "bg-slate-300"
+                            }`}
+                          />
+                          <span className="min-w-0 flex-1 truncate" title={crm.reason || crm.nextAction}>
+                            <span className="font-medium">Next:</span> {crm.nextAction}
+                          </span>
+                          <span className="shrink-0 text-[10px] text-slate-400">
+                            {crm.daysSinceActivity === 0 ? "today" : `${crm.daysSinceActivity}d`}
+                          </span>
+                        </div>
+                      )}
 
                       {p.analysis && (
                         <div className="mt-2 rounded-lg bg-slate-50 p-2 text-xs text-slate-600">
