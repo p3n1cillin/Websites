@@ -14,6 +14,7 @@ import { getPortalsForOrg } from "@/lib/customers";
 import { buildCrmStates, needsAttention } from "@/lib/crm";
 import { getBusinessesForOrg } from "@/lib/businesses";
 import { buildBusinessGraph } from "@/lib/discovery-graph";
+import { buildEmpirePortfolio } from "@/lib/empire";
 import { PROSPECT_STATUSES, type OutreachMessage, type Proposal, type ProspectStatus, type SitePreview } from "@/lib/types";
 import Nexus, { type NexusData, type NexusAgent } from "./Nexus";
 import StarMap, { type StarNode } from "./StarMap";
@@ -230,6 +231,15 @@ export default async function CommandCenterPage() {
     )
   );
 
+  const empire = buildEmpirePortfolio({
+    clusters: graph.clusters,
+    retainers,
+    liveSites: publishedBusinesses.length,
+    prospectCount: prospects.length,
+    orgName: org.name,
+  });
+  const topOpp = empire.opportunities[0] ?? null;
+
   const starNodes: StarNode[] = prospects.map((p) => ({
     id: p.id,
     name: p.name,
@@ -269,6 +279,30 @@ export default async function CommandCenterPage() {
 
       {/* DISCOVERY STARMAP — the real business graph as a zoomable spatial map. */}
       <StarMap nodes={starNodes} />
+
+      {/* EMPIRE — the owner's portfolio: assets + the best opportunity to compound. */}
+      <Link
+        href="/admin/empire"
+        className="group flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-fuchsia-500/30 bg-gradient-to-r from-fuchsia-50 to-white p-4 transition-colors hover:border-fuchsia-400"
+      >
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+          <div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-fuchsia-500">Empire · portfolio</div>
+            <div className="text-lg font-semibold text-slate-900">
+              {gbp(empire.assetValuePence)} <span className="text-sm font-normal text-slate-400">value · {gbp(empire.totalMrrPence)}/mo · {empire.assets.length} assets</span>
+            </div>
+          </div>
+          {topOpp && (
+            <div className="border-l border-fuchsia-200 pl-6">
+              <div className="font-mono text-[10px] uppercase tracking-widest text-slate-400">Top opportunity</div>
+              <div className="text-sm font-medium text-slate-800">
+                {topOpp.title} <span className="text-fuchsia-600">· empire {topOpp.empireScore}</span>
+              </div>
+            </div>
+          )}
+        </div>
+        <span className="font-mono text-xs uppercase tracking-widest text-fuchsia-600 group-hover:text-fuchsia-700">open empire ▸</span>
+      </Link>
 
       {/* Classic readouts remain available as a secondary, detailed view. */}
       <details className="group">

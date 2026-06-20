@@ -21,7 +21,13 @@ interface NavGroup {
 }
 
 const GROUPS: NavGroup[] = [
-  { label: "Overview", items: [{ href: "/admin", label: "Dashboard" }] },
+  {
+    label: "Overview",
+    items: [
+      { href: "/admin", label: "Nexus" },
+      { href: "/admin/empire", label: "Empire" },
+    ],
+  },
   {
     label: "Acquire",
     items: [
