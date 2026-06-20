@@ -180,6 +180,49 @@ export async function discoverLiveAction(formData: FormData): Promise<void> {
 }
 
 // ---------------------------------------------------------------------------
+// Discover at scale — fan a brief out across many towns × services × sources,
+// merge + dedup, then run the whole haul through the Discovery agent (auto).
+// ---------------------------------------------------------------------------
+export async function discoverCampaignAction(formData: FormData): Promise<void> {
+  const org = await requireOrg();
+  const splitLines = (v: FormDataEntryValue | null) =>
+    ((v as string) ?? "")
+      .split(/[\r\n,]+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+
+  const areas = splitLines(formData.get("areas"));
+  const categories = splitLines(formData.get("categories"));
+  const perQueryLimit = Math.min(Math.max(Number(formData.get("perQueryLimit")) || 25, 1), 60);
+  if (areas.length === 0) redirect("/admin/prospects?found=0&seen=0");
+
+  const { runDiscoveryCampaign } = await import("@/lib/discovery-sources/campaign");
+  let candidates: DiscoveryCandidate[] = [];
+  try {
+    const res = await runDiscoveryCampaign({ areas, categories, perQueryLimit });
+    candidates = res.candidates;
+  } catch {
+    candidates = [];
+  }
+  if (candidates.length === 0) redirect("/admin/prospects?found=0&seen=0");
+
+  const input: DiscoveryAgentInput = {
+    orgId: org.id,
+    candidates,
+    note: `Campaign sweep — ${areas.length} area(s)${categories.length ? `, ${categories.length} service(s)` : ""}`,
+  };
+  const res = await runAgent<DiscoveryAgentOutput>({
+    kind: "discovery",
+    orgId: org.id,
+    actorUserId: org.ownerUserId,
+    autonomyOverride: "auto",
+    input,
+  });
+  const created = res.output?.created ?? 0;
+  redirect(`/admin/prospects?found=${created}&seen=${candidates.length}`);
+}
+
+// ---------------------------------------------------------------------------
 // Analyse (Market agent) — callable from the board client.
 // ---------------------------------------------------------------------------
 export async function analyseProspectAction(

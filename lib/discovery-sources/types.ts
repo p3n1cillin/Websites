@@ -13,6 +13,8 @@ import type { DiscoveryCandidate } from "@/lib/agents/discovery";
 export interface DiscoveryQuery {
   /** Free-text place to search, e.g. "Warrington" or "Stockton Heath, UK". */
   area: string;
+  /** Optional service/industry to target, e.g. "plumber" (keyword sources use it). */
+  category?: string;
   /** Search radius around the geocoded centre, metres. */
   radiusMeters?: number;
   /** Max candidates to return. */

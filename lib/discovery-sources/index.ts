@@ -1,13 +1,16 @@
 import type { DiscoverySource } from "./types";
 import { overpassSource } from "./overpass";
+import { nominatimSource } from "./nominatim";
 
 /**
- * Discovery source registry. Overpass (free) is the default + only live source
- * today; a Google Places source would register here behind the same interface
- * (and flip `available` when STRIPE-style env keys are present).
+ * Discovery source registry. Two free OSM streams ship today: Overpass (broad
+ * radius sweep) and Nominatim (keyword "[service] in [city]" search). A licensed
+ * source (Google Places) registers here behind the same interface and flips
+ * `available` when its env key is present.
  */
 const SOURCES: Record<string, DiscoverySource> = {
   [overpassSource.id]: overpassSource,
+  [nominatimSource.id]: nominatimSource,
 };
 
 export const DEFAULT_SOURCE_ID = overpassSource.id;

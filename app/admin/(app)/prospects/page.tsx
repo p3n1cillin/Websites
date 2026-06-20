@@ -7,8 +7,16 @@ import { getPortalsForOrg } from "@/lib/customers";
 import { getProposalsForOrg } from "@/lib/proposals";
 import { SITE_URL } from "@/lib/seo";
 import { BUSINESS_CATEGORIES, type OutreachMessage, type Proposal, type SitePreview } from "@/lib/types";
+import { buildBusinessGraph } from "@/lib/discovery-graph";
 import Board from "./Board";
-import { createProspectAction, discoverAction, discoverLiveAction } from "./actions";
+import {
+  createProspectAction,
+  discoverAction,
+  discoverLiveAction,
+  discoverCampaignAction,
+} from "./actions";
+
+const gbp = (pence: number) => `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
 
 export const dynamic = "force-dynamic";
 
@@ -58,6 +66,10 @@ export default async function ProspectsPage({
   const open = prospects.filter((p) => p.status !== "won" && p.status !== "lost");
   const pipelineValue = open.reduce((sum, p) => sum + p.valueEstimate, 0);
   const won = prospects.filter((p) => p.status === "won").length;
+
+  // Business graph — rank (industry × town) clusters by domination potential.
+  const graph = buildBusinessGraph(prospects);
+  const topClusters = graph.clusters.filter((c) => c.size >= 2).slice(0, 6);
 
   return (
     <div className="space-y-6">
@@ -129,6 +141,97 @@ export default async function ProspectsPage({
           Find businesses
         </button>
       </form>
+
+      {/* Discover at scale — fan out across many towns × services. */}
+      <form
+        action={discoverCampaignAction}
+        className="space-y-3 rounded-2xl border border-violet-200 bg-violet-50/40 p-4"
+      >
+        <div>
+          <h2 className="text-sm font-semibold text-slate-800">Discover at scale (campaign)</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Sweeps every town × service across both free OSM streams (Overpass + keyword), merges and
+            dedups. Leave services blank for a broad sweep of each town.
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <label className="text-xs text-slate-600">
+            Towns / areas (one per line)
+            <textarea
+              name="areas"
+              rows={4}
+              defaultValue={"Warrington\nWidnes\nRuncorn"}
+              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="text-xs text-slate-600">
+            Services (optional, one per line)
+            <textarea
+              name="categories"
+              rows={4}
+              placeholder={"plumber\ndentist\nbarber"}
+              className="mt-1 block w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
+            />
+          </label>
+          <div className="flex flex-col justify-between">
+            <label className="text-xs text-slate-600">
+              Per query
+              <input
+                name="perQueryLimit"
+                type="number"
+                min={1}
+                max={60}
+                defaultValue={25}
+                className="mt-1 block w-24 rounded-md border border-slate-300 px-3 py-2 text-sm"
+              />
+            </label>
+            <button className="mt-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700">
+              Run campaign
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-slate-400">
+          Runs politely (~1 query/sec) to respect free OSM limits — a big sweep can take a minute.
+        </p>
+      </form>
+
+      {/* Opportunity clusters — the business graph: which industry×town pockets to own. */}
+      {topClusters.length > 0 && (
+        <section className="rounded-2xl border border-slate-200 bg-white p-4">
+          <div className="flex items-end justify-between gap-2">
+            <div>
+              <h2 className="text-sm font-semibold text-slate-800">Opportunity clusters</h2>
+              <p className="mt-0.5 text-xs text-slate-500">
+                {graph.totalNodes} businesses · {graph.totalCompetitorEdges.toLocaleString("en-GB")} competitor links.
+                Ranked by domination potential (opportunity + digital whitespace + size).
+              </p>
+            </div>
+          </div>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {topClusters.map((c) => (
+              <div key={c.key} className="rounded-xl border border-slate-200 p-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-semibold capitalize text-slate-800">
+                    {c.category} · {c.city}
+                  </span>
+                  <span className="rounded-full bg-violet-100 px-2 py-0.5 text-xs font-bold text-violet-700">
+                    {c.dominationScore}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-slate-500">
+                  {c.size} businesses · {c.whitespacePct}% weak/no site · {gbp(c.addressableValuePence)} potential
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full bg-violet-500"
+                    style={{ width: `${Math.max(3, c.dominationScore)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Intake: add one, or discover many from a pasted list. */}
       <div className="grid gap-4 md:grid-cols-2">
