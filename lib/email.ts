@@ -6,6 +6,12 @@
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM = process.env.LEAD_NOTIFY_FROM || "Leads <onboarding@resend.dev>";
+// The address outreach is SENT FROM — must be on a Resend-verified domain to reach
+// real prospects. Falls back to Resend's shared test sender (own-account only) when
+// unset. Set OUTREACH_FROM_EMAIL=you@yourdomain.com once your domain is verified.
+const OUTREACH_FROM_EMAIL = process.env.OUTREACH_FROM_EMAIL || "onboarding@resend.dev";
+// Where prospect replies land (your inbox). Optional.
+const OUTREACH_REPLY_TO = process.env.OUTREACH_REPLY_TO || process.env.NEXT_PUBLIC_BRAND_EMAIL;
 
 export const emailConfigured = Boolean(RESEND_API_KEY);
 
@@ -71,14 +77,21 @@ export async function sendOutreachEmail(input: {
   fromName?: string;
 }): Promise<boolean> {
   if (!RESEND_API_KEY || !input.to) return false;
-  const from = input.fromName ? `${input.fromName} <onboarding@resend.dev>` : FROM;
+  const from = input.fromName ? `${input.fromName} <${OUTREACH_FROM_EMAIL}>` : FROM;
   // Plain-text body → simple HTML (preserve line breaks).
   const html = input.body.split(/\n{2,}/).map((p) => `<p>${esc(p).replace(/\n/g, "<br/>")}</p>`).join("\n");
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [input.to], subject: input.subject, html, text: input.body }),
+      body: JSON.stringify({
+        from,
+        to: [input.to],
+        reply_to: OUTREACH_REPLY_TO || undefined,
+        subject: input.subject,
+        html,
+        text: input.body,
+      }),
     });
     if (!res.ok) {
       console.error("[email] outreach send failed:", res.status, await safeText(res));
