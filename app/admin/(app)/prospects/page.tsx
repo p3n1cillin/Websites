@@ -8,6 +8,7 @@ import { getProposalsForOrg } from "@/lib/proposals";
 import { SITE_URL } from "@/lib/seo";
 import { BUSINESS_CATEGORIES, type OutreachMessage, type Proposal, type SitePreview } from "@/lib/types";
 import { buildBusinessGraph } from "@/lib/discovery-graph";
+import { selectDueMessages } from "@/lib/outreach-cadence";
 import Board from "./Board";
 import {
   createProspectAction,
@@ -15,6 +16,7 @@ import {
   discoverLiveAction,
   discoverCampaignAction,
   autoBuildDemosAction,
+  runFollowUpsAction,
 } from "./actions";
 
 const gbp = (pence: number) => `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
@@ -24,12 +26,14 @@ export const dynamic = "force-dynamic";
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: { found?: string; seen?: string; built?: string };
+  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string };
 }) {
   const org = await requireOrg();
   const found = searchParams?.found;
   const seen = searchParams?.seen;
   const built = searchParams?.built;
+  const sent = searchParams?.sent;
+  const skipped = searchParams?.skipped;
   const [prospects, previews, outreach, portals, proposals, previewStats] = await Promise.all([
     getProspectsForOrg(org.id),
     getPreviewsForOrg(org.id),
@@ -73,6 +77,9 @@ export default async function ProspectsPage({
   const graph = buildBusinessGraph(prospects);
   const topClusters = graph.clusters.filter((c) => c.size >= 2).slice(0, 6);
 
+  // Follow-up cadence — how many next-step messages are due to send right now.
+  const dueFollowUps = selectDueMessages(prospects, outreach).length;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-4">
@@ -107,6 +114,38 @@ export default async function ProspectsPage({
               ? `Found ${seen} business${seen === "1" ? "" : "es"} nearby, but they're already in your pipeline — try a different area.`
               : "No businesses found there — try a larger area, a nearby town, or check the spelling."}
         </p>
+      )}
+
+      {sent !== undefined && (
+        <p
+          className={`rounded-lg px-3 py-2 text-sm ${
+            sent === "0" ? "bg-amber-50 text-amber-700" : "bg-emerald-50 text-emerald-700"
+          }`}
+        >
+          {sent !== "0"
+            ? `Sent ${sent} follow-up${sent === "1" ? "" : "s"}${skipped && skipped !== "0" ? ` (${skipped} skipped — no email/Resend)` : ""}.`
+            : `Nothing sent${skipped && skipped !== "0" ? ` — ${skipped} due but skipped (add prospect emails + set RESEND_API_KEY)` : " — nothing was due"}.`}
+        </p>
+      )}
+
+      {dueFollowUps > 0 && (
+        <form
+          action={runFollowUpsAction}
+          className="flex flex-wrap items-center gap-3 rounded-2xl border border-sky-200 bg-sky-50/50 p-4"
+        >
+          <div className="flex-1">
+            <h2 className="text-sm font-semibold text-slate-800">
+              📨 {dueFollowUps} follow-up{dueFollowUps === 1 ? "" : "s"} due
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Sends the next due step of each active sequence (initial now, then after a few days if
+              there&apos;s no reply). Sends via Resend when configured.
+            </p>
+          </div>
+          <button className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-medium text-white hover:bg-sky-700">
+            Send due follow-ups
+          </button>
+        </form>
       )}
 
       {built !== undefined && (

@@ -4,6 +4,7 @@ import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { listEnabledWorkflowsAllOrgs } from "@/lib/workflows";
 import { executeWorkflowForSeed, prospectEntryStatus } from "@/lib/workflow-engine";
 import { getProspectsForOrg } from "@/lib/prospects";
+import { dispatchDueFollowUps } from "@/lib/outreach-cadence";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -55,7 +56,20 @@ async function handle(request: Request): Promise<Response> {
     }
   }
 
-  return NextResponse.json({ ok: true, workflows: workflows.length, runs });
+  // Unattended follow-ups: for every org with automation enabled, send any cadence
+  // steps now due (no-op without Resend / prospect emails — never fakes a send).
+  let followUpsSent = 0;
+  const orgIds = [...new Set(workflows.map((wf) => wf.orgId))];
+  for (const orgId of orgIds) {
+    try {
+      const res = await dispatchDueFollowUps({ id: orgId, name: "" });
+      followUpsSent += res.sent;
+    } catch {
+      /* one org's follow-ups failing must not stop the tick */
+    }
+  }
+
+  return NextResponse.json({ ok: true, workflows: workflows.length, runs, followUpsSent });
 }
 
 export const GET = handle;

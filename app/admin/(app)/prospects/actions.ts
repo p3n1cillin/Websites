@@ -31,6 +31,7 @@ import {
   deleteOutreachMessage,
 } from "@/lib/outreach";
 import { sendOutreachEmail, emailConfigured } from "@/lib/email";
+import { dispatchDueFollowUps } from "@/lib/outreach-cadence";
 import { recordWinningPattern } from "@/lib/knowledge";
 import type { Prospect } from "@/lib/types";
 import { SITE_URL } from "@/lib/seo";
@@ -441,6 +442,18 @@ export async function dispatchOutreachAction(
     await updateProspectStatus(prospect.id, "contacted");
   }
   return { ok: true };
+}
+
+/**
+ * Send every follow-up that's currently DUE across the pipeline (cadence engine).
+ * The autonomous "automate outreach and follow-up" step, as a one-click trigger.
+ * Only sends what it genuinely can (Resend configured + prospect email); the result
+ * banner reports sent vs skipped honestly.
+ */
+export async function runFollowUpsAction(): Promise<void> {
+  const org = await requireOrg();
+  const res = await dispatchDueFollowUps({ id: org.id, name: org.name });
+  redirect(`/admin/prospects?sent=${res.sent}&skipped=${res.skipped}`);
 }
 
 export async function deleteOutreachAction(
