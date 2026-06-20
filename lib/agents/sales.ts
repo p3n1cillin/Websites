@@ -90,7 +90,7 @@ export const salesAgent: AgentDefinition<SalesAgentInput, SalesAgentOutput> = {
         tier: "smart",
         maxTokens: 800,
         system:
-          "You are a friendly, low-pressure B2B salesperson for a local web-design agency. Write a 3-message email FOLLOW-UP SEQUENCE to a small business: (1) intent 'initial' — lead with a concrete benefit and the free demo link if provided; (2) intent 'follow_up' — a short, warm nudge; (3) intent 'final' — a graceful last check-in that leaves the door open. Each under 110 words, sign off '[Your name]'. No hype, no fake urgency, no invented facts.",
+          "You are a friendly, low-pressure B2B salesperson for a local web-design agency. Write a 3-message email FOLLOW-UP SEQUENCE to a small business: (1) intent 'initial' — lead with a concrete benefit and the free demo link if provided; (2) intent 'follow_up' — a short, warm nudge; (3) intent 'final' — a graceful last check-in that leaves the door open. Each under 110 words, sign off '[Your name]'. No hype, no fake urgency, no invented facts. Write as a human studio — NEVER mention AI, automation, bots, or that anything is auto-generated.",
         prompt: `Prospect: ${p.name}, a ${p.category} in ${p.city || "an unknown town"}. Winning angle: ${
           p.analysis?.angle || "modern, conversion-focused website"
         }. ${input.previewUrl ? `Free demo link: ${input.previewUrl}` : "No demo link available."}${winGuidance} Return the 3 messages in order.`,

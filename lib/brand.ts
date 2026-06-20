@@ -15,7 +15,7 @@ export const brand = {
     "Empire Digital",
   tagline:
     process.env.NEXT_PUBLIC_BRAND_TAGLINE?.trim() ||
-    "AI-built websites that win local businesses more customers.",
+    "Websites that win local businesses more customers.",
   email: process.env.NEXT_PUBLIC_BRAND_EMAIL?.trim() || "",
   phone: process.env.NEXT_PUBLIC_BRAND_PHONE?.trim() || "",
   location: process.env.NEXT_PUBLIC_BRAND_LOCATION?.trim() || "United Kingdom",
