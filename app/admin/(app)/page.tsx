@@ -17,7 +17,6 @@ import { buildBusinessGraph } from "@/lib/discovery-graph";
 import { buildEmpirePortfolio } from "@/lib/empire";
 import { PROSPECT_STATUSES, type OutreachMessage, type Proposal, type ProspectStatus, type SitePreview } from "@/lib/types";
 import Nexus, { type NexusData, type NexusAgent } from "./Nexus";
-import StarMap, { type StarNode } from "./StarMap";
 import AutopilotButton from "./AutopilotButton";
 
 const AGENT_LABELS: Record<string, string> = {
@@ -242,15 +241,6 @@ export default async function CommandCenterPage() {
   });
   const topOpp = empire.opportunities[0] ?? null;
 
-  const starNodes: StarNode[] = prospects.map((p) => ({
-    id: p.id,
-    name: p.name,
-    category: p.category,
-    city: p.city,
-    opportunity: p.opportunityScore,
-    status: p.status,
-  }));
-
   const nexusData: NexusData = {
     health,
     mrrPence: recurringPence,
@@ -281,9 +271,6 @@ export default async function CommandCenterPage() {
 
       {/* AUTOPILOT — drive the whole funnel start-to-finish in one pass. */}
       <AutopilotButton />
-
-      {/* DISCOVERY STARMAP — the real business graph as a zoomable spatial map. */}
-      <StarMap nodes={starNodes} />
 
       {/* EMPIRE — the owner's portfolio: assets + the best opportunity to compound. */}
       <Link
