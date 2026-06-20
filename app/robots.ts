@@ -6,7 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/api/"],
+      // Private/tokenised surfaces — keep them out of the index.
+      disallow: ["/api/", "/admin", "/preview/", "/portal/", "/proposal/", "/auth/"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

@@ -1,16 +1,30 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { brand, hasBrandEmail } from "@/lib/brand";
+import { brand, hasBrandEmail, organizationJsonLd, websiteJsonLd } from "@/lib/brand";
 
 /**
  * Public marketing chrome for the agency's own site (the homepage Stripe + clients
  * see). Header with brand + nav + client login; footer with legal links + the real
- * business contact. Separate from the admin shell and tenant sites.
+ * business contact. Separate from the admin shell and tenant sites. Carries the
+ * site-wide SEO: canonical, Open Graph/Twitter cards + Organization/WebSite JSON-LD.
  */
 export const metadata: Metadata = {
   title: { default: `${brand.name} — ${brand.tagline}`, template: `%s | ${brand.name}` },
   description: brand.tagline,
   robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    url: brand.url,
+    siteName: brand.name,
+    title: `${brand.name} — ${brand.tagline}`,
+    description: brand.tagline,
+    locale: "en_GB",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${brand.name} — ${brand.tagline}`,
+    description: brand.tagline,
+  },
 };
 
 const NAV = [
@@ -23,6 +37,14 @@ const NAV = [
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-white text-slate-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd()) }}
+      />
       <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <Link href="/" className="flex items-center gap-2.5">

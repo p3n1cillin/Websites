@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { brand, hasBrandEmail } from "@/lib/brand";
 import { gbp, PRICING } from "@/lib/brand";
 
-export const metadata: Metadata = { title: "Terms & Refund Policy" };
+export const metadata: Metadata = {
+  title: "Terms & Refund Policy",
+  alternates: { canonical: "/terms" },
+};
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

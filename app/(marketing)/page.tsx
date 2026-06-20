@@ -1,5 +1,8 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import { brand, PRICING, gbp } from "@/lib/brand";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 /**
  * Public homepage for the agency — what we do, for whom, how it works, and what it
@@ -40,9 +43,23 @@ const FAQ = [
   { q: "Do I own the website?", a: "Yes — the site and content are yours. The monthly plan covers hosting, maintenance and ongoing support." },
 ];
 
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
+  })),
+};
+
 export default function MarketingHome() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+      />
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950 text-white">
         <div

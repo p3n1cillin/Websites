@@ -33,3 +33,40 @@ export const PRICING = {
 
 export const gbp = (pence: number) =>
   `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
+
+/**
+ * Organization + WebSite JSON-LD for the agency's own site — what search engines use
+ * to recognise the business (knowledge panel, rich results). Only emits facts that
+ * are configured (email), never invents them.
+ */
+export function organizationJsonLd() {
+  const ld: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "@id": `${brand.url}#org`,
+    name: brand.legalName,
+    url: brand.url,
+    description: brand.tagline,
+    areaServed: brand.location,
+    knowsAbout: ["Web design", "Local SEO", "Conversion optimisation", "Lead generation"],
+    makesOffer: [
+      { "@type": "Offer", name: "Website build", priceCurrency: "GBP", price: (PRICING.buildFromPence / 100).toFixed(0) },
+      { "@type": "Offer", name: "Website care plan", priceCurrency: "GBP", price: (PRICING.carePlanPence / 100).toFixed(0) },
+    ],
+  };
+  if (hasBrandEmail) ld.email = brand.email;
+  if (hasBrandPhone) ld.telephone = brand.phone;
+  return ld;
+}
+
+export function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${brand.url}#website`,
+    url: brand.url,
+    name: brand.name,
+    description: brand.tagline,
+    publisher: { "@id": `${brand.url}#org` },
+  };
+}

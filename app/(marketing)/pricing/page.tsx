@@ -2,7 +2,11 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { PRICING, gbp } from "@/lib/brand";
 
-export const metadata: Metadata = { title: "Pricing" };
+export const metadata: Metadata = {
+  title: "Pricing",
+  description: "Simple, transparent website pricing — a one-off build fee plus a low monthly care plan. Cancel anytime.",
+  alternates: { canonical: "/pricing" },
+};
 
 const INCLUDED = [
   "Bespoke, mobile-first website designed around your customers",

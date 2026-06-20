@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { brand, hasBrandEmail } from "@/lib/brand";
 
-export const metadata: Metadata = { title: "Privacy Policy" };
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  alternates: { canonical: "/privacy" },
+};
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (

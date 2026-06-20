@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { brand, hasBrandEmail, hasBrandPhone } from "@/lib/brand";
 
-export const metadata: Metadata = { title: "Contact" };
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Get a free website audit and a real demo of your new site — no obligation.",
+  alternates: { canonical: "/contact" },
+};
 
 export default function ContactPage() {
   return (
