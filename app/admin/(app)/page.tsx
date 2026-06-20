@@ -18,6 +18,7 @@ import { buildEmpirePortfolio } from "@/lib/empire";
 import { PROSPECT_STATUSES, type OutreachMessage, type Proposal, type ProspectStatus, type SitePreview } from "@/lib/types";
 import Nexus, { type NexusData, type NexusAgent } from "./Nexus";
 import StarMap, { type StarNode } from "./StarMap";
+import AutopilotButton from "./AutopilotButton";
 
 const AGENT_LABELS: Record<string, string> = {
   discovery: "Discovery",
@@ -277,6 +278,9 @@ export default async function CommandCenterPage() {
     <div className="space-y-6">
       {/* THE NEXUS — the agency as a living operations station (primary view). */}
       <Nexus data={nexusData} agents={agents} orgName={org.name} />
+
+      {/* AUTOPILOT — drive the whole funnel start-to-finish in one pass. */}
+      <AutopilotButton />
 
       {/* DISCOVERY STARMAP — the real business graph as a zoomable spatial map. */}
       <StarMap nodes={starNodes} />

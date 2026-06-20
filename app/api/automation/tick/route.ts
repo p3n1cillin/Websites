@@ -5,6 +5,8 @@ import { listEnabledWorkflowsAllOrgs } from "@/lib/workflows";
 import { executeWorkflowForSeed, prospectEntryStatus } from "@/lib/workflow-engine";
 import { getProspectsForOrg } from "@/lib/prospects";
 import { dispatchDueFollowUps } from "@/lib/outreach-cadence";
+import { runAutopilot } from "@/lib/autopilot";
+import { getOrgById } from "@/lib/orgs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -56,20 +58,37 @@ async function handle(request: Request): Promise<Response> {
     }
   }
 
-  // Unattended follow-ups: for every org with automation enabled, send any cadence
-  // steps now due (no-op without Resend / prospect emails — never fakes a send).
+  // Unattended AUTOPILOT: for every org with automation enabled, drive the whole
+  // funnel forward one step (discover → demos → outreach → ventures). Never fakes a
+  // send/payment; human-gated steps are skipped. Falls back to follow-ups only if the
+  // org record can't be loaded (autopilot needs the owner for agent attribution).
   let followUpsSent = 0;
+  let demosBuilt = 0;
+  let discovered = 0;
   const orgIds = [...new Set(workflows.map((wf) => wf.orgId))];
   for (const orgId of orgIds) {
     try {
-      const res = await dispatchDueFollowUps({ id: orgId, name: "" });
-      followUpsSent += res.sent;
+      const org = await getOrgById(orgId);
+      if (org) {
+        const ap = await runAutopilot({ orgId, orgName: org.name, ownerUserId: org.ownerUserId });
+        followUpsSent += ap.outreachSent;
+        demosBuilt += ap.demosBuilt;
+        discovered += ap.discovered;
+      } else {
+        const res = await dispatchDueFollowUps({ id: orgId, name: "" });
+        followUpsSent += res.sent;
+      }
     } catch {
-      /* one org's follow-ups failing must not stop the tick */
+      /* one org's autopilot failing must not stop the tick */
     }
   }
 
-  return NextResponse.json({ ok: true, workflows: workflows.length, runs, followUpsSent });
+  return NextResponse.json({
+    ok: true,
+    workflows: workflows.length,
+    runs,
+    autopilot: { discovered, demosBuilt, followUpsSent },
+  });
 }
 
 export const GET = handle;
