@@ -10,7 +10,18 @@ import {
   updateChangeRequestStatus,
   deleteChangeRequest,
 } from "@/lib/change-requests";
-import { CHANGE_REQUEST_STATUSES, type ChangeRequestStatus, type CustomerReport } from "@/lib/types";
+import {
+  getRetainerRecord,
+  setRetainerStatus,
+  setRetainerAmount,
+} from "@/lib/retainers";
+import {
+  CHANGE_REQUEST_STATUSES,
+  RETAINER_STATUSES,
+  type ChangeRequestStatus,
+  type CustomerReport,
+  type RetainerStatus,
+} from "@/lib/types";
 
 /** Run the Success agent for one of the org's businesses (read-only report). */
 export async function runReportAction(
@@ -52,6 +63,34 @@ export async function deleteChangeRequestAction(
   const cr = await getChangeRequestRecord(id);
   if (!cr || cr.orgId !== org.id) return { ok: false, error: "Request not found." };
   await deleteChangeRequest(id);
+  return { ok: true };
+}
+
+/** Pause / resume / cancel a client's recurring retainer (changes true MRR). */
+export async function setRetainerStatusAction(
+  id: string,
+  status: RetainerStatus
+): Promise<{ ok: boolean; error?: string }> {
+  const org = await requireOrg();
+  if (!RETAINER_STATUSES.includes(status)) return { ok: false, error: "Invalid status." };
+  const r = await getRetainerRecord(id);
+  if (!r || r.orgId !== org.id) return { ok: false, error: "Retainer not found." };
+  await setRetainerStatus(id, status);
+  return { ok: true };
+}
+
+/** Set a client's agreed monthly fee (pounds → pence). */
+export async function setRetainerAmountAction(
+  id: string,
+  monthlyPounds: number
+): Promise<{ ok: boolean; error?: string }> {
+  const org = await requireOrg();
+  if (!Number.isFinite(monthlyPounds) || monthlyPounds < 0) {
+    return { ok: false, error: "Invalid amount." };
+  }
+  const r = await getRetainerRecord(id);
+  if (!r || r.orgId !== org.id) return { ok: false, error: "Retainer not found." };
+  await setRetainerAmount(id, Math.round(monthlyPounds * 100));
   return { ok: true };
 }
 

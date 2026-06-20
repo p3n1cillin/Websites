@@ -2,18 +2,21 @@ import { requireOrg } from "@/lib/auth";
 import { getPortalsForOrg } from "@/lib/customers";
 import { getBusinessesForOrg } from "@/lib/businesses";
 import { getChangeRequestsForOrg } from "@/lib/change-requests";
+import { getRetainersForOrg } from "@/lib/retainers";
 import { SITE_URL } from "@/lib/seo";
 import type { ChangeRequest } from "@/lib/types";
 import Customers, { type CustomerView } from "./Customers";
+import Retainers from "./Retainers";
 
 export const dynamic = "force-dynamic";
 
 export default async function CustomersPage() {
   const org = await requireOrg();
-  const [portals, businesses, requests] = await Promise.all([
+  const [portals, businesses, requests, retainers] = await Promise.all([
     getPortalsForOrg(org.id),
     getBusinessesForOrg(org.id),
     getChangeRequestsForOrg(org.id),
+    getRetainersForOrg(org.id),
   ]);
 
   const bizById = new Map(businesses.map((b) => [b.id, b]));
@@ -57,6 +60,8 @@ export default async function CustomersPage() {
           </span>
         </div>
       </div>
+
+      <Retainers retainers={retainers} />
 
       {customers.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-12 text-center text-slate-500">

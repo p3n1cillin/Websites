@@ -2,6 +2,7 @@
 
 import { getProposalByToken, updateProposalStatus } from "@/lib/proposals";
 import { getProspectRecord, updateProspectStatus } from "@/lib/prospects";
+import { ensureRetainerForWonDeal } from "@/lib/retainers";
 
 /**
  * Public accept action for /proposal/[token]. Capability-by-token: the prospect
@@ -21,6 +22,12 @@ export async function acceptProposalAction(
   const prospect = await getProspectRecord(proposal.prospectId);
   if (prospect && prospect.status !== "won") {
     await updateProspectStatus(prospect.id, "won");
+    // Revenue truth: open a real recurring retainer for the won client (idempotent).
+    await ensureRetainerForWonDeal({
+      orgId: prospect.orgId,
+      name: prospect.name,
+      prospectId: prospect.id,
+    });
   }
   return { ok: true };
 }

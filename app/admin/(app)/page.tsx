@@ -9,6 +9,7 @@ import { getOutreachForOrg } from "@/lib/outreach";
 import { getCostToday, getCostThisMonth } from "@/lib/ai/cost";
 import { getRecentAgentRuns } from "@/lib/agent-runs";
 import { buildLeadIntelReport } from "@/lib/lead-intel";
+import { getRetainersForOrg, activeMrrPence, DEFAULT_RETAINER_PENCE } from "@/lib/retainers";
 import { PROSPECT_STATUSES, type ProspectStatus } from "@/lib/types";
 
 /**
@@ -66,7 +67,7 @@ function Stat({
 export default async function CommandCenterPage() {
   const org = await requireOrg();
 
-  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs] =
+  const [prospects, proposals, leads, previews, previewStats, outreach, costToday, costMonth, runs, retainers] =
     await Promise.all([
       getProspectsForOrg(org.id),
       getProposalsForOrg(org.id),
@@ -77,6 +78,7 @@ export default async function CommandCenterPage() {
       getCostToday(org.id),
       getCostThisMonth(org.id),
       getRecentAgentRuns(org.id, 200),
+      getRetainersForOrg(org.id),
     ]);
 
   // ---- Pipeline ---------------------------------------------------------------
@@ -104,13 +106,16 @@ export default async function CommandCenterPage() {
   );
 
   // ---- Goal: £1000/mo recurring ----------------------------------------------
-  // Recurring revenue is modelled (won clients × a typical monthly retainer) since
-  // client subscriptions aren't billed through this app — clearly an estimate.
-  const MONTHLY_RETAINER_PENCE = 3900; // £39/mo typical care plan
+  // TRUE MRR = sum of ACTIVE client retainers (real, agreed, drops on churn). If
+  // none have been opened yet, fall back to a projection (won clients × £39) so a
+  // fresh org still sees the target — clearly labelled below as projected vs real.
   const TARGET_PENCE = 100_000; // £1,000/mo
-  const recurringPence = wonProspects.length * MONTHLY_RETAINER_PENCE;
+  const realMrrPence = activeMrrPence(retainers);
+  const activeRetainers = retainers.filter((r) => r.status === "active").length;
+  const hasRetainers = retainers.length > 0;
+  const recurringPence = hasRetainers ? realMrrPence : wonProspects.length * DEFAULT_RETAINER_PENCE;
   const goalPct = Math.min(100, Math.round((recurringPence / TARGET_PENCE) * 100));
-  const clientsToGoal = Math.max(0, Math.ceil((TARGET_PENCE - recurringPence) / MONTHLY_RETAINER_PENCE));
+  const clientsToGoal = Math.max(0, Math.ceil((TARGET_PENCE - recurringPence) / DEFAULT_RETAINER_PENCE));
 
   // ---- AI performance ---------------------------------------------------------
   const finished = runs.filter((r) => r.status === "completed" || r.status === "failed");
@@ -180,7 +185,9 @@ export default async function CommandCenterPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5">
           <div className="flex flex-wrap items-end justify-between gap-2">
             <div>
-              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">Goal · £1,000/mo recurring</h2>
+              <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Goal · £1,000/mo recurring{hasRetainers ? "" : " (projected)"}
+              </h2>
               <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">
                 {gbp(recurringPence)}<span className="text-base font-normal text-slate-400">/mo</span>
                 <span className="ml-2 text-sm font-medium text-slate-500">{goalPct}%</span>
@@ -199,7 +206,10 @@ export default async function CommandCenterPage() {
             />
           </div>
           <p className="mt-2 text-xs text-slate-400">
-            Projected at £39/mo per won client ({wonProspects.length} won) — not yet billed here. Plus {gbp(wonValuePence)} in one-off build fees booked.
+            {hasRetainers
+              ? `Real agreed MRR across ${activeRetainers} active retainer${activeRetainers === 1 ? "" : "s"} — manage them in Customers.`
+              : `Projected at £39/mo per won client (${wonProspects.length} won) — open a retainer in Customers to track real MRR.`}{" "}
+            Plus {gbp(wonValuePence)} in one-off build fees booked.
           </p>
         </section>
       )}

@@ -33,6 +33,7 @@ import {
 import { sendOutreachEmail, emailConfigured } from "@/lib/email";
 import { dispatchDueFollowUps } from "@/lib/outreach-cadence";
 import { recordWinningPattern } from "@/lib/knowledge";
+import { ensureRetainerForWonDeal } from "@/lib/retainers";
 import type { Prospect } from "@/lib/types";
 import { SITE_URL } from "@/lib/seo";
 import {
@@ -53,6 +54,13 @@ async function ownedProspect(id: string, orgId: string) {
  * guidance, so outreach gets sharper with every close. Best-effort; never blocks.
  */
 async function recordWinFeedback(prospect: Prospect): Promise<void> {
+  // Revenue truth: open a real recurring retainer for the won client (idempotent,
+  // best-effort) so the Command Center counts actual MRR, not a flat projection.
+  await ensureRetainerForWonDeal({
+    orgId: prospect.orgId,
+    name: prospect.name,
+    prospectId: prospect.id,
+  });
   try {
     const industry = prospect.source?.industry?.trim() || prospect.category;
     const msgs = await getOutreachForOrg(prospect.orgId);

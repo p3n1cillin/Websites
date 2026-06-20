@@ -591,6 +591,29 @@ export interface CustomerPortal {
   updatedAt: string;
 }
 
+export type RetainerStatus = "active" | "paused" | "cancelled";
+export const RETAINER_STATUSES: RetainerStatus[] = ["active", "paused", "cancelled"];
+
+/**
+ * A real, agreed monthly recurring fee for a WON client (the revenue-truth layer).
+ * The Command Center sums ACTIVE retainers as true MRR — see lib/retainers.ts.
+ */
+export interface ClientRetainer {
+  id: string;
+  orgId: string;
+  prospectId?: string | null;
+  businessId?: string | null;
+  name: string;
+  /** Agreed monthly fee, pence. */
+  monthlyPence: number;
+  status: RetainerStatus;
+  note?: string | null;
+  startedAt: string;
+  cancelledAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type ChangeRequestStatus = "open" | "in_progress" | "done" | "declined";
 export const CHANGE_REQUEST_STATUSES: ChangeRequestStatus[] = [
   "open",
