@@ -233,6 +233,47 @@ export async function discoverCampaignAction(formData: FormData): Promise<void> 
 }
 
 // ---------------------------------------------------------------------------
+// Expand competitors — grow the markets we're already in. Derives a campaign from
+// our existing high-opportunity (city, service) footholds and re-sweeps them to
+// surface competitors we haven't captured yet. Reuses the campaign + Discovery
+// pipeline (its dedup makes re-finding the seeds harmless).
+// ---------------------------------------------------------------------------
+export async function expandCompetitorsAction(formData: FormData): Promise<void> {
+  const org = await requireOrg();
+  const minOpportunity = Math.min(Math.max(Number(formData.get("minOpportunity")) || 50, 0), 100);
+
+  const prospects = await getProspectsForOrg(org.id);
+  const { buildExpansionBrief } = await import("@/lib/discovery-sources/expansion");
+  const brief = buildExpansionBrief(prospects, { minOpportunity });
+  if (brief.areas.length === 0) redirect("/admin/prospects?found=0&seen=0&expanded=1");
+
+  const { runDiscoveryCampaign } = await import("@/lib/discovery-sources/campaign");
+  let candidates: DiscoveryCandidate[] = [];
+  try {
+    const res = await runDiscoveryCampaign(brief);
+    candidates = res.candidates;
+  } catch {
+    candidates = [];
+  }
+  if (candidates.length === 0) redirect("/admin/prospects?found=0&seen=0&expanded=1");
+
+  const input: DiscoveryAgentInput = {
+    orgId: org.id,
+    candidates,
+    note: `Competitor expansion — ${brief.areas.length} area(s) × ${brief.categories?.length ?? 0} service(s)`,
+  };
+  const res = await runAgent<DiscoveryAgentOutput>({
+    kind: "discovery",
+    orgId: org.id,
+    actorUserId: org.ownerUserId,
+    autonomyOverride: "auto",
+    input,
+  });
+  const created = res.output?.created ?? 0;
+  redirect(`/admin/prospects?found=${created}&seen=${candidates.length}&expanded=1`);
+}
+
+// ---------------------------------------------------------------------------
 // Auto-build demos — one click takes the top-opportunity prospects with no demo
 // yet and runs the whole prep chain for each: analyse (Market) → build demo
 // (Prospecting) → draft first-touch outreach (Sales). The operator wakes up to

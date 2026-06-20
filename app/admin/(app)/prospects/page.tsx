@@ -15,6 +15,7 @@ import {
   discoverAction,
   discoverLiveAction,
   discoverCampaignAction,
+  expandCompetitorsAction,
   autoBuildDemosAction,
   runFollowUpsAction,
 } from "./actions";
@@ -26,7 +27,7 @@ export const dynamic = "force-dynamic";
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string };
+  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string };
 }) {
   const org = await requireOrg();
   const found = searchParams?.found;
@@ -34,6 +35,7 @@ export default async function ProspectsPage({
   const built = searchParams?.built;
   const sent = searchParams?.sent;
   const skipped = searchParams?.skipped;
+  const expanded = searchParams?.expanded;
   const [prospects, previews, outreach, portals, proposals, previewStats] = await Promise.all([
     getProspectsForOrg(org.id),
     getPreviewsForOrg(org.id),
@@ -109,10 +111,12 @@ export default async function ProspectsPage({
           }`}
         >
           {found !== "0"
-            ? `Discovered ${found} new local business${found === "1" ? "" : "es"} — analyse them to score the opportunity.`
+            ? `${expanded ? "Competitor expansion found" : "Discovered"} ${found} new local business${found === "1" ? "" : "es"} — analyse them to score the opportunity.`
             : seen && seen !== "0"
               ? `Found ${seen} business${seen === "1" ? "" : "es"} nearby, but they're already in your pipeline — try a different area.`
-              : "No businesses found there — try a larger area, a nearby town, or check the spelling."}
+              : expanded
+                ? "No new competitors found — add more prospects (or lower the score threshold) to seed the expansion."
+                : "No businesses found there — try a larger area, a nearby town, or check the spelling."}
         </p>
       )}
 
@@ -274,6 +278,34 @@ export default async function ProspectsPage({
         <p className="text-xs text-slate-400">
           Runs politely (~1 query/sec) to respect free OSM limits — a big sweep can take a minute.
         </p>
+      </form>
+
+      {/* Expand competitors — grow the markets we already have a foothold in. */}
+      <form
+        action={expandCompetitorsAction}
+        className="flex flex-wrap items-end gap-3 rounded-2xl border border-fuchsia-200 bg-fuchsia-50/40 p-4"
+      >
+        <div className="flex-1">
+          <h2 className="text-sm font-semibold text-slate-800">🕸️ Expand competitors</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Re-sweeps the towns × services of your best existing prospects to surface competitors you
+            haven&apos;t captured yet — automatically maps each local industry. Dedups against your pipeline.
+          </p>
+        </div>
+        <label className="text-xs text-slate-600">
+          Min opportunity
+          <input
+            name="minOpportunity"
+            type="number"
+            min={0}
+            max={100}
+            defaultValue={50}
+            className="mt-1 block w-24 rounded-md border border-slate-300 px-3 py-2 text-sm"
+          />
+        </label>
+        <button className="rounded-lg bg-fuchsia-600 px-4 py-2 text-sm font-medium text-white hover:bg-fuchsia-700">
+          Expand competitors
+        </button>
       </form>
 
       {/* Opportunity clusters — the business graph: which industry×town pockets to own. */}
