@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { SITE_URL } from "@/lib/seo";
+import { brand } from "@/lib/brand";
 import "./globals.css";
 
 const inter = Inter({
@@ -12,11 +13,10 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Warrington Local Business Websites",
+    default: `${brand.name} — ${brand.tagline}`,
     template: "%s",
   },
-  description:
-    "Professionally generated, conversion-optimised websites for local businesses across Warrington, UK.",
+  description: brand.tagline,
   robots: { index: true, follow: true },
 };
 

@@ -149,7 +149,7 @@ export function buildEmpirePortfolio(input: EmpireInputs): EmpirePortfolio {
   }
   assets.push({
     id: "asset-platform",
-    name: "Agency OS platform",
+    name: "Empire Agencies platform",
     type: "saas",
     monthlyRevenuePence: 0,
     note: "The build/discovery/sales engine itself — licensable as SaaS.",
@@ -221,7 +221,7 @@ export function buildEmpirePortfolio(input: EmpireInputs): EmpirePortfolio {
   // 4. SaaS — license the platform itself. Highest empire synergy.
   opps.push({
     id: "opp-saas",
-    title: "License the Agency OS as SaaS",
+    title: "License the Empire Agencies platform as SaaS",
     category: "saas",
     rationale: "Sell the discovery→build→sell engine to other agencies — recurring seats, the platform already exists.",
     effort: "high",

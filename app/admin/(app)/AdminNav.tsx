@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "../auth-actions";
+import { brand } from "@/lib/brand";
 
 /**
  * Admin navigation — a grouped sidebar on desktop, a condensed scrolling bar on
@@ -105,9 +106,9 @@ export default function AdminNav({
   const Wordmark = (
     <Link href="/admin" className="flex items-center gap-2.5">
       <span className="grid h-7 w-7 place-items-center rounded-lg bg-slate-900 text-xs font-bold text-white">
-        A
+        {brand.name.charAt(0)}
       </span>
-      <span className="text-sm font-semibold tracking-tight text-slate-900">Agency OS</span>
+      <span className="text-sm font-semibold tracking-tight text-slate-900">{brand.name}</span>
     </Link>
   );
 
