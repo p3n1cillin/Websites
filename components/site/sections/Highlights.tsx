@@ -1,5 +1,5 @@
 import type { Business } from "@/lib/types";
-import { Section, Container, Eyebrow, Heading } from "@/components/site/primitives";
+import { Section, Container, Heading } from "@/components/site/primitives";
 import Reveal from "@/components/Reveal";
 import { offerCopy } from "@/lib/site-copy";
 
@@ -15,15 +15,14 @@ export default function Highlights({ business }: { business: Business }) {
     <Section tone="surface">
       <Container>
         <div className="max-w-2xl">
-          <Eyebrow>What we offer</Eyebrow>
-          <Heading className="mt-2 text-3xl sm:text-4xl">
+          <Heading className="text-3xl sm:text-4xl">
             {h.heading ?? offerCopy(business).heading}
           </Heading>
         </div>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {h.items.map((item) => (
             <Reveal key={item.title}>
-              <div className="h-full rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-6 shadow-sm">
+              <div className="h-full rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-6 shadow-soft">
                 <div className="mb-4 h-1 w-10 rounded-full bg-brand" />
                 <h3 className="text-lg font-bold text-[rgb(var(--ink))]">{item.title}</h3>
                 <p className="mt-2 text-[rgb(var(--ink-muted))]">{item.description}</p>

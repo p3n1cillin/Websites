@@ -2,7 +2,7 @@ import type { Business } from "@/lib/types";
 import type { DesignDNA } from "@/lib/design/types";
 import Reveal from "@/components/Reveal";
 import StarRating from "@/components/StarRating";
-import { Section, Container, Eyebrow, Heading } from "../primitives";
+import { Section, Container, Heading } from "../primitives";
 
 /** Testimonials variant: one large featured quote with a strip of supporting voices. */
 export default function TestimonialsQuote({ business }: { business: Business; dna: DesignDNA }) {
@@ -12,8 +12,7 @@ export default function TestimonialsQuote({ business }: { business: Business; dn
     <Section tone="muted">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow>Reviews</Eyebrow>
-          <Heading className="mt-2 text-3xl sm:text-4xl">
+          <Heading className="text-3xl sm:text-4xl">
             What {business.address.city} says about us
           </Heading>
         </div>
@@ -55,7 +54,7 @@ export default function TestimonialsQuote({ business }: { business: Business; dn
                 as="article"
                 key={t.author}
                 delay={i * 0.08}
-                className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-6 shadow-sm"
+                className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-6 shadow-soft"
               >
                 <StarRating value={t.rating} size="h-4 w-4" />
                 <blockquote className="mt-3 text-[rgb(var(--ink-muted))]">“{t.quote}”</blockquote>

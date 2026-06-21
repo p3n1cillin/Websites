@@ -1,5 +1,5 @@
 import type { Business } from "@/lib/types";
-import { Section, Container, Eyebrow, Heading } from "@/components/site/primitives";
+import { Section, Container, Heading } from "@/components/site/primitives";
 
 /**
  * Menu / price list for food businesses (restaurants, cafés, takeaways). Renders
@@ -11,8 +11,7 @@ export default function Menu({ business }: { business: Business }) {
   return (
     <Section tone="surface">
       <Container className="max-w-3xl">
-        <Eyebrow>Menu</Eyebrow>
-        <Heading className="mt-2 text-3xl sm:text-4xl">{menu.heading ?? "Our menu"}</Heading>
+        <Heading className="text-3xl sm:text-4xl">{menu.heading ?? "Our menu"}</Heading>
         <div className="mt-8 space-y-10">
           {menu.sections.map((sec) => (
             <div key={sec.name}>

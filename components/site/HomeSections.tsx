@@ -82,7 +82,7 @@ export default function HomeSections({
 
           <Reveal from="left" className="grid gap-6">
             <OpeningHours business={business} />
-            <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-6 shadow-sm">
+            <div className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-6 shadow-soft">
               <h3 className="text-lg font-bold text-[rgb(var(--ink))]">
                 Proudly serving {business.address.city}
               </h3>

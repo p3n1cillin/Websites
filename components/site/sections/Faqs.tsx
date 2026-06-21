@@ -1,5 +1,5 @@
 import type { Business } from "@/lib/types";
-import { Section, Container, Eyebrow, Heading } from "@/components/site/primitives";
+import { Section, Container, Heading } from "@/components/site/primitives";
 
 /**
  * Customer FAQs — universal SEO + conversion win, tailored per industry by the
@@ -12,8 +12,7 @@ export default function Faqs({ business }: { business: Business }) {
   return (
     <Section tone="muted">
       <Container className="max-w-3xl">
-        <Eyebrow>FAQs</Eyebrow>
-        <Heading className="mt-2 text-3xl sm:text-4xl">Frequently asked questions</Heading>
+        <Heading className="text-3xl sm:text-4xl">Frequently asked questions</Heading>
         <div className="mt-8 divide-y divide-[rgb(var(--border))] border-y border-[rgb(var(--border))]">
           {faqs.map((f) => (
             <details key={f.question} className="group py-4">
