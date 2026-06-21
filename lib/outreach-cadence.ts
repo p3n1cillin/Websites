@@ -69,6 +69,8 @@ export interface DispatchResult {
   skipped: number;
   /** Skipped specifically because the prospect has no email on file. */
   skippedNoEmail: number;
+  /** Had an email + Resend, but the send was REJECTED (e.g. unverified from-domain). */
+  sendFailed: number;
   /** False when RESEND_API_KEY isn't set on this deployment (can't send at all). */
   emailConfigured: boolean;
 }
@@ -91,6 +93,7 @@ export async function dispatchDueFollowUps(
   let sent = 0;
   let skipped = 0;
   let skippedNoEmail = 0;
+  let sendFailed = 0;
 
   for (const { message, prospect } of due.slice(0, max)) {
     // Can't send at all without Resend, or for non-email channels.
@@ -112,6 +115,7 @@ export async function dispatchDueFollowUps(
     });
     if (!ok) {
       skipped += 1;
+      sendFailed += 1; // Resend rejected it (often an unverified from-domain)
       continue;
     }
     await markOutreachSent(message.id);
@@ -121,5 +125,5 @@ export async function dispatchDueFollowUps(
     }
     sent += 1;
   }
-  return { due: due.length, sent, skipped, skippedNoEmail, emailConfigured };
+  return { due: due.length, sent, skipped, skippedNoEmail, sendFailed, emailConfigured };
 }

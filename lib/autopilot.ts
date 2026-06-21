@@ -158,10 +158,21 @@ export async function runAutopilot(org: AutopilotOrg): Promise<AutopilotResult> 
     const dispatch = await dispatchDueFollowUps({ id: org.orgId, name: org.orgName });
     res.outreachSent = dispatch.sent;
     res.outreachSkipped = dispatch.skipped;
-    if (dispatch.skipped > 0 && dispatch.sent === 0) {
-      res.blocked.push(
-        `${dispatch.skipped} message(s) ready but not sent — set RESEND_API_KEY + ensure prospects have emails.`
-      );
+    if (dispatch.skipped > 0) {
+      // Name the ACTUAL cause so the operator fixes the right thing.
+      if (!dispatch.emailConfigured) {
+        res.blocked.push(
+          `${dispatch.skipped} message(s) ready, but email isn't configured on this deployment — set RESEND_API_KEY + OUTREACH_FROM_EMAIL and redeploy.`
+        );
+      } else if (dispatch.sendFailed > 0) {
+        res.blocked.push(
+          `${dispatch.sendFailed} send(s) rejected by Resend — check your sending domain is verified and OUTREACH_FROM_EMAIL is an address on it.`
+        );
+      } else if (dispatch.skippedNoEmail > 0) {
+        res.blocked.push(
+          `${dispatch.skippedNoEmail} due prospect(s) have no email yet — run "Find contacts" to scrape more.`
+        );
+      }
     }
   } catch {
     res.notes.push("Outreach step failed this run.");

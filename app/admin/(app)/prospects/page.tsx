@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string; noemail?: string; noresend?: string; enriched?: string; efound?: string; pfound?: string; escan?: string; wfound?: string; enoweb?: string };
+  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string; noemail?: string; sendfail?: string; noresend?: string; enriched?: string; efound?: string; pfound?: string; escan?: string; wfound?: string; enoweb?: string };
 }) {
   const org = await requireOrg();
   const found = searchParams?.found;
@@ -38,6 +38,7 @@ export default async function ProspectsPage({
   const skipped = searchParams?.skipped;
   const enriched = searchParams?.enriched === "1";
   const noEmail = Number(searchParams?.noemail ?? 0);
+  const sendFail = Number(searchParams?.sendfail ?? 0);
   const noResend = searchParams?.noresend === "1";
   const expanded = searchParams?.expanded;
   const [prospects, previews, outreach, portals, proposals, previewStats] = await Promise.all([
@@ -134,11 +135,13 @@ export default async function ProspectsPage({
             ? `Sent ${sent} follow-up${sent === "1" ? "" : "s"}${skipped && skipped !== "0" ? ` (${skipped} skipped).` : "."}`
             : noResend
               ? "Nothing sent: email isn't configured on this deployment. Set RESEND_API_KEY (and OUTREACH_FROM_EMAIL) in your hosting env, then redeploy."
-              : noEmail > 0
-                ? `Nothing sent: ${noEmail} due ${noEmail === 1 ? "prospect has" : "prospects have"} no email address. Run Analyse or Autopilot to scrape emails from their sites, or add emails manually. (Discovery sources rarely include an email.)`
-                : skipped && skipped !== "0"
-                  ? `Nothing sent: ${skipped} due but skipped.`
-                  : "Nothing was due to send."}
+              : sendFail > 0
+                ? `Nothing sent: Resend rejected ${sendFail} send${sendFail === 1 ? "" : "s"}. Check your sending domain is verified in Resend and OUTREACH_FROM_EMAIL is an address on that domain (e.g. hello@empireagencies.com).`
+                : noEmail > 0
+                  ? `Nothing sent: ${noEmail} due ${noEmail === 1 ? "prospect has" : "prospects have"} no email address. Use "Find contacts" to scrape more, or add emails manually.`
+                  : skipped && skipped !== "0"
+                    ? `Nothing sent: ${skipped} due but skipped.`
+                    : "Nothing was due to send."}
         </p>
       )}
 
