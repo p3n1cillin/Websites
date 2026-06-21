@@ -146,6 +146,54 @@ export function extractPhone(html: string): string | null {
   return null;
 }
 
+/** Mine schema.org JSON-LD blocks for telephone/email (the most reliable source). */
+function fromJsonLd(html: string): { email?: string; phone?: string } {
+  const result: { email?: string; phone?: string } = {};
+  const re = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  const visit = (node: unknown) => {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) return node.forEach(visit);
+    const o = node as Record<string, unknown>;
+    if (!result.email && typeof o.email === "string") result.email = o.email;
+    if (!result.phone && typeof o.telephone === "string") result.phone = o.telephone;
+    for (const v of Object.values(o)) if (v && typeof v === "object") visit(v);
+  };
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) {
+    try { visit(JSON.parse(m[1].trim())); } catch { /* ignore malformed block */ }
+  }
+  return result;
+}
+
+/** Mine HTML microdata (itemprop) for telephone/email. */
+function fromMicrodata(html: string): { email?: string; phone?: string } {
+  const out: { email?: string; phone?: string } = {};
+  const tel = html.match(/itemprop=["']telephone["'][^>]*?(?:content=["']([^"']+)["']|>\s*([^<]{5,40}))/i);
+  if (tel) out.phone = (tel[1] || tel[2])?.trim();
+  const em = html.match(/itemprop=["']email["'][^>]*?(?:content=["']([^"']+)["']|>\s*([^<]{5,80}))/i);
+  if (em) out.email = (em[1] || em[2])?.trim();
+  return out;
+}
+
+/**
+ * Mine a page's contact details from MULTIPLE sources, best-reliability first:
+ * schema.org JSON-LD → microdata → mailto/tel links → visible text. Validates
+ * candidates (email junk filter, phone digit count). Never invents.
+ */
+export function mineContact(html: string, host?: string): { email: string | null; phone: string | null } {
+  const structured = [fromJsonLd(html), fromMicrodata(html)];
+  const ldEmail =
+    structured
+      .map((s) => s.email?.toLowerCase().replace(/^mailto:/, "").trim())
+      .find((e) => e && e.includes("@") && !EMAIL_JUNK.test(e)) ?? null;
+  const ldPhone =
+    structured.map((s) => s.phone).find((p) => p && p.replace(/\D/g, "").length >= 9) ?? null;
+  return {
+    email: ldEmail ?? extractEmail(html, host),
+    phone: (ldPhone ? ldPhone.replace(/\s+/g, " ").trim() : null) ?? extractPhone(html),
+  };
+}
+
 /** GET a page, capped + hard-timeout, returning HTML or null. Never throws. */
 async function fetchHtmlSafe(url: string, timeoutMs = 6_000): Promise<string | null> {
   const controller = new AbortController();
@@ -196,8 +244,9 @@ export async function deepContactLookup(
     const html = await fetchHtmlSafe(url);
     fetches += 1;
     if (!html) continue;
-    if (need.email && !email) email = extractEmail(html, host);
-    if (need.phone && !phone) phone = extractPhone(html);
+    const mined = mineContact(html, host);
+    if (need.email && !email) email = mined.email;
+    if (need.phone && !phone) phone = mined.phone;
   }
   return { email, phone };
 }
@@ -272,8 +321,7 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
   const reputation = extractReputation(html);
   let host: string | undefined;
   try { host = new URL(finalUrl).host; } catch { /* ignore */ }
-  const contactEmail = extractEmail(html, host);
-  const contactPhone = extractPhone(html);
+  const { email: contactEmail, phone: contactPhone } = mineContact(html, host);
 
   penalise(!hasViewport, 20, "Not mobile-friendly (no viewport tag) — loses mobile customers.");
   penalise(!https, 14, "No HTTPS — browsers flag the site as 'Not secure'.");

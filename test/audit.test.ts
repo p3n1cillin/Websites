@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { extractEmail, extractPhone } from "@/lib/audit";
+import { extractEmail, extractPhone, mineContact } from "@/lib/audit";
 
 test("pulls a mailto: address from the homepage", () => {
   const html = `<a href="mailto:info@theshop.co.uk">Email us</a>`;
@@ -35,4 +35,20 @@ test("finds a UK phone in plain text", () => {
 
 test("ignores numbers that aren't phone numbers", () => {
   assert.equal(extractPhone("<p>VAT 1234 · order 5</p>"), null);
+});
+
+test("mineContact prefers schema.org JSON-LD for email + phone", () => {
+  const html = `<script type="application/ld+json">
+    {"@type":"LocalBusiness","name":"X","telephone":"01925 600600","email":"info@biz.co.uk"}
+  </script><p>some other text noise@spam.com 0000</p>`;
+  const c = mineContact(html, "biz.co.uk");
+  assert.equal(c.email, "info@biz.co.uk");
+  assert.equal(c.phone, "01925 600600");
+});
+
+test("mineContact falls back to mailto/tel when no structured data", () => {
+  const html = `<a href="mailto:hi@shop.com">e</a><a href="tel:0161 123 4567">c</a>`;
+  const c = mineContact(html, "shop.com");
+  assert.equal(c.email, "hi@shop.com");
+  assert.equal(c.phone, "0161 123 4567");
 });
