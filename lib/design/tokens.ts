@@ -23,10 +23,12 @@ import type {
 const FONT_STACKS: Record<FontKey, string> = {
   inter: "var(--font-sans), system-ui, -apple-system, Segoe UI, Roboto, sans-serif",
   system: "system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif",
-  grotesk: "'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif",
+  // grotesk / garamond / slab are real self-hosted faces loaded in the [business]
+  // layout (next/font), exposed as --font-* vars; fall back to web-safe stacks.
+  grotesk: "var(--font-grotesk), 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif",
   georgia: "Georgia, Cambria, 'Times New Roman', Times, serif",
-  garamond: "'EB Garamond', 'Hoefler Text', Garamond, Georgia, serif",
-  slab: "Rockwell, 'Roboto Slab', 'Courier New', Georgia, serif",
+  garamond: "var(--font-garamond), 'Hoefler Text', Garamond, Georgia, serif",
+  slab: "var(--font-slab), Rockwell, 'Roboto Slab', Georgia, serif",
 };
 
 /** Surface + ink palette per mode, as alpha-aware "r g b" triplets. */

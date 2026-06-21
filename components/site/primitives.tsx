@@ -68,7 +68,7 @@ export function Heading({
   return (
     <Tag
       style={{ fontFamily: "var(--font-heading)" }}
-      className={`font-extrabold tracking-tight text-[rgb(var(--ink))] ${className}`}
+      className={`font-bold tracking-tight text-[rgb(var(--ink))] ${className}`}
     >
       {children}
     </Tag>

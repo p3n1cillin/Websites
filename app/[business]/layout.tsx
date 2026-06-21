@@ -1,5 +1,14 @@
 import { notFound } from "next/navigation";
+import { Space_Grotesk, EB_Garamond, Roboto_Slab } from "next/font/google";
 import { getAllSlugs, getBusinessBySlug } from "@/lib/businesses";
+
+// Real, self-hosted display faces wired through the DNA font keys (lib/design/tokens
+// FONT_STACKS). Heading-only, so body stays fast on Inter/system. Lifts every
+// generated site's typography off web-safe system stacks.
+const grotesk = Space_Grotesk({ subsets: ["latin"], weight: ["500", "600", "700"], variable: "--font-grotesk", display: "swap" });
+const garamond = EB_Garamond({ subsets: ["latin"], weight: ["500", "600", "700"], style: ["normal", "italic"], variable: "--font-garamond", display: "swap" });
+const slab = Roboto_Slab({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-slab", display: "swap" });
+const FONT_VARS = `${grotesk.variable} ${garamond.variable} ${slab.variable}`;
 import { getPublishedPosts } from "@/lib/blog";
 import { getPalette } from "@/lib/branding";
 import { getDesignDNA } from "@/lib/design/dna";
@@ -33,7 +42,7 @@ export default async function BusinessLayout({ children, params }: LayoutProps) 
   const showBlog = (await getPublishedPosts(params.business)).length > 0;
 
   return (
-    <ThemeProvider business={business} dna={dna} className="flex min-h-screen flex-col">
+    <ThemeProvider business={business} dna={dna} className={`${FONT_VARS} flex min-h-screen flex-col`}>
       {/* LocalBusiness structured data — rendered once per site in the layout. */}
       <JsonLd data={localBusinessJsonLd(business)} />
       {/* Brand colour for browser UI / PWA theming. */}
