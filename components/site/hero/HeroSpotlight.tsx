@@ -37,7 +37,7 @@ export default function HeroSpotlight({
 
           <h1
             style={{ fontFamily: "var(--font-heading)" }}
-            className="mt-6 text-4xl font-extrabold leading-[1.08] tracking-tight text-[rgb(var(--ink))] sm:text-5xl lg:text-6xl"
+            className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight text-[rgb(var(--ink))] sm:text-5xl lg:text-6xl"
           >
             {business.categoryLabel} in <span className="text-brand">{business.address.city}</span>
           </h1>

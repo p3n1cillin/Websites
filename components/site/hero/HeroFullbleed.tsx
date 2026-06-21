@@ -51,7 +51,7 @@ export default function HeroFullbleed({
 
         <h1
           style={{ fontFamily: "var(--font-heading)" }}
-          className="mt-6 max-w-3xl text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
+          className="mt-6 max-w-3xl text-4xl font-bold leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-6xl"
         >
           {business.categoryLabel} in <span className="text-brand-light">{business.address.city}</span>
         </h1>

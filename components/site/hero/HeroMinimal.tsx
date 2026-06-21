@@ -39,7 +39,7 @@ export default function HeroMinimal({
 
           <h1
             style={{ fontFamily: "var(--font-heading)" }}
-            className="mt-5 text-5xl font-extrabold leading-[1.04] tracking-tight text-[rgb(var(--ink))] sm:text-6xl"
+            className="mt-5 text-5xl font-bold leading-[1.04] tracking-tight text-[rgb(var(--ink))] sm:text-6xl"
           >
             {business.categoryLabel}
             <br />
