@@ -127,6 +127,81 @@ export function extractEmail(html: string, siteHost?: string): string | null {
   return onDomain ?? clean[0];
 }
 
+/**
+ * Extract a plausible UK phone number — `tel:` links first (reliable), then text.
+ * Conservative digit-count validation so it never returns a random long number.
+ */
+export function extractPhone(html: string): string | null {
+  const tel = html.match(/href=["']tel:([+\d][\d\s()\-]{6,18})["']/i);
+  if (tel) {
+    const digits = tel[1].replace(/\D/g, "");
+    if (digits.length >= 9 && digits.length <= 13) return tel[1].replace(/\s+/g, " ").trim();
+  }
+  const text = html.replace(/<[^>]+>/g, " ");
+  const m = text.match(/(?:\+44\s?|\(?0)\d[\d\s()\-]{7,13}\d/);
+  if (m) {
+    const digits = m[0].replace(/\D/g, "");
+    if (digits.length >= 10 && digits.length <= 13) return m[0].replace(/\s+/g, " ").trim();
+  }
+  return null;
+}
+
+/** GET a page, capped + hard-timeout, returning HTML or null. Never throws. */
+async function fetchHtmlSafe(url: string, timeoutMs = 6_000): Promise<string | null> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, {
+      redirect: "follow",
+      signal: controller.signal,
+      headers: { "User-Agent": UA, Accept: "text/html,application/xhtml+xml" },
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    const text = await res.text();
+    return text.slice(0, MAX_BYTES);
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Common pages that carry contact details when the homepage doesn't. */
+const CONTACT_PATHS = ["/contact", "/contact-us", "/about", "/get-in-touch"];
+
+/**
+ * Deep contact lookup: when the homepage didn't yield an email/phone, fetch a few
+ * common contact pages and mine them. Bounded (stops as soon as both are found,
+ * max a handful of short fetches). Returns only what it genuinely finds — never
+ * fabricates. This is the "check multiple pages" enrichment.
+ */
+export async function deepContactLookup(
+  input: string,
+  need: { email: boolean; phone: boolean } = { email: true, phone: true }
+): Promise<{ email: string | null; phone: string | null }> {
+  const base = normalizeUrl(input);
+  if (!base) return { email: null, phone: null };
+  let host: string | undefined;
+  try { host = new URL(base).host; } catch { /* ignore */ }
+
+  let email: string | null = null;
+  let phone: string | null = null;
+  let fetches = 0;
+  for (const path of CONTACT_PATHS) {
+    if ((!need.email || email) && (!need.phone || phone)) break;
+    if (fetches >= 3) break;
+    let url: string;
+    try { url = new URL(path, base).toString(); } catch { continue; }
+    const html = await fetchHtmlSafe(url);
+    fetches += 1;
+    if (!html) continue;
+    if (need.email && !email) email = extractEmail(html, host);
+    if (need.phone && !phone) phone = extractPhone(html);
+  }
+  return { email, phone };
+}
+
 /** Pull recognised social-profile labels linked from the homepage HTML. */
 function extractSocials(html: string): string[] {
   const hrefs = html.match(/href=["']([^"']+)["']/gi) ?? [];
@@ -198,6 +273,7 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
   let host: string | undefined;
   try { host = new URL(finalUrl).host; } catch { /* ignore */ }
   const contactEmail = extractEmail(html, host);
+  const contactPhone = extractPhone(html);
 
   penalise(!hasViewport, 20, "Not mobile-friendly (no viewport tag) — loses mobile customers.");
   penalise(!https, 14, "No HTTPS — browsers flag the site as 'Not secure'.");
@@ -252,6 +328,7 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
     },
     reputation,
     contactEmail,
+    contactPhone,
     issues,
     at: new Date().toISOString(),
   };

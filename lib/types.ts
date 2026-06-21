@@ -401,6 +401,8 @@ export interface WebsiteAudit {
   };
   /** A contact email scraped from the homepage (mailto/text), or null — never invented. */
   contactEmail?: string | null;
+  /** A contact phone scraped from the homepage (tel/text), or null — never invented. */
+  contactPhone?: string | null;
   /** Plain-language weaknesses — the sales ammunition. */
   issues: string[];
   at: string;

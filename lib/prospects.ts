@@ -303,12 +303,14 @@ export async function updateProspectAnalysis(
     opportunityScore?: number;
     valueEstimate?: number;
     status?: ProspectStatus;
-    /** Enrich the contact email when we found one and none was on file. */
+    /** Enrich the contact email/phone when found and none was on file. */
     email?: string | null;
+    phone?: string | null;
   }
 ): Promise<Prospect> {
   const fields: Record<string, unknown> = { analysis: patch.analysis };
   if (patch.email) fields.email = patch.email;
+  if (patch.phone) fields.phone = patch.phone;
   if (patch.presenceScore !== undefined) fields.presence_score = patch.presenceScore;
   if (patch.opportunityScore !== undefined) fields.opportunity_score = patch.opportunityScore;
   if (patch.valueEstimate !== undefined) fields.value_estimate = patch.valueEstimate;

@@ -14,7 +14,7 @@
  */
 
 import { aiConfigured } from "../ai/client";
-import { auditWebsite } from "../audit";
+import { auditWebsite, deepContactLookup } from "../audit";
 import { getPersonality, personalityForCategory } from "../design/personalities";
 import { scoreProspect, updateProspectAnalysis } from "../prospects";
 import type { Prospect, ProspectAnalysis, WebsiteAudit } from "../types";
@@ -139,9 +139,24 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
       }
     }
 
-    // Email enrichment: if we don't have a contact email but scraped one from their
-    // own site, capture it so outreach has a real recipient (never invented).
-    const enrichedEmail = !p.email?.trim() && audit?.contactEmail ? audit.contactEmail : undefined;
+    // Contact enrichment (multi-source, never invented): fill missing email/phone
+    // from the homepage audit first, then a deep lookup across the site's contact
+    // pages. Only fetches deeper when something's still missing, and only when a
+    // website exists. Gives outreach a real recipient where one is published.
+    const needEmail = !p.email?.trim();
+    const needPhone = !p.phone?.trim();
+    let enrichedEmail = needEmail ? audit?.contactEmail ?? undefined : undefined;
+    let enrichedPhone = needPhone ? audit?.contactPhone ?? undefined : undefined;
+    if ((needEmail && !enrichedEmail) || (needPhone && !enrichedPhone)) {
+      if (p.websiteUrl?.trim()) {
+        const deep = await deepContactLookup(p.websiteUrl, {
+          email: needEmail && !enrichedEmail,
+          phone: needPhone && !enrichedPhone,
+        });
+        enrichedEmail = enrichedEmail ?? (needEmail ? deep.email ?? undefined : undefined);
+        enrichedPhone = enrichedPhone ?? (needPhone ? deep.phone ?? undefined : undefined);
+      }
+    }
 
     const applied = ctx.autonomy === "auto";
     if (applied) {
@@ -151,6 +166,7 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
         opportunityScore: scores.opportunityScore,
         valueEstimate: scores.valueEstimate,
         email: enrichedEmail,
+        phone: enrichedPhone,
         // Advance the pipeline only from the initial state.
         status: p.status === "discovered" ? "analysed" : undefined,
       });
