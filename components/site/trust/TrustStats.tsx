@@ -30,7 +30,7 @@ export default function TrustStats({ business }: { business: Business; dna: Desi
           {stats.map((stat) => (
             <div
               key={stat.label}
-              className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-5 py-6 text-center shadow-soft"
+              className="rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] px-5 py-6 text-center shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand/30"
             >
               <div className="flex items-center justify-center gap-2">
                 <span className="text-3xl font-extrabold text-brand">{stat.value}</span>

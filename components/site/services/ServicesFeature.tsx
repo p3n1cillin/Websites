@@ -25,7 +25,7 @@ export default function ServicesFeature({ business }: { business: Business; dna:
               as="article"
               key={service.name}
               delay={(i % 2) * 0.08}
-              className="flex gap-5 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-7 shadow-soft"
+              className="flex gap-5 rounded-[var(--radius-lg)] border border-[rgb(var(--border))] bg-[rgb(var(--surface))] p-7 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand/30"
             >
               <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[var(--radius)] bg-brand text-brand-fg">
                 <ServiceIconSvg name={service.icon} className="h-7 w-7" />
