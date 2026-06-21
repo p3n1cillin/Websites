@@ -349,6 +349,15 @@ export interface ProspectSource {
   /** The raw industry text as entered (e.g. "trading cards"), preserved even when
    * the design `category` bucket is broad (retail/other). Feeds the AI profiler. */
   industry?: string;
+  /** Verified Companies House facts (when matched). Authoritative, never invented. */
+  company?: {
+    number: string;
+    legalName: string;
+    status: string;
+    established?: number;
+    address?: { line1: string; city: string; postcode: string };
+    sicCodes?: string[];
+  };
   at?: string;
 }
 

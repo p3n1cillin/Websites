@@ -15,6 +15,7 @@
 
 import { aiConfigured } from "../ai/client";
 import { auditWebsite, deepContactLookup } from "../audit";
+import { companiesHouseConfigured, lookupCompany } from "../companies-house";
 import { getPersonality, personalityForCategory } from "../design/personalities";
 import { scoreProspect, updateProspectAnalysis } from "../prospects";
 import type { Prospect, ProspectAnalysis, WebsiteAudit } from "../types";
@@ -158,6 +159,31 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
       }
     }
 
+    // Companies House: authoritative legal name / address / incorporation / status
+    // (UK limited companies only; never invented). Stored on the source blob so the
+    // build can use the verified address + established year.
+    let nextSource = p.source ?? undefined;
+    if (companiesHouseConfigured) {
+      const ch = await lookupCompany(p.name, p.city);
+      if (ch) {
+        nextSource = {
+          ...(p.source ?? { origin: "discovery" as const }),
+          company: {
+            number: ch.companyNumber,
+            legalName: ch.legalName,
+            status: ch.status,
+            established: ch.established,
+            address: ch.address,
+            sicCodes: ch.sicCodes,
+          },
+        };
+        analysis.signals = [
+          `Companies House: ${ch.legalName}${ch.established ? `, est. ${ch.established}` : ""} (${ch.status})`,
+          ...(analysis.signals ?? []),
+        ];
+      }
+    }
+
     const applied = ctx.autonomy === "auto";
     if (applied) {
       await updateProspectAnalysis(p.id, {
@@ -167,6 +193,7 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
         valueEstimate: scores.valueEstimate,
         email: enrichedEmail,
         phone: enrichedPhone,
+        source: nextSource,
         // Advance the pipeline only from the initial state.
         status: p.status === "discovered" ? "analysed" : undefined,
       });

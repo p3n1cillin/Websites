@@ -306,11 +306,14 @@ export async function updateProspectAnalysis(
     /** Enrich the contact email/phone when found and none was on file. */
     email?: string | null;
     phone?: string | null;
+    /** Merge verified Companies House facts into the prospect's source blob. */
+    source?: ProspectSource | null;
   }
 ): Promise<Prospect> {
   const fields: Record<string, unknown> = { analysis: patch.analysis };
   if (patch.email) fields.email = patch.email;
   if (patch.phone) fields.phone = patch.phone;
+  if (patch.source !== undefined) fields.source = patch.source;
   if (patch.presenceScore !== undefined) fields.presence_score = patch.presenceScore;
   if (patch.opportunityScore !== undefined) fields.opportunity_score = patch.opportunityScore;
   if (patch.valueEstimate !== undefined) fields.value_estimate = patch.valueEstimate;

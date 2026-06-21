@@ -385,6 +385,19 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
   const email = prospect.email?.trim() || "";
   const townKnown = Boolean(prospect.city?.trim());
 
+  // Companies House verified facts (UK Ltd only). Use the registered-office address
+  // ONLY when its locality matches the prospect's town (avoids an accountant's
+  // address being shown as the trading address); always trust the incorporation year.
+  const company = prospect.source?.company;
+  const chAddressUsable =
+    company?.address &&
+    townKnown &&
+    company.address.city.toLowerCase().trim() === prospect.city!.toLowerCase().trim();
+  const address = chAddressUsable
+    ? { line1: company!.address!.line1, city: company!.address!.city, postcode: company!.address!.postcode }
+    : { line1: "", city: prospect.city?.trim() || "", postcode: "" };
+  const established = company?.established;
+
   return {
     slug: slugifyName(prospect.name, idTail),
     name: prospect.name,
@@ -394,9 +407,10 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
     industryLabel: rawIndustry || undefined,
     tagline: `${primary} in ${city}, done properly and priced fairly.`,
     about,
+    ...(established ? { established } : {}),
     phone,
     email,
-    address: { line1: "", city: prospect.city?.trim() || "", postcode: "" },
+    address,
     serviceAreas: townKnown ? [prospect.city!.trim()] : [],
     services,
     openingHours: STANDARD_HOURS,
@@ -410,7 +424,7 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
     verification: {
       phone: phone ? "verified" : "missing",
       email: email ? "verified" : "missing",
-      address: townKnown ? "template" : "missing",
+      address: chAddressUsable ? "verified" : townKnown ? "template" : "missing",
       rating: "missing",
       testimonials: "missing",
     },
