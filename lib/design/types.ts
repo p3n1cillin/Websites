@@ -58,7 +58,7 @@ export type PersonalityKey =
 
 // --- Section layout variants (one key per SLOT) --------------------------------
 
-export type HeroVariant = "fullbleed" | "spotlight" | "minimal";
+export type HeroVariant = "fullbleed" | "spotlight" | "minimal" | "editorial";
 export type ServicesVariant = "cards" | "rows" | "feature";
 export type TrustVariant = "strip" | "stats" | "badges";
 export type TestimonialsVariant = "grid" | "quote";

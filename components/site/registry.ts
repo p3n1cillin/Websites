@@ -20,6 +20,7 @@ import type { DesignDNA } from "@/lib/design/types";
 import HeroFullbleed from "./hero/HeroFullbleed";
 import HeroSpotlight from "./hero/HeroSpotlight";
 import HeroMinimal from "./hero/HeroMinimal";
+import HeroEditorial from "./hero/HeroEditorial";
 
 import ServicesCards from "./services/ServicesCards";
 import ServicesRows from "./services/ServicesRows";
@@ -43,6 +44,7 @@ export const heroRegistry: Record<HeroVariant, SiteSection> = {
   fullbleed: HeroFullbleed,
   spotlight: HeroSpotlight,
   minimal: HeroMinimal,
+  editorial: HeroEditorial,
 };
 
 export const servicesRegistry: Record<ServicesVariant, SiteSection> = {

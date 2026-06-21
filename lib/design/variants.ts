@@ -28,11 +28,11 @@ export function pick<T>(rng: RandomSource, items: readonly T[]): T {
 
 /** Per-personality candidate variants for each slot. */
 const HERO: Record<PersonalityKey, HeroVariant[]> = {
-  "premium-clinical": ["spotlight", "minimal"],
+  "premium-clinical": ["spotlight", "minimal", "editorial"],
   "fast-urgent": ["fullbleed", "spotlight"],
   "warm-inviting": ["spotlight", "fullbleed"],
-  "modern-bold": ["fullbleed", "minimal"],
-  "trusted-traditional": ["spotlight", "minimal"],
+  "modern-bold": ["fullbleed", "minimal", "editorial"],
+  "trusted-traditional": ["spotlight", "editorial", "minimal"],
 };
 
 const SERVICES: Record<PersonalityKey, ServicesVariant[]> = {
