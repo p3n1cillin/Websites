@@ -499,6 +499,19 @@ export async function dispatchOutreachAction(
  * Only sends what it genuinely can (Resend configured + prospect email); the result
  * banner reports sent vs skipped honestly.
  */
+/**
+ * Bulk-scrape missing email/phone for prospects from their own websites — reaches
+ * prospects at any stage (incl. ones whose demos predate the scraper). Bounded.
+ */
+export async function enrichContactsAction(): Promise<void> {
+  const org = await requireOrg();
+  const { enrichOrgContacts } = await import("@/lib/contact-enrichment");
+  const res = await enrichOrgContacts(org.id, 15);
+  redirect(
+    `/admin/prospects?enriched=1&efound=${res.emailsFound}&pfound=${res.phonesFound}&escan=${res.scanned}&enoweb=${res.noWebsite}`
+  );
+}
+
 export async function runFollowUpsAction(): Promise<void> {
   const org = await requireOrg();
   const res = await dispatchDueFollowUps({ id: org.id, name: org.name });

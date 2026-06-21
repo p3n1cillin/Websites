@@ -452,6 +452,45 @@ function unreachable(url: string, statusCode?: number, reason = "The site didn't
   };
 }
 
+/**
+ * Full contact + profile enrichment for one website: mine the homepage (JSON-LD →
+ * microdata → mailto/tel → text) for email/phone/established/address, then fall back
+ * to the contact pages for any missing email/phone. One place the pipeline can call
+ * to backfill a prospect's contact details. Never throws; returns only real data.
+ */
+export async function enrichContact(input: string): Promise<{
+  email: string | null;
+  phone: string | null;
+  established: number | null;
+  address: { line1: string; city: string; postcode: string } | null;
+}> {
+  const base = normalizeUrl(input);
+  if (!base) return { email: null, phone: null, established: null, address: null };
+  let host: string | undefined;
+  try { host = new URL(base).host; } catch { /* ignore */ }
+
+  let email: string | null = null;
+  let phone: string | null = null;
+  let established: number | null = null;
+  let address: { line1: string; city: string; postcode: string } | null = null;
+
+  const home = await fetchHtmlSafe(base, 7_000);
+  if (home) {
+    const c = mineContact(home, host);
+    email = c.email;
+    phone = c.phone;
+    const p = mineProfile(home);
+    established = p.established;
+    address = p.address;
+  }
+  if (!email || !phone) {
+    const deep = await deepContactLookup(base, { email: !email, phone: !phone });
+    email = email ?? deep.email;
+    phone = phone ?? deep.phone;
+  }
+  return { email, phone, established, address };
+}
+
 /** Fetch + audit a homepage. Never throws — returns an unreachable audit on error. */
 export async function auditWebsite(input: string): Promise<WebsiteAudit | null> {
   const url = normalizeUrl(input);

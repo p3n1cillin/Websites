@@ -18,6 +18,7 @@ import {
   expandCompetitorsAction,
   autoBuildDemosAction,
   runFollowUpsAction,
+  enrichContactsAction,
 } from "./actions";
 
 const gbp = (pence: number) => `£${Math.round(pence / 100).toLocaleString("en-GB")}`;
@@ -27,7 +28,7 @@ export const dynamic = "force-dynamic";
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string; noemail?: string; noresend?: string };
+  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string; noemail?: string; noresend?: string; enriched?: string; efound?: string; pfound?: string; escan?: string; enoweb?: string };
 }) {
   const org = await requireOrg();
   const found = searchParams?.found;
@@ -35,6 +36,7 @@ export default async function ProspectsPage({
   const built = searchParams?.built;
   const sent = searchParams?.sent;
   const skipped = searchParams?.skipped;
+  const enriched = searchParams?.enriched === "1";
   const noEmail = Number(searchParams?.noemail ?? 0);
   const noResend = searchParams?.noresend === "1";
   const expanded = searchParams?.expanded;
@@ -139,6 +141,34 @@ export default async function ProspectsPage({
                   : "Nothing was due to send."}
         </p>
       )}
+
+      {enriched && (
+        <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+          Scanned {searchParams?.escan ?? 0} site{searchParams?.escan === "1" ? "" : "s"} — found{" "}
+          {searchParams?.efound ?? 0} email{searchParams?.efound === "1" ? "" : "s"} and{" "}
+          {searchParams?.pfound ?? 0} phone number{searchParams?.pfound === "1" ? "" : "s"}.
+          {Number(searchParams?.enoweb ?? 0) > 0
+            ? ` ${searchParams?.enoweb} more have no website to scrape (add a contact manually).`
+            : ""}
+        </p>
+      )}
+
+      {/* Backfill missing email/phone from prospect websites (any stage). */}
+      <form
+        action={enrichContactsAction}
+        className="flex flex-wrap items-center gap-3 rounded-2xl border border-teal-200 bg-teal-50/50 p-4"
+      >
+        <div className="flex-1">
+          <h2 className="text-sm font-semibold text-slate-800">🔎 Find missing contact details</h2>
+          <p className="mt-0.5 text-xs text-slate-500">
+            Scrapes email + phone from the websites of prospects that don&apos;t have them yet
+            (structured data, contact pages). Reaches prospects at any stage.
+          </p>
+        </div>
+        <button className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-700">
+          Find contacts
+        </button>
+      </form>
 
       {dueFollowUps > 0 && (
         <form

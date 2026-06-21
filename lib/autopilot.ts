@@ -10,6 +10,7 @@ import { getBusinessesForOrg } from "./businesses";
 import { runDiscoveryCampaign } from "./discovery-sources/campaign";
 import { buildExpansionBrief } from "./discovery-sources/expansion";
 import { dispatchDueFollowUps } from "./outreach-cadence";
+import { enrichOrgContacts } from "./contact-enrichment";
 import { buildBusinessGraph } from "./discovery-graph";
 import { buildEmpirePortfolio } from "./empire";
 import {
@@ -142,6 +143,14 @@ export async function runAutopilot(org: AutopilotOrg): Promise<AutopilotResult> 
     } catch {
       /* one prospect failing never stops the run */
     }
+  }
+
+  // --- 2b. CONTACT BACKFILL — scrape missing email/phone so outreach has somewhere
+  // to go (reaches prospects at any stage, incl. demos built before scraping). ----
+  try {
+    await enrichOrgContacts(org.orgId, 10);
+  } catch {
+    res.notes.push("Contact enrichment step failed this run.");
   }
 
   // --- 3. OUTREACH — send everything that's due (never fakes a send) ------------

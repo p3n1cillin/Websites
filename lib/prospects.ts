@@ -328,6 +328,20 @@ export async function updateProspectAnalysis(
   return toProspect(row);
 }
 
+/** Lightweight contact/profile patch (no analysis) — used by bulk enrichment. */
+export async function updateProspectContact(
+  id: string,
+  patch: { email?: string; phone?: string; source?: ProspectSource | null }
+): Promise<void> {
+  const fields: Record<string, unknown> = {};
+  if (patch.email) fields.email = patch.email;
+  if (patch.phone) fields.phone = patch.phone;
+  if (patch.source !== undefined) fields.source = patch.source;
+  if (Object.keys(fields).length === 0) return;
+  await sbUpdate<ProspectRow>("prospects", `id=eq.${encodeURIComponent(id)}`, fields);
+  revalidatePath("/admin/prospects");
+}
+
 export async function deleteProspect(id: string): Promise<void> {
   await sbDelete("prospects", `id=eq.${encodeURIComponent(id)}`);
   revalidatePath("/admin/prospects");
