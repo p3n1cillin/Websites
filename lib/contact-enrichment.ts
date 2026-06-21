@@ -1,5 +1,6 @@
 import { getProspectsForOrg, updateProspectContact } from "./prospects";
 import { enrichContact } from "./audit";
+import { findWebsite } from "./web-search";
 import type { ProspectSource } from "./types";
 
 /**
@@ -13,12 +14,43 @@ export interface EnrichResult {
   scanned: number;
   emailsFound: number;
   phonesFound: number;
-  /** Missing contact but no website to scrape — unreachable by this method. */
+  /** Websites discovered via search for prospects that had none on file. */
+  websitesFound: number;
+  /** Still no website even after a search — only reachable by phone/manual. */
   noWebsite: number;
 }
 
-export async function enrichOrgContacts(orgId: string, max = 12): Promise<EnrichResult> {
-  const prospects = await getProspectsForOrg(orgId); // opportunity desc
+export async function enrichOrgContacts(
+  orgId: string,
+  max = 12,
+  discoverMax = 6
+): Promise<EnrichResult> {
+  let prospects = await getProspectsForOrg(orgId); // opportunity desc
+  // Stay under the serverless function limit (Vercel Hobby ~10s): do as much as the
+  // budget allows, then return cleanly. Each prospect is committed as we go, so the
+  // action is fully re-runnable to chip through the rest.
+  const deadline = Date.now() + 8_000;
+
+  // --- Phase 0: find a website for prospects that have none (free web search),
+  // so the scraper below has something to read. Bounded (search is heavier). ----
+  let websitesFound = 0;
+  const websiteless = prospects.filter(
+    (p) => p.status !== "won" && p.status !== "lost" && !p.websiteUrl?.trim()
+  ).slice(0, discoverMax);
+  for (const p of websiteless) {
+    if (Date.now() > deadline) break;
+    try {
+      const site = await findWebsite(p.name, p.city);
+      if (site) {
+        await updateProspectContact(p.id, { websiteUrl: site });
+        websitesFound += 1;
+      }
+    } catch {
+      /* best-effort */
+    }
+  }
+  if (websitesFound > 0) prospects = await getProspectsForOrg(orgId); // refresh with new sites
+
   const needsContact = prospects.filter(
     (p) => p.status !== "won" && p.status !== "lost" && (!p.email?.trim() || !p.phone?.trim())
   );
@@ -28,6 +60,7 @@ export async function enrichOrgContacts(orgId: string, max = 12): Promise<Enrich
   let emailsFound = 0;
   let phonesFound = 0;
   for (const p of targets) {
+    if (Date.now() > deadline) break;
     try {
       const e = await enrichContact(p.websiteUrl!);
       const patch: { email?: string; phone?: string; source?: ProspectSource } = {};
@@ -54,5 +87,5 @@ export async function enrichOrgContacts(orgId: string, max = 12): Promise<Enrich
       /* one prospect failing must not stop the batch */
     }
   }
-  return { scanned: targets.length, emailsFound, phonesFound, noWebsite };
+  return { scanned: targets.length, emailsFound, phonesFound, websitesFound, noWebsite };
 }

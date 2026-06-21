@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 export default async function ProspectsPage({
   searchParams,
 }: {
-  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string; noemail?: string; noresend?: string; enriched?: string; efound?: string; pfound?: string; escan?: string; enoweb?: string };
+  searchParams: { found?: string; seen?: string; built?: string; sent?: string; skipped?: string; expanded?: string; noemail?: string; noresend?: string; enriched?: string; efound?: string; pfound?: string; escan?: string; wfound?: string; enoweb?: string };
 }) {
   const org = await requireOrg();
   const found = searchParams?.found;
@@ -144,11 +144,12 @@ export default async function ProspectsPage({
 
       {enriched && (
         <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
-          Scanned {searchParams?.escan ?? 0} site{searchParams?.escan === "1" ? "" : "s"} — found{" "}
+          {Number(searchParams?.wfound ?? 0) > 0 ? `Found ${searchParams?.wfound} new website${searchParams?.wfound === "1" ? "" : "s"} via search. ` : ""}
+          Scanned {searchParams?.escan ?? 0} site{searchParams?.escan === "1" ? "" : "s"}: found{" "}
           {searchParams?.efound ?? 0} email{searchParams?.efound === "1" ? "" : "s"} and{" "}
           {searchParams?.pfound ?? 0} phone number{searchParams?.pfound === "1" ? "" : "s"}.
           {Number(searchParams?.enoweb ?? 0) > 0
-            ? ` ${searchParams?.enoweb} more have no website to scrape (add a contact manually).`
+            ? ` ${searchParams?.enoweb} still have no web presence — reach those by phone or add a contact manually. Re-run to keep working through the list.`
             : ""}
         </p>
       )}

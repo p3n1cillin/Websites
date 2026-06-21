@@ -232,7 +232,7 @@ export function mineProfile(html: string): {
 }
 
 /** GET a page, capped + hard-timeout, returning HTML or null. Never throws. */
-async function fetchHtmlSafe(url: string, timeoutMs = 6_000): Promise<string | null> {
+async function fetchHtmlSafe(url: string, timeoutMs = 5_000): Promise<string | null> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -474,7 +474,7 @@ export async function enrichContact(input: string): Promise<{
   let established: number | null = null;
   let address: { line1: string; city: string; postcode: string } | null = null;
 
-  const home = await fetchHtmlSafe(base, 7_000);
+  const home = await fetchHtmlSafe(base, 5_000);
   if (home) {
     const c = mineContact(home, host);
     email = c.email;

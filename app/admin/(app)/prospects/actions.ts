@@ -506,9 +506,9 @@ export async function dispatchOutreachAction(
 export async function enrichContactsAction(): Promise<void> {
   const org = await requireOrg();
   const { enrichOrgContacts } = await import("@/lib/contact-enrichment");
-  const res = await enrichOrgContacts(org.id, 15);
+  const res = await enrichOrgContacts(org.id, 10, 6);
   redirect(
-    `/admin/prospects?enriched=1&efound=${res.emailsFound}&pfound=${res.phonesFound}&escan=${res.scanned}&enoweb=${res.noWebsite}`
+    `/admin/prospects?enriched=1&efound=${res.emailsFound}&pfound=${res.phonesFound}&escan=${res.scanned}&wfound=${res.websitesFound}&enoweb=${res.noWebsite}`
   );
 }
 

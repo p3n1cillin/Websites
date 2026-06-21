@@ -331,11 +331,12 @@ export async function updateProspectAnalysis(
 /** Lightweight contact/profile patch (no analysis) — used by bulk enrichment. */
 export async function updateProspectContact(
   id: string,
-  patch: { email?: string; phone?: string; source?: ProspectSource | null }
+  patch: { email?: string; phone?: string; websiteUrl?: string; source?: ProspectSource | null }
 ): Promise<void> {
   const fields: Record<string, unknown> = {};
   if (patch.email) fields.email = patch.email;
   if (patch.phone) fields.phone = patch.phone;
+  if (patch.websiteUrl) fields.website_url = patch.websiteUrl;
   if (patch.source !== undefined) fields.source = patch.source;
   if (Object.keys(fields).length === 0) return;
   await sbUpdate<ProspectRow>("prospects", `id=eq.${encodeURIComponent(id)}`, fields);
