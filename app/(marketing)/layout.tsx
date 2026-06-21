@@ -18,20 +18,20 @@ const display = Bricolage_Grotesque({
  * site-wide SEO: canonical, Open Graph/Twitter cards + Organization/WebSite JSON-LD.
  */
 export const metadata: Metadata = {
-  title: { default: `${brand.name} — ${brand.tagline}`, template: `%s | ${brand.name}` },
+  title: { default: `${brand.name} - ${brand.tagline}`, template: `%s | ${brand.name}` },
   description: brand.tagline,
   robots: { index: true, follow: true },
   openGraph: {
     type: "website",
     url: brand.url,
     siteName: brand.name,
-    title: `${brand.name} — ${brand.tagline}`,
+    title: `${brand.name} - ${brand.tagline}`,
     description: brand.tagline,
     locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${brand.name} — ${brand.tagline}`,
+    title: `${brand.name} - ${brand.tagline}`,
     description: brand.tagline,
   },
 };

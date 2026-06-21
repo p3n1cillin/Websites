@@ -30,8 +30,8 @@ export default function PrivacyPage() {
 
       <Section title="2. Data we collect">
         <p>
-          <strong>Enquiries.</strong> When you contact us we collect the details you provide — such as
-          your name, business, email and phone number — to respond and provide a quote.
+          <strong>Enquiries.</strong> When you contact us we collect the details you provide (such as
+          your name, business, email and phone number) to respond and provide a quote.
         </p>
         <p>
           <strong>Payments.</strong> Payments are processed by Stripe. We receive confirmation of
@@ -52,8 +52,8 @@ export default function PrivacyPage() {
 
       <Section title="4. Sharing">
         <p>
-          We share data only with service providers who help us operate — for example Stripe (payments)
-          and our hosting and email providers — and only as needed to deliver the service, or where
+          We share data only with service providers who help us operate (for example Stripe for payments,
+          and our hosting and email providers) and only as needed to deliver the service, or where
           required by law.
         </p>
       </Section>

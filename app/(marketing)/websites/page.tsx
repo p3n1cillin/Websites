@@ -4,7 +4,7 @@ import { SERVICE_PAGES } from "@/lib/seo-content";
 
 export const metadata: Metadata = {
   title: "Website Design by Industry",
-  description: "Conversion-focused, SEO-ready websites built for local service businesses — plumbers, electricians, dentists, builders, salons and more.",
+  description: "Conversion-focused, SEO-ready websites built for local service businesses: plumbers, electricians, dentists, builders, salons and more.",
   alternates: { canonical: "/websites" },
 };
 
@@ -14,7 +14,7 @@ export default function WebsitesHub() {
       <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Website design, built for your industry</h1>
       <p className="mt-3 max-w-2xl text-slate-600">
         Every trade wins customers differently. We build websites around how your customers actually
-        search, choose and book — not a one-size-fits-all template.
+        search, choose and book, not a one-size-fits-all template.
       </p>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-2">

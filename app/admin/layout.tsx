@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { supabaseConfigured, supabaseWritable } from "@/lib/supabase/client";
 
 export const metadata = {
-  title: "Admin — Site Generator",
+  title: "Admin - Empire Agencies",
   robots: { index: false, follow: false },
 };
 

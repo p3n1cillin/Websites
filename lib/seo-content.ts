@@ -64,7 +64,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     plural: "Dentists",
     headline: "Dental practice websites that fill the appointment book",
     intro:
-      "New patients judge a practice by its website before they ever walk in. A modern, reassuring site with easy booking turns searches into registrations — and showcases the high-value treatments that grow the practice.",
+      "New patients judge a practice by its website before they ever walk in. A modern, reassuring site with easy booking turns searches into registrations, and showcases the high-value treatments that grow the practice.",
     painPoints: [
       "Clunky or no online booking, so prospective patients bounce",
       "Treatments and prices hidden, creating friction and doubt",
@@ -73,7 +73,7 @@ export const SERVICE_PAGES: ServicePage[] = [
     ],
     outcomes: [
       "Frictionless enquiry/booking flow for new patients",
-      "Clear treatment pages — including high-value cosmetic work",
+      "Clear treatment pages, including high-value cosmetic work",
       "A polished, trustworthy design that reflects your standards",
       "Local SEO + reviews to win the new-patient search",
     ],
@@ -95,7 +95,7 @@ export const SERVICE_PAGES: ServicePage[] = [
       "A project portfolio that sells your craftsmanship",
       "A detailed quote form that pre-qualifies enquiries",
       "Local SEO across every town you work in",
-      "Trust signals — guarantees, accreditations, testimonials",
+      "Trust signals: guarantees, accreditations, testimonials",
     ],
   },
   {

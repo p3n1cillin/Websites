@@ -3,7 +3,7 @@ import { brand, hasBrandEmail, hasBrandPhone } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Get a free website audit and a real demo of your new site — no obligation.",
+  description: "Get a free website audit and a real demo of your new site, no obligation.",
   alternates: { canonical: "/contact" },
 };
 
@@ -13,7 +13,7 @@ export default function ContactPage() {
       <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Contact us</h1>
       <p className="mt-3 text-slate-600">
         Tell us about your business and we&apos;ll send a free audit plus a real demo of your new
-        website — no obligation.
+        website, no obligation.
       </p>
 
       <div className="mt-10 grid gap-6 sm:grid-cols-2">

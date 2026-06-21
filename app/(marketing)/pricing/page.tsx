@@ -4,14 +4,14 @@ import { PRICING, gbp } from "@/lib/brand";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description: "Simple, transparent website pricing — a one-off build fee plus a low monthly care plan. Cancel anytime.",
+  description: "Simple, transparent website pricing: a one-off build fee plus a low monthly care plan. Cancel anytime.",
   alternates: { canonical: "/pricing" },
 };
 
 const INCLUDED = [
   "Bespoke, mobile-first website designed around your customers",
   "Local SEO setup (titles, structured data, location pages)",
-  "Lead capture — call buttons and quote forms wired to your inbox",
+  "Lead capture: call buttons and quote forms wired to your inbox",
   "Google Business and maps integration",
   "Fast, secure hosting with SSL",
 ];
@@ -37,7 +37,7 @@ export default function PricingPage() {
         <div className="rounded-3xl border border-slate-200 p-8">
           <h2 className="text-lg font-semibold">Website build</h2>
           <div className="mt-2 text-4xl font-semibold">from {gbp(PRICING.buildFromPence)}</div>
-          <p className="mt-1 text-sm text-slate-500">one-off — payable after you approve the demo</p>
+          <p className="mt-1 text-sm text-slate-500">one-off, payable after you approve the demo</p>
           <ul className="mt-6 space-y-3 text-sm text-slate-600">
             {INCLUDED.map((i) => (
               <li key={i} className="flex gap-2"><span className="text-emerald-500">✓</span>{i}</li>

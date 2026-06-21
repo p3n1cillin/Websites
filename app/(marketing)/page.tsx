@@ -27,7 +27,7 @@ const STEPS = [
 ];
 
 const FAQ = [
-  { q: "Who is this for?", a: "Local service businesses — trades, salons, clinics, restaurants and similar — who rely on being found and contacted online." },
+  { q: "Who is this for?", a: "Local service businesses (trades, salons, clinics, restaurants and similar) that rely on being found and contacted online." },
   { q: "Do I see it before I pay?", a: "Yes. We build a real demo of your new site first. You only pay the build fee once you're happy to proceed." },
   { q: "What does it cost?", a: `A one-off build from ${gbp(PRICING.buildFromPence)}, then ${gbp(PRICING.carePlanPence)}/month for hosting, updates and support. Cancel the plan anytime.` },
   { q: "Do I own the website?", a: "Yes. The site and content are yours. The monthly plan covers hosting, maintenance and ongoing support." },
