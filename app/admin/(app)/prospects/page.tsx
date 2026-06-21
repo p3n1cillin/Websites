@@ -317,8 +317,14 @@ export default async function ProspectsPage({
             </button>
           </div>
         </div>
+        <label className="flex items-center gap-2 text-xs text-slate-600">
+          <input type="checkbox" name="requireWebsite" defaultChecked className="rounded border-slate-300" />
+          Only keep businesses that have a website (so you can actually email them)
+        </label>
         <p className="text-xs text-slate-400">
           Runs politely (~1 query/sec) to respect free OSM limits — a big sweep can take a minute.
+          Tip: leave the website filter on for an emailable pipeline; turn it off to also capture
+          no-website businesses (your strongest leads, but you&apos;ll need to call those).
         </p>
       </form>
 

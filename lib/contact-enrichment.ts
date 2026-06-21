@@ -23,13 +23,15 @@ export interface EnrichResult {
 export async function enrichOrgContacts(
   orgId: string,
   max = 12,
-  discoverMax = 6
+  discoverMax = 6,
+  budgetMs = 8_000
 ): Promise<EnrichResult> {
   let prospects = await getProspectsForOrg(orgId); // opportunity desc
-  // Stay under the serverless function limit (Vercel Hobby ~10s): do as much as the
-  // budget allows, then return cleanly. Each prospect is committed as we go, so the
-  // action is fully re-runnable to chip through the rest.
-  const deadline = Date.now() + 8_000;
+  // Stay under the serverless function limit (Vercel Hobby ~10s) by default: do as
+  // much as the budget allows, then return cleanly. Each prospect is committed as we
+  // go, so the action is fully re-runnable. A CLI script can pass a large budget to
+  // process the whole list in one go.
+  const deadline = Date.now() + budgetMs;
 
   // --- Phase 0: find a website for prospects that have none (free web search),
   // so the scraper below has something to read. Bounded (search is heavier). ----

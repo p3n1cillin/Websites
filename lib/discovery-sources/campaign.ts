@@ -25,6 +25,8 @@ export interface CampaignBrief {
   perQueryLimit?: number;
   /** Safety ceiling on total candidates returned. */
   maxTotal?: number;
+  /** Keep only businesses that already have a website (i.e. likely emailable). */
+  requireWebsite?: boolean;
 }
 
 export interface CampaignResult {
@@ -103,5 +105,12 @@ export async function runDiscoveryCampaign(brief: CampaignBrief): Promise<Campai
     await sleep(GAP_MS);
   }
 
-  return { candidates: [...merged.values()], queries, found, duplicatesMerged };
+  let candidates = [...merged.values()];
+  // Emailable-pipeline filter: keep only businesses that publish a website (the ones
+  // we can actually scrape an email from). The no-website majority are great leads
+  // but unreachable by email — chase those by phone instead.
+  if (brief.requireWebsite) {
+    candidates = candidates.filter((c) => c.websiteUrl?.trim());
+  }
+  return { candidates, queries, found, duplicatesMerged };
 }

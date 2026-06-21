@@ -204,12 +204,13 @@ export async function discoverCampaignAction(formData: FormData): Promise<void> 
   const areas = splitLines(formData.get("areas"));
   const categories = splitLines(formData.get("categories"));
   const perQueryLimit = Math.min(Math.max(Number(formData.get("perQueryLimit")) || 25, 1), 60);
+  const requireWebsite = formData.get("requireWebsite") === "on";
   if (areas.length === 0) redirect("/admin/prospects?found=0&seen=0");
 
   const { runDiscoveryCampaign } = await import("@/lib/discovery-sources/campaign");
   let candidates: DiscoveryCandidate[] = [];
   try {
-    const res = await runDiscoveryCampaign({ areas, categories, perQueryLimit });
+    const res = await runDiscoveryCampaign({ areas, categories, perQueryLimit, requireWebsite });
     candidates = res.candidates;
   } catch {
     candidates = [];
