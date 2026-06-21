@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function WebsitesHub() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-20">
-      <h1 className="text-3xl font-semibold tracking-tight">Website design, built for your industry</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Website design, built for your industry</h1>
       <p className="mt-3 max-w-2xl text-slate-600">
         Every trade wins customers differently. We build websites around how your customers actually
         search, choose and book — not a one-size-fits-all template.

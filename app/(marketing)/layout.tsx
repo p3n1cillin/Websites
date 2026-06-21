@@ -1,6 +1,15 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Bricolage_Grotesque } from "next/font/google";
 import { brand, hasBrandEmail, organizationJsonLd, websiteJsonLd } from "@/lib/brand";
+
+// Distinctive modern-agency display face (not Inter) — applied to headings only.
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-display",
+  display: "swap",
+});
 
 /**
  * Public marketing chrome for the agency's own site (the homepage Stripe + clients
@@ -36,7 +45,7 @@ const NAV = [
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900">
+    <div className={`${display.variable} flex min-h-screen flex-col bg-white text-slate-900`}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd()) }}
@@ -51,7 +60,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-slate-900 text-sm font-bold text-white">
               {brand.name.charAt(0)}
             </span>
-            <span className="text-base font-semibold tracking-tight">{brand.name}</span>
+            <span className="font-display text-base font-semibold tracking-tight">{brand.name}</span>
           </Link>
           <nav className="hidden items-center gap-7 text-sm font-medium text-slate-600 md:flex">
             {NAV.map((n) => (
@@ -66,9 +75,9 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             </Link>
             <Link
               href="/contact"
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700"
+              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700 active:translate-y-px"
             >
-              Get a quote
+              Get a free audit
             </Link>
           </div>
         </div>

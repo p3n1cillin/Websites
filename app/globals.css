@@ -41,6 +41,26 @@ body {
   outline-offset: 2px;
 }
 
+/* ===========================================================================
+   Public marketing site (Empire Agencies own brand). Display font hook + a small
+   load-in animation. Scoped via .font-display + .marketing-fade so it never
+   touches tenant sites or the admin shell. Reduced-motion safe.
+   ========================================================================= */
+.font-display {
+  font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+@keyframes marketingFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marketing-fade {
+    opacity: 0;
+    animation: marketingFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
 /* Admin shell typographic polish — confident, tightly-tracked headings across
    every dashboard page (taste rule 4.1), applied once rather than per page. */
 .admin-shell h1 {

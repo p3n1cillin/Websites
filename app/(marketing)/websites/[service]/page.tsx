@@ -52,8 +52,8 @@ export default function ServiceLandingPage({ params }: { params: { service: stri
       {/* Hero */}
       <section className="border-b border-slate-200 bg-slate-950 text-white">
         <div className="mx-auto max-w-5xl px-6 py-20">
-          <p className="text-sm font-medium text-indigo-300">Website design for {page.plural.toLowerCase()}</p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">{page.headline}</h1>
+          <p className="text-sm font-medium text-emerald-300">Website design for {page.plural.toLowerCase()}</p>
+          <h1 className="font-display mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">{page.headline}</h1>
           <p className="mt-5 max-w-2xl text-lg text-slate-300">{page.intro}</p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/contact" className="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100">

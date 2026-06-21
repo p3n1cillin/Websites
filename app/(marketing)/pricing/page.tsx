@@ -27,7 +27,7 @@ const PLAN = [
 export default function PricingPage() {
   return (
     <div className="mx-auto max-w-5xl px-6 py-20">
-      <h1 className="text-3xl font-semibold tracking-tight">Pricing</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Pricing</h1>
       <p className="mt-3 max-w-2xl text-slate-600">
         One simple structure: a one-off build fee, then a low monthly care plan. You see a real demo
         of your site before you pay the build fee, and you can cancel the care plan at any time.

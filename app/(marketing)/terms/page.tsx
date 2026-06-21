@@ -19,7 +19,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 export default function TermsPage() {
   return (
     <div className="mx-auto max-w-3xl px-6 py-20">
-      <h1 className="text-3xl font-semibold tracking-tight">Terms of Service &amp; Refund Policy</h1>
+      <h1 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">Terms of Service &amp; Refund Policy</h1>
       <p className="mt-2 text-sm text-slate-400">Last updated {new Date().getFullYear()}</p>
 
       <Section title="1. Who we are">

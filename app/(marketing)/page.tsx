@@ -1,197 +1,239 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Metadata } from "next";
 import { brand, PRICING, gbp } from "@/lib/brand";
 import { SERVICE_PAGES } from "@/lib/seo-content";
+import Reveal from "./Reveal";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
-/**
- * Public homepage for the agency — what we do, for whom, how it works, and what it
- * costs. This is the business site Stripe reviews for activation, so it states the
- * product, pricing and contact plainly.
- */
+const HERO_IMG =
+  "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80";
+const FACTORY_IMG =
+  "https://images.unsplash.com/photo-1486262715619-67b85e0b08d3?auto=format&fit=crop&w=1100&q=80";
 
 const SERVICES = [
-  {
-    title: "Conversion-focused websites",
-    body: "Fast, mobile-first sites built around one goal: turning local searches into phone calls, bookings and enquiries.",
-  },
-  {
-    title: "Local SEO setup",
-    body: "Title tags, structured data, Google Business and location pages so you're found when nearby customers search.",
-  },
-  {
-    title: "Lead capture & follow-up",
-    body: "Tap-to-call, quote forms wired to your inbox, and automated follow-up so no enquiry goes cold.",
-  },
-  {
-    title: "Care plan & hosting",
-    body: "Fast secure hosting, ongoing updates, edits and performance monitoring on a simple monthly plan.",
-  },
+  { title: "Conversion-first websites", body: "Fast, mobile-first sites built around one goal: turning local searches into calls, bookings and enquiries." },
+  { title: "Local SEO", body: "Structured data, location pages and Google Business setup so nearby customers actually find you." },
+  { title: "Lead capture & follow-up", body: "Tap-to-call and quote forms wired to your inbox, with automated follow-up so nothing goes cold." },
+  { title: "Care plan & hosting", body: "Fast secure hosting, ongoing edits and performance monitoring on one simple monthly plan." },
 ];
 
 const STEPS = [
-  { n: 1, title: "Free audit", body: "We analyse your current site (or lack of one) and your local competitors, and show you exactly what's costing you customers." },
-  { n: 2, title: "See a demo first", body: "We build a real preview of your new site before you pay a penny — you see the upgrade, not a pitch deck." },
-  { n: 3, title: "Go live in ~2 weeks", body: "Approve it, we launch it: domain, hosting, SEO and lead capture all wired up and working." },
-  { n: 4, title: "Grow every month", body: "Your care plan keeps the site fast, updated and climbing — with ongoing edits and improvements." },
+  { k: "01", title: "Audit", body: "We analyse your current site and your local competitors, and show you exactly what's costing you customers." },
+  { k: "02", title: "Demo", body: "We build a real preview of your new site before you pay a penny. You see the upgrade, not a pitch." },
+  { k: "03", title: "Launch", body: "Approve it and we go live: domain, hosting, SEO and lead capture all wired up and working." },
+  { k: "04", title: "Grow", body: "Your care plan keeps the site fast, updated and climbing, with ongoing edits and improvements." },
 ];
 
 const FAQ = [
   { q: "Who is this for?", a: "Local service businesses — trades, salons, clinics, restaurants and similar — who rely on being found and contacted online." },
   { q: "Do I see it before I pay?", a: "Yes. We build a real demo of your new site first. You only pay the build fee once you're happy to proceed." },
   { q: "What does it cost?", a: `A one-off build from ${gbp(PRICING.buildFromPence)}, then ${gbp(PRICING.carePlanPence)}/month for hosting, updates and support. Cancel the plan anytime.` },
-  { q: "Do I own the website?", a: "Yes — the site and content are yours. The monthly plan covers hosting, maintenance and ongoing support." },
+  { q: "Do I own the website?", a: "Yes. The site and content are yours. The monthly plan covers hosting, maintenance and ongoing support." },
 ];
 
 const faqJsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: FAQ.map((f) => ({
-    "@type": "Question",
-    name: f.q,
-    acceptedAnswer: { "@type": "Answer", text: f.a },
-  })),
+  mainEntity: FAQ.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
 };
 
 export default function MarketingHome() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
-      />
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-200 bg-slate-950 text-white">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            background:
-              "radial-gradient(700px 400px at 75% -10%, rgba(99,102,241,0.35), transparent 60%), radial-gradient(600px 400px at 10% 110%, rgba(16,185,129,0.25), transparent 60%)",
-          }}
-        />
-        <div className="relative mx-auto max-w-6xl px-6 py-24 sm:py-28">
-          <p className="text-sm font-medium text-indigo-300">{brand.name}</p>
-          <h1 className="mt-3 max-w-3xl text-4xl font-semibold tracking-tight sm:text-5xl">
-            {brand.tagline}
-          </h1>
-          <p className="mt-5 max-w-xl text-lg text-slate-300">
-            We design and build modern websites for local businesses — and you see a real demo of
-            yours before you pay anything.
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/contact" className="rounded-lg bg-white px-5 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-100">
-              Get your free audit
-            </Link>
-            <Link href="/pricing" className="rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10">
-              See pricing
-            </Link>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }} />
+
+      {/* HERO — asymmetric split, real image, single message. */}
+      <section className="border-b border-slate-200 bg-slate-50">
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-6 pb-16 pt-16 lg:grid-cols-2 lg:pt-24">
+          <div>
+            <p className="marketing-fade text-sm font-medium text-emerald-700" style={{ animationDelay: "0ms" }}>
+              Web design for local business
+            </p>
+            <h1 className="marketing-fade font-display mt-3 text-4xl font-semibold leading-[1.05] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl" style={{ animationDelay: "80ms" }}>
+              Websites that turn local searches into paying customers.
+            </h1>
+            <p className="marketing-fade mt-5 max-w-md text-lg leading-relaxed text-slate-600" style={{ animationDelay: "160ms" }}>
+              We design fast, modern websites for local businesses. You see a real demo of yours before you pay anything.
+            </p>
+            <div className="marketing-fade mt-8 flex flex-wrap gap-3" style={{ animationDelay: "240ms" }}>
+              <Link href="/contact" className="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-700 active:translate-y-px">
+                Get a free audit
+              </Link>
+              <Link href="/pricing" className="rounded-lg border border-slate-300 px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-900 hover:text-slate-900">
+                See pricing
+              </Link>
+            </div>
+          </div>
+
+          <div className="marketing-fade relative" style={{ animationDelay: "200ms" }}>
+            <div className="absolute -right-3 -top-3 hidden h-24 w-24 rounded-2xl bg-emerald-500/15 lg:block" aria-hidden />
+            <div className="relative aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 shadow-xl shadow-slate-900/5">
+              <Image
+                src={HERO_IMG}
+                alt="A local business owner reviewing their new website"
+                fill
+                priority
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
-      </section>
-
-      {/* Services */}
-      <section id="services" className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className="text-2xl font-semibold tracking-tight">What we do</h2>
-        <p className="mt-2 max-w-2xl text-slate-600">
-          Everything a local business needs to get found online and turn visitors into customers.
-        </p>
-        <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {SERVICES.map((s) => (
-            <div key={s.title} className="rounded-2xl border border-slate-200 p-6">
-              <h3 className="font-semibold text-slate-900">{s.title}</h3>
-              <p className="mt-2 text-sm text-slate-600">{s.body}</p>
-            </div>
-          ))}
+        {/* Trust line — under the hero, not inside it. Honest, no fake logos. */}
+        <div className="mx-auto max-w-6xl border-t border-slate-200 px-6 py-4">
+          <p className="text-sm text-slate-500">Built for UK trades, salons, clinics, restaurants and local services.</p>
         </div>
       </section>
 
-      {/* Process */}
-      <section id="process" className="border-y border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <h2 className="text-2xl font-semibold tracking-tight">How it works</h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((s) => (
-              <div key={s.n} className="rounded-2xl bg-white p-6 shadow-sm">
-                <div className="grid h-9 w-9 place-items-center rounded-full bg-slate-900 text-sm font-bold text-white">
-                  {s.n}
+      {/* WHAT WE DO — split: anchored heading + real service content (bento rhythm). */}
+      <section id="services" className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
+          <Reveal>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              Everything you need to get found and get booked.
+            </h2>
+            <p className="mt-4 max-w-sm text-slate-600">
+              Not a template. Each site is built around how your customers actually search, choose and contact you.
+            </p>
+          </Reveal>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {SERVICES.map((s, i) => (
+              <Reveal key={s.title} delay={i * 0.06}>
+                <div className="h-full rounded-2xl border border-slate-200 p-6 transition-colors hover:border-slate-300">
+                  <div className="font-display text-sm font-semibold text-emerald-700">0{i + 1}</div>
+                  <h3 className="mt-2 font-semibold text-slate-900">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{s.body}</p>
                 </div>
-                <h3 className="mt-4 font-semibold text-slate-900">{s.title}</h3>
-                <p className="mt-2 text-sm text-slate-600">{s.body}</p>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Pricing teaser */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 sm:p-12">
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">Simple, transparent pricing</h2>
-              <p className="mt-2 max-w-xl text-slate-600">
-                A one-off build fee plus a low monthly care plan. No long contracts — cancel the plan anytime.
-              </p>
-            </div>
-            <Link href="/pricing" className="rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white hover:bg-slate-700">
-              Full pricing →
-            </Link>
-          </div>
-          <div className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <div className="text-sm text-slate-500">Website build</div>
-              <div className="mt-1 text-3xl font-semibold">from {gbp(PRICING.buildFromPence)}</div>
-              <div className="text-sm text-slate-500">one-off · pay after you approve the demo</div>
-            </div>
-            <div className="rounded-2xl border border-slate-200 p-6">
-              <div className="text-sm text-slate-500">Care plan</div>
-              <div className="mt-1 text-3xl font-semibold">{gbp(PRICING.carePlanPence)}<span className="text-base font-normal text-slate-400">/mo</span></div>
-              <div className="text-sm text-slate-500">hosting, updates &amp; support · cancel anytime</div>
-            </div>
+      {/* HOW IT WORKS — 4-step row, verb labels (different layout family). */}
+      <section id="process" className="border-y border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+          <Reveal>
+            <h2 className="font-display max-w-xl text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              From invisible to fully booked, in about two weeks.
+            </h2>
+          </Reveal>
+          <div className="mt-12 grid gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 sm:grid-cols-2 lg:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <Reveal key={s.k} delay={i * 0.06} className="bg-white">
+                <div className="h-full p-6">
+                  <div className="font-display text-2xl font-semibold text-slate-300">{s.k}</div>
+                  <h3 className="mt-3 font-display text-lg font-semibold text-slate-900">{s.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-600">{s.body}</p>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Industries — internal links to the per-trade landing pages (SEO). */}
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <h2 className="text-2xl font-semibold tracking-tight">Built for your industry</h2>
-        <p className="mt-2 max-w-2xl text-slate-600">
-          We tailor every site to how your customers search and book. A few of the trades we build for:
-        </p>
-        <div className="mt-8 flex flex-wrap gap-2">
-          {SERVICE_PAGES.map((s) => (
-            <Link
-              key={s.slug}
-              href={`/websites/${s.slug}`}
-              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:text-slate-900"
-            >
-              Websites for {s.plural}
+      {/* INDUSTRIES — pill strip linking the SEO landing pages (different family). */}
+      <section className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+        <div className="grid items-center gap-10 lg:grid-cols-2">
+          <Reveal className="relative">
+            <div className="relative aspect-[5/4] overflow-hidden rounded-2xl border border-slate-200">
+              <Image src={FACTORY_IMG} alt="Designing a website for a local business" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+            </div>
+          </Reveal>
+          <Reveal delay={0.08}>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              Built for your industry.
+            </h2>
+            <p className="mt-4 max-w-md text-slate-600">
+              We tailor the site to how customers in your trade search and book. A few of the industries we build for:
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              {SERVICE_PAGES.map((s) => (
+                <Link key={s.slug} href={`/websites/${s.slug}`} className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:border-slate-900 hover:text-slate-900">
+                  {s.plural}
+                </Link>
+              ))}
+              <Link href="/websites" className="rounded-full bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700">
+                All industries
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* PRICING — two cards (different family). */}
+      <section className="border-y border-slate-200 bg-slate-50">
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:py-28">
+          <Reveal>
+            <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">
+              Simple, transparent pricing.
+            </h2>
+            <p className="mt-4 max-w-xl text-slate-600">
+              A one-off build fee plus a low monthly care plan. You pay the build only after you approve the demo, and you can cancel the plan anytime.
+            </p>
+          </Reveal>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2">
+            <Reveal>
+              <div className="h-full rounded-2xl border border-slate-200 bg-white p-8">
+                <div className="text-sm text-slate-500">Website build</div>
+                <div className="font-display mt-1 text-4xl font-semibold text-slate-900">from {gbp(PRICING.buildFromPence)}</div>
+                <p className="mt-1 text-sm text-slate-500">one-off, after you approve the demo</p>
+              </div>
+            </Reveal>
+            <Reveal delay={0.06}>
+              <div className="h-full rounded-2xl border border-emerald-600 bg-white p-8 ring-1 ring-emerald-600">
+                <div className="text-sm text-slate-500">Care plan</div>
+                <div className="font-display mt-1 text-4xl font-semibold text-slate-900">
+                  {gbp(PRICING.carePlanPence)}<span className="text-lg font-normal text-slate-400">/mo</span>
+                </div>
+                <p className="mt-1 text-sm text-slate-500">hosting, updates and support, cancel anytime</p>
+              </div>
+            </Reveal>
+          </div>
+          <div className="mt-8">
+            <Link href="/pricing" className="text-sm font-semibold text-emerald-700 hover:text-emerald-800">
+              See what&apos;s included →
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ — accordion (different family). */}
+      <section className="mx-auto max-w-3xl px-6 py-20 lg:py-28">
+        <Reveal>
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-slate-900 sm:text-4xl">Questions</h2>
+        </Reveal>
+        <div className="mt-8 divide-y divide-slate-200 border-y border-slate-200">
+          {FAQ.map((f) => (
+            <details key={f.q} className="group py-4">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium text-slate-900">
+                {f.q}
+                <span className="text-slate-400 transition-transform group-open:rotate-45">+</span>
+              </summary>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">{f.a}</p>
+            </details>
           ))}
-          <Link href="/websites" className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
-            All industries →
-          </Link>
         </div>
       </section>
 
-      {/* FAQ */}
-      <section className="border-t border-slate-200 bg-slate-50">
-        <div className="mx-auto max-w-3xl px-6 py-20">
-          <h2 className="text-2xl font-semibold tracking-tight">Questions</h2>
-          <dl className="mt-8 space-y-6">
-            {FAQ.map((f) => (
-              <div key={f.q} className="rounded-2xl bg-white p-6">
-                <dt className="font-semibold text-slate-900">{f.q}</dt>
-                <dd className="mt-2 text-sm text-slate-600">{f.a}</dd>
-              </div>
-            ))}
-          </dl>
-          <div className="mt-10 text-center">
-            <Link href="/contact" className="rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white hover:bg-slate-700">
-              Get your free audit
-            </Link>
-          </div>
+      {/* FINAL CTA — one deliberate dark color block. */}
+      <section className="bg-slate-950">
+        <div className="mx-auto max-w-6xl px-6 py-20 text-center lg:py-28">
+          <Reveal>
+            <h2 className="font-display mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+              See your new website before you pay anything.
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-slate-400">
+              We&apos;ll audit your current presence and build a real demo, free.
+            </p>
+            <div className="mt-8">
+              <Link href="/contact" className="rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-100 active:translate-y-px">
+                Get a free audit
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </section>
     </>
