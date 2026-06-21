@@ -385,18 +385,18 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
   const email = prospect.email?.trim() || "";
   const townKnown = Boolean(prospect.city?.trim());
 
-  // Companies House verified facts (UK Ltd only). Use the registered-office address
-  // ONLY when its locality matches the prospect's town (avoids an accountant's
-  // address being shown as the trading address); always trust the incorporation year.
-  const company = prospect.source?.company;
-  const chAddressUsable =
-    company?.address &&
+  // Profile facts scraped from the business's own structured data (lib/audit
+  // mineProfile). Use the published address ONLY when its locality matches the
+  // prospect's town (sanity guard); trust the founding year.
+  const profile = prospect.source?.profile;
+  const scrapedAddressUsable =
+    profile?.address &&
     townKnown &&
-    company.address.city.toLowerCase().trim() === prospect.city!.toLowerCase().trim();
-  const address = chAddressUsable
-    ? { line1: company!.address!.line1, city: company!.address!.city, postcode: company!.address!.postcode }
+    profile.address.city.toLowerCase().trim() === prospect.city!.toLowerCase().trim();
+  const address = scrapedAddressUsable
+    ? { line1: profile!.address!.line1, city: profile!.address!.city, postcode: profile!.address!.postcode }
     : { line1: "", city: prospect.city?.trim() || "", postcode: "" };
-  const established = company?.established;
+  const established = profile?.established;
 
   return {
     slug: slugifyName(prospect.name, idTail),
@@ -424,7 +424,7 @@ export function draftBusinessFromProspect(prospect: Prospect): Business {
     verification: {
       phone: phone ? "verified" : "missing",
       email: email ? "verified" : "missing",
-      address: chAddressUsable ? "verified" : townKnown ? "template" : "missing",
+      address: scrapedAddressUsable ? "verified" : townKnown ? "template" : "missing",
       rating: "missing",
       testimonials: "missing",
     },

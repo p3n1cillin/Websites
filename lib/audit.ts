@@ -194,6 +194,43 @@ export function mineContact(html: string, host?: string): { email: string | null
   };
 }
 
+/**
+ * Mine a business PROFILE from schema.org JSON-LD on the page (no key, non-gov —
+ * the business's own published data): founding year + postal address. Replaces the
+ * Companies House lookup with the site's own authoritative trading details.
+ */
+export function mineProfile(html: string): {
+  established: number | null;
+  address: { line1: string; city: string; postcode: string } | null;
+} {
+  let established: number | null = null;
+  let address: { line1: string; city: string; postcode: string } | null = null;
+  const thisYear = new Date().getFullYear();
+  const re = /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  const visit = (node: unknown) => {
+    if (!node || typeof node !== "object") return;
+    if (Array.isArray(node)) return node.forEach(visit);
+    const o = node as Record<string, unknown>;
+    if (!established && typeof o.foundingDate === "string") {
+      const y = Number(o.foundingDate.slice(0, 4));
+      if (y > 1800 && y <= thisYear) established = y;
+    }
+    if (!address && o.address && typeof o.address === "object" && !Array.isArray(o.address)) {
+      const a = o.address as Record<string, unknown>;
+      const city = String(a.addressLocality ?? "").trim();
+      const postcode = String(a.postalCode ?? "").trim();
+      const line1 = String(a.streetAddress ?? "").trim();
+      if (city && (postcode || line1)) address = { line1, city, postcode };
+    }
+    for (const v of Object.values(o)) if (v && typeof v === "object") visit(v);
+  };
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(html))) {
+    try { visit(JSON.parse(m[1].trim())); } catch { /* ignore malformed block */ }
+  }
+  return { established, address };
+}
+
 /** GET a page, capped + hard-timeout, returning HTML or null. Never throws. */
 async function fetchHtmlSafe(url: string, timeoutMs = 6_000): Promise<string | null> {
   const controller = new AbortController();
@@ -322,6 +359,7 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
   let host: string | undefined;
   try { host = new URL(finalUrl).host; } catch { /* ignore */ }
   const { email: contactEmail, phone: contactPhone } = mineContact(html, host);
+  const profile = mineProfile(html);
 
   penalise(!hasViewport, 20, "Not mobile-friendly (no viewport tag) — loses mobile customers.");
   penalise(!https, 14, "No HTTPS — browsers flag the site as 'Not secure'.");
@@ -377,6 +415,8 @@ function scoreHtml(url: string, html: string, finalUrl: string, status: number):
     reputation,
     contactEmail,
     contactPhone,
+    established: profile.established,
+    contactAddress: profile.address,
     issues,
     at: new Date().toISOString(),
   };

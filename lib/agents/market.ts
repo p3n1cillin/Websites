@@ -15,7 +15,6 @@
 
 import { aiConfigured } from "../ai/client";
 import { auditWebsite, deepContactLookup } from "../audit";
-import { companiesHouseConfigured, lookupCompany } from "../companies-house";
 import { getPersonality, personalityForCategory } from "../design/personalities";
 import { scoreProspect, updateProspectAnalysis } from "../prospects";
 import type { Prospect, ProspectAnalysis, WebsiteAudit } from "../types";
@@ -159,26 +158,24 @@ export const marketAgent: AgentDefinition<MarketAgentInput, MarketAgentOutput> =
       }
     }
 
-    // Companies House: authoritative legal name / address / incorporation / status
-    // (UK limited companies only; never invented). Stored on the source blob so the
-    // build can use the verified address + established year.
+    // Business profile from the site's own structured data (schema.org JSON-LD) —
+    // no key, non-government. Captures founding year + trading address when the
+    // business publishes them; stored on the source blob for the build to use.
     let nextSource = p.source ?? undefined;
-    if (companiesHouseConfigured) {
-      const ch = await lookupCompany(p.name, p.city);
-      if (ch) {
-        nextSource = {
-          ...(p.source ?? { origin: "discovery" as const }),
-          company: {
-            number: ch.companyNumber,
-            legalName: ch.legalName,
-            status: ch.status,
-            established: ch.established,
-            address: ch.address,
-            sicCodes: ch.sicCodes,
-          },
-        };
+    const scrapedEstablished = audit?.established ?? undefined;
+    const scrapedAddress = audit?.contactAddress ?? undefined;
+    if (scrapedEstablished || scrapedAddress) {
+      nextSource = {
+        ...(p.source ?? { origin: "discovery" as const }),
+        profile: {
+          ...(p.source?.profile ?? {}),
+          ...(scrapedEstablished ? { established: scrapedEstablished } : {}),
+          ...(scrapedAddress ? { address: scrapedAddress } : {}),
+        },
+      };
+      if (scrapedEstablished) {
         analysis.signals = [
-          `Companies House: ${ch.legalName}${ch.established ? `, est. ${ch.established}` : ""} (${ch.status})`,
+          `Established ${scrapedEstablished} (from their site)`,
           ...(analysis.signals ?? []),
         ];
       }

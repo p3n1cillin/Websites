@@ -37,9 +37,6 @@ Copy these from your local `.env.local`:
 **Outreach (Resend)** — so autopilot can actually send emails
 - `RESEND_API_KEY`, `OUTREACH_FROM_EMAIL` (address on your verified domain)
 
-**Enrichment (optional)** — authoritative company data
-- `COMPANIES_HOUSE_API_KEY` — free key from developer.company-information.service.gov.uk;
-  adds verified legal name / registered address / incorporation year to UK Ltd prospects.
 
 **Public brand** (shown on your homepage — Stripe reviews this)
 - `NEXT_PUBLIC_BRAND_NAME`, `NEXT_PUBLIC_BRAND_LEGAL_NAME`

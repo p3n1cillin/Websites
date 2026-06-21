@@ -349,14 +349,11 @@ export interface ProspectSource {
   /** The raw industry text as entered (e.g. "trading cards"), preserved even when
    * the design `category` bucket is broad (retail/other). Feeds the AI profiler. */
   industry?: string;
-  /** Verified Companies House facts (when matched). Authoritative, never invented. */
-  company?: {
-    number: string;
-    legalName: string;
-    status: string;
+  /** Business profile facts scraped from the site's own structured data (JSON-LD).
+   * Non-government, no API key; only ever real published data, never invented. */
+  profile?: {
     established?: number;
     address?: { line1: string; city: string; postcode: string };
-    sicCodes?: string[];
   };
   at?: string;
 }
@@ -412,6 +409,10 @@ export interface WebsiteAudit {
   contactEmail?: string | null;
   /** A contact phone scraped from the homepage (tel/text), or null — never invented. */
   contactPhone?: string | null;
+  /** Founding year from the site's schema.org JSON-LD, or null. */
+  established?: number | null;
+  /** Postal address from the site's schema.org JSON-LD, or null. */
+  contactAddress?: { line1: string; city: string; postcode: string } | null;
   /** Plain-language weaknesses — the sales ammunition. */
   issues: string[];
   at: string;
