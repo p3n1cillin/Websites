@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { brand, PRICING, gbp } from "@/lib/brand";
+import { SERVICE_PAGES } from "@/lib/seo-content";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -149,6 +150,28 @@ export default function MarketingHome() {
               <div className="text-sm text-slate-500">hosting, updates &amp; support · cancel anytime</div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Industries — internal links to the per-trade landing pages (SEO). */}
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className="text-2xl font-semibold tracking-tight">Built for your industry</h2>
+        <p className="mt-2 max-w-2xl text-slate-600">
+          We tailor every site to how your customers search and book. A few of the trades we build for:
+        </p>
+        <div className="mt-8 flex flex-wrap gap-2">
+          {SERVICE_PAGES.map((s) => (
+            <Link
+              key={s.slug}
+              href={`/websites/${s.slug}`}
+              className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:border-slate-400 hover:text-slate-900"
+            >
+              Websites for {s.plural}
+            </Link>
+          ))}
+          <Link href="/websites" className="rounded-full bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700">
+            All industries →
+          </Link>
         </div>
       </section>
 
