@@ -67,6 +67,10 @@ export interface DispatchResult {
   due: number;
   sent: number;
   skipped: number;
+  /** Skipped specifically because the prospect has no email on file. */
+  skippedNoEmail: number;
+  /** False when RESEND_API_KEY isn't set on this deployment (can't send at all). */
+  emailConfigured: boolean;
 }
 
 /**
@@ -86,10 +90,18 @@ export async function dispatchDueFollowUps(
   const due = selectDueMessages(prospects, messages);
   let sent = 0;
   let skipped = 0;
+  let skippedNoEmail = 0;
 
   for (const { message, prospect } of due.slice(0, max)) {
-    if (message.channel !== "email" || !prospect.email || !emailConfigured) {
+    // Can't send at all without Resend, or for non-email channels.
+    if (message.channel !== "email" || !emailConfigured) {
       skipped += 1;
+      continue;
+    }
+    // Have Resend, but this prospect has no address — skip (never fake a recipient).
+    if (!prospect.email) {
+      skipped += 1;
+      skippedNoEmail += 1;
       continue;
     }
     const ok = await sendOutreachEmail({
@@ -109,5 +121,5 @@ export async function dispatchDueFollowUps(
     }
     sent += 1;
   }
-  return { due: due.length, sent, skipped };
+  return { due: due.length, sent, skipped, skippedNoEmail, emailConfigured };
 }

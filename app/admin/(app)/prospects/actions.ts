@@ -502,7 +502,9 @@ export async function dispatchOutreachAction(
 export async function runFollowUpsAction(): Promise<void> {
   const org = await requireOrg();
   const res = await dispatchDueFollowUps({ id: org.id, name: org.name });
-  redirect(`/admin/prospects?sent=${res.sent}&skipped=${res.skipped}`);
+  redirect(
+    `/admin/prospects?sent=${res.sent}&skipped=${res.skipped}&noemail=${res.skippedNoEmail}&noresend=${res.emailConfigured ? 0 : 1}`
+  );
 }
 
 export async function deleteOutreachAction(
