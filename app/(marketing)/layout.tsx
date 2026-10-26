@@ -37,8 +37,9 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/#services", label: "Services" },
-  { href: "/#process", label: "How it works" },
+  { href: "/map-pack-kit", label: "Map Pack Kit" },
+  { href: "/free-tools/google-business-description", label: "Free Tool" },
+  { href: "/#services", label: "Websites" },
   { href: "/pricing", label: "Pricing" },
   { href: "/contact", label: "Contact" },
 ];
@@ -74,10 +75,10 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               Client login
             </Link>
             <Link
-              href="/contact"
-              className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-slate-700 active:translate-y-px"
+              href="/map-pack-kit"
+              className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-emerald-700 active:translate-y-px"
             >
-              Get a free audit
+              Get Map Pack Kit
             </Link>
           </div>
         </div>
@@ -97,12 +98,22 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
             <p className="mt-3 text-sm text-slate-500">{brand.tagline}</p>
           </div>
           <div>
-            <h3 className="text-sm font-semibold text-slate-700">Company</h3>
+            <h3 className="text-sm font-semibold text-slate-700">Digital Products</h3>
             <ul className="mt-3 space-y-2 text-sm text-slate-500">
-              <li><Link href="/#services" className="hover:text-slate-900">Services</Link></li>
+              <li><Link href="/map-pack-kit" className="hover:text-slate-900 font-medium text-slate-800">Map Pack Kit (£19)</Link></li>
+              <li><Link href="/free-tools/google-business-description" className="hover:text-slate-900">Free GBP Description Generator</Link></li>
+              <li><Link href="/kit/sample" className="hover:text-slate-900">Live Sample Kit</Link></li>
+              <li><Link href="/map-pack-kit/plumbers" className="hover:text-slate-900">Kits for Plumbers</Link></li>
+              <li><Link href="/map-pack-kit/electricians" className="hover:text-slate-900">Kits for Electricians</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-slate-700">Agency &amp; Websites</h3>
+            <ul className="mt-3 space-y-2 text-sm text-slate-500">
+              <li><Link href="/#services" className="hover:text-slate-900">Website Builds</Link></li>
               <li><Link href="/websites" className="hover:text-slate-900">Industries</Link></li>
-              <li><Link href="/pricing" className="hover:text-slate-900">Pricing</Link></li>
-              <li><Link href="/contact" className="hover:text-slate-900">Contact</Link></li>
+              <li><Link href="/pricing" className="hover:text-slate-900">Website Pricing</Link></li>
+              <li><Link href="/contact" className="hover:text-slate-900">Free Audit</Link></li>
             </ul>
           </div>
           <div>

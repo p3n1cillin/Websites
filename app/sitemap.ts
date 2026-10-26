@@ -3,6 +3,7 @@ import { getAllBusinesses } from "@/lib/businesses";
 import { getAllPublishedPostRefs } from "@/lib/blog";
 import { SITE_URL } from "@/lib/seo";
 import { SERVICE_PAGES } from "@/lib/seo-content";
+import { SEO_TRADES } from "@/lib/kit/seo-trades";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [businesses, postRefs] = await Promise.all([
@@ -14,6 +15,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // The agency's own marketing site (what Stripe + new customers find).
   const root: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: now, changeFrequency: "weekly", priority: 1 },
+    { url: `${SITE_URL}/map-pack-kit`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/free-tools/google-business-description`, lastModified: now, changeFrequency: "weekly", priority: 0.9 },
     { url: `${SITE_URL}/pricing`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${SITE_URL}/contact`, lastModified: now, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/terms`, lastModified: now, changeFrequency: "yearly", priority: 0.3 },
@@ -24,6 +27,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: now,
       changeFrequency: "monthly" as const,
       priority: 0.7,
+    })),
+    ...SEO_TRADES.map((t) => ({
+      url: `${SITE_URL}/map-pack-kit/${t.slug}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
     })),
   ];
 

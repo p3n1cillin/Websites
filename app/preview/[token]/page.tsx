@@ -32,18 +32,21 @@ export default async function PreviewPage({
   params,
   searchParams,
 }: {
-  params: { token: string };
-  searchParams: { bad?: string };
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ bad?: string }>;
 }) {
-  const preview = await getActivePreviewByToken(params.token);
+  const { token } = await params;
+  const sp = await searchParams;
+  const preview = await getActivePreviewByToken(token);
   if (!preview) notFound();
 
   // Optional private-share gate (migration 0010). Best-effort: if no password is
   // set (or the column isn't migrated) this is a no-op and the demo shows openly.
-  const password = await getPreviewPassword(params.token);
+  const password = await getPreviewPassword(token);
   if (password) {
-    const cleared = cookies().get(gateCookie(params.token))?.value === "ok";
-    if (!cleared) return <PreviewGate token={params.token} bad={searchParams?.bad === "1"} />;
+    const cookieStore = await cookies();
+    const cleared = cookieStore.get(gateCookie(token))?.value === "ok";
+    if (!cleared) return <PreviewGate token={token} bad={sp?.bad === "1"} />;
   }
 
   // Best-effort open counter (a buying signal); never blocks or breaks the demo.
@@ -72,7 +75,7 @@ export default async function PreviewPage({
       </div>
       <Footer business={business} showBlog={false} />
       <StickyCallBar business={business} />
-      <PreviewAnalytics token={params.token} />
+      <PreviewAnalytics token={token} />
     </ThemeProvider>
   );
 }

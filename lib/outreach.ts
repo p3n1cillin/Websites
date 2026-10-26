@@ -130,3 +130,34 @@ export async function deleteOutreachMessage(id: string): Promise<void> {
   await sbDelete("outreach_messages", `id=eq.${encodeURIComponent(id)}`);
   revalidatePath("/admin/prospects");
 }
+
+/**
+ * Record a prospect's REPLY (inbound). Used by the Resend inbound webhook so the
+ * cadence stops chasing prospects who already answered and the CRM shows the
+ * thread. Never faked: only called with a real received email.
+ */
+export async function createInboundOutreach(input: {
+  orgId: string;
+  prospectId: string;
+  subject?: string | null;
+  body: string;
+}): Promise<OutreachMessage> {
+  const row = await sbInsert<OutreachRow>(
+    "outreach_messages",
+    rowFromOutreach({
+      orgId: input.orgId,
+      prospectId: input.prospectId,
+      channel: "email",
+      direction: "inbound",
+      status: "received",
+      subject: input.subject ?? null,
+      body: input.body,
+      intent: "initial", // inbound replies aren't sequence steps
+      step: 0,
+      ai: false,
+    })
+  );
+  revalidatePath("/admin/prospects");
+  return toOutreach(row);
+}
+

@@ -199,7 +199,24 @@ export function buildEmpirePortfolio(input: EmpireInputs): EmpirePortfolio {
     });
   }
 
-  // 3. Digital product — sell the design system / templates we already build.
+  // 3. Digital product — Map Pack Kit (instant self-serve GBP content kits).
+  opps.push({
+    id: "opp-map-pack-kit",
+    title: "Map Pack Kit — Google Business Profile content kits",
+    category: "digital-product",
+    rationale: "Self-serve £19/£29 instant content kits for trades: 52 weekly posts + review scripts generated on Stripe payment.",
+    effort: "low",
+    startupCostPence: 0,
+    timeToRevenueDays: 1,
+    recurringPotentialPence: 80_000,
+    scalability: 98,
+    automation: 95,
+    risk: "low",
+    competition: "low",
+    source: "Map Pack Kit digital product engine (/map-pack-kit)",
+  });
+
+  // 3b. Digital product — sell the design system / templates we already build.
   if (liveSites > 0 || prospectCount > 5) {
     opps.push({
       id: "opp-templates",

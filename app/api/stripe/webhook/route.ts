@@ -30,6 +30,18 @@ export async function POST(req: Request): Promise<Response> {
       case "checkout.session.completed": {
         const s = event.data.object;
 
+        // Digital product: Map Pack Kit instant purchase
+        if (s.metadata?.kind === "map_pack_kit") {
+          const { getPaidKitOrder, fulfilSection } = await import("@/lib/kit/order");
+          const order = await getPaidKitOrder(s.id);
+          if (order) {
+            await fulfilSection(order, "profile").catch((err) =>
+              console.error("[kit-webhook] profile fulfilment error:", err)
+            );
+          }
+          break;
+        }
+
         // Client paying an agency PROPOSAL (our revenue) — close the deal + bank it.
         // Subscription checkouts settle with a subscription id (payment_status may be
         // "paid" or "no_payment_required"); either closes the deal.

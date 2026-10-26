@@ -39,7 +39,7 @@ function toOrg(row: OrgRow): Org {
 
 /** The signed-in user, or null. */
 export async function getCurrentUser(): Promise<User | null> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -51,7 +51,7 @@ export async function getCurrentUser(): Promise<User | null> {
  * Returns null if the user is not authenticated.
  */
 export async function getCurrentOrg(): Promise<Org | null> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

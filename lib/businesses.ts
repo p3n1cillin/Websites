@@ -1,7 +1,6 @@
-import { revalidateTag } from "next/cache";
 import type { Business, BusinessRecord, BusinessStatus } from "./types";
 import { LOCAL_BUSINESSES } from "./data";
-import { CATALOGUE_TAG, tenantTag } from "./cache-tags";
+import { CATALOGUE_TAG, tenantTag, safeRevalidateTag } from "./cache-tags";
 import {
   sbSelect,
   sbInsert,
@@ -225,8 +224,8 @@ function assertWritable(): void {
 
 /** Refresh the catalogue and (optionally) a single tenant's pages. */
 function revalidateBusiness(slug?: string): void {
-  revalidateTag(CATALOGUE_TAG);
-  if (slug) revalidateTag(tenantTag(slug));
+  safeRevalidateTag(CATALOGUE_TAG);
+  if (slug) safeRevalidateTag(tenantTag(slug));
 }
 
 export async function createBusiness(

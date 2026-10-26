@@ -21,7 +21,7 @@ import JsonLd from "@/components/JsonLd";
 
 interface LayoutProps {
   children: React.ReactNode;
-  params: { business: string };
+  params: Promise<{ business: string }>;
 }
 
 /** Pre-render every business at build time (SSG) for instant, SEO-ready pages. */
@@ -31,7 +31,8 @@ export async function generateStaticParams() {
 }
 
 export default async function BusinessLayout({ children, params }: LayoutProps) {
-  const business = await getBusinessBySlug(params.business);
+  const { business: slug } = await params;
+  const business = await getBusinessBySlug(slug);
   if (!business) notFound();
 
   const palette = getPalette(business);
@@ -39,7 +40,7 @@ export default async function BusinessLayout({ children, params }: LayoutProps) 
   // site (every page below) re-skins from data. See lib/design.
   const dna = getDesignDNA(business);
   // Only surface the blog nav once the SEO engine has published articles.
-  const showBlog = (await getPublishedPosts(params.business)).length > 0;
+  const showBlog = (await getPublishedPosts(slug)).length > 0;
 
   return (
     <ThemeProvider business={business} dna={dna} className={`${FONT_VARS} flex min-h-screen flex-col`}>

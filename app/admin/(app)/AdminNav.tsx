@@ -26,6 +26,7 @@ const GROUPS: NavGroup[] = [
     label: "Overview",
     items: [
       { href: "/admin", label: "Nexus" },
+      { href: "/admin/briefing", label: "Briefing" },
       { href: "/admin/empire", label: "Empire" },
     ],
   },
@@ -42,6 +43,14 @@ const GROUPS: NavGroup[] = [
       { href: "/admin/businesses", label: "Businesses" },
       { href: "/admin/customers", label: "Customers" },
       { href: "/admin/leads", label: "Leads" },
+    ],
+  },
+  {
+    label: "Digital Products",
+    items: [
+      { href: "/map-pack-kit", label: "Map Pack Kit ↗" },
+      { href: "/kit/sample", label: "Sample Kit ↗" },
+      { href: "/free-tools/google-business-description", label: "Free GBP Tool ↗" },
     ],
   },
   {

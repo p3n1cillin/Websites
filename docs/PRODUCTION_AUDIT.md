@@ -117,3 +117,16 @@ genuine legal/reputational exposure for an agency sending these to clients. **Th
    **no `01925 000 000`, no `4.9/127`, no invented testimonials**, and labelled placeholders instead.
 3. Confirm the QA panel **flags** the unverified facts and the verification checklist lists them.
 4. Generate for a prospect **with** real phone/email → confirm those render as normal.
+
+---
+
+## Status update — reply-capture gap closed (Goal Engine phase)
+
+The cadence previously only stopped when the OPERATOR manually marked a prospect as
+replied — hot leads went cold unattended and follow-ups chased prospects who had already
+answered. Now closed: Resend Inbound → `POST /api/webhooks/resend` (secret-gated,
+`RESEND_INBOUND_SECRET`) records the real reply as an inbound `outreach_messages` row and
+advances the prospect forward-only to `responded`, which halts the sequence (`selectDueMessages`
+already halts on inbound/received). Related: the autopilot now runs closed-loop throughput
+control off `lib/goal-engine.ts` (gap-to-£1,000/mo), the operator cockpit is `/admin/briefing`,
+and migration `0016_loop_state.sql` gates the weekly digest + funnel snapshots.

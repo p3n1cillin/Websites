@@ -81,9 +81,16 @@ export default function MarketingHome() {
             </div>
           </div>
         </div>
-        {/* Trust line — under the hero, not inside it. Honest, no fake logos. */}
-        <div className="mx-auto max-w-6xl border-t border-slate-200 px-6 py-4">
+        {/* Trust & Digital Product Announcement Bar */}
+        <div className="mx-auto max-w-6xl border-t border-slate-200 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-sm text-slate-500">Built for UK trades, salons, clinics, restaurants and local services.</p>
+          <Link
+            href="/map-pack-kit"
+            className="inline-flex items-center gap-2 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1 text-xs font-semibold text-emerald-800 hover:bg-emerald-100 transition"
+          >
+            <span>✨ New: Self-serve Map Pack Kit (52 Weekly Posts) from £19</span>
+            <span>→</span>
+          </Link>
         </div>
       </section>
 

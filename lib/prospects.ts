@@ -347,3 +347,20 @@ export async function deleteProspect(id: string): Promise<void> {
   await sbDelete("prospects", `id=eq.${encodeURIComponent(id)}`);
   revalidatePath("/admin/prospects");
 }
+
+/**
+ * Match an inbound email's sender to a prospect (reply capture). Case-insensitive
+ * exact match on the prospect's stored email, most recent first. Returns null
+ * when no prospect owns that address — the webhook then ignores the email rather
+ * than guessing.
+ */
+export async function findProspectByEmail(email: string): Promise<Prospect | null> {
+  const addr = email.trim().toLowerCase();
+  if (!addr || !addr.includes("@")) return null;
+  const rows = await sbSelect<ProspectRow>({
+    query: `prospects?${SELECT_COLS}&email=ilike.${encodeURIComponent(addr)}&order=created_at.desc&limit=1`,
+    tier: "service",
+  });
+  return rows[0] ? toProspect(rows[0]) : null;
+}
+

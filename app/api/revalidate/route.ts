@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { revalidateTag } from "next/cache";
-import { CATALOGUE_TAG, tenantTag } from "@/lib/cache-tags";
+import { CATALOGUE_TAG, tenantTag, safeRevalidateTag } from "@/lib/cache-tags";
 
 export const runtime = "nodejs";
 
@@ -37,8 +36,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  revalidateTag(CATALOGUE_TAG);
-  if (body.slug) revalidateTag(tenantTag(body.slug));
+  safeRevalidateTag(CATALOGUE_TAG);
+  if (body.slug) safeRevalidateTag(tenantTag(body.slug));
 
   return NextResponse.json({
     revalidated: true,

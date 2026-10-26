@@ -27,7 +27,7 @@ export async function signIn(_prev: AuthState, formData: FormData): Promise<Auth
   const { email, password, error } = readCredentials(formData);
   if (error) return { error };
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { error: signInError } = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -42,7 +42,7 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
   const { email, password, error } = readCredentials(formData);
   if (error) return { error };
 
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   const { data, error: signUpError } = await supabase.auth.signUp({ email, password });
   if (signUpError) return { error: signUpError.message };
 
@@ -54,7 +54,7 @@ export async function signUp(_prev: AuthState, formData: FormData): Promise<Auth
 }
 
 export async function signOut(): Promise<void> {
-  const supabase = createSupabaseServerClient();
+  const supabase = await createSupabaseServerClient();
   await supabase.auth.signOut();
   redirect("/admin/login");
 }

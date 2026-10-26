@@ -1,6 +1,5 @@
-import { revalidateTag } from "next/cache";
 import type { BlogPost, BlogPostStatus, BusinessRecord } from "./types";
-import { CATALOGUE_TAG, blogTag, tenantTag } from "./cache-tags";
+import { CATALOGUE_TAG, blogTag, tenantTag, safeRevalidateTag } from "./cache-tags";
 import { sbSelect, sbInsert, supabaseConfigured, supabaseWritable } from "./supabase/client";
 import { planPostsFor } from "./seo-automation";
 
@@ -194,12 +193,12 @@ export async function runSeoGeneration(
 
     if (batch.length > 0) {
       created += batch.length;
-      revalidateTag(blogTag(record.slug));
-      revalidateTag(tenantTag(record.slug));
+      safeRevalidateTag(blogTag(record.slug));
+      safeRevalidateTag(tenantTag(record.slug));
     }
     perBusiness.push({ slug: record.slug, created: batch.length });
   }
 
-  if (created > 0) revalidateTag(CATALOGUE_TAG);
+  if (created > 0) safeRevalidateTag(CATALOGUE_TAG);
   return { created, perBusiness };
 }

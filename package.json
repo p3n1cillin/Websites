@@ -10,7 +10,9 @@
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test \"test/**/*.test.ts\"",
-    "new-business": "node scripts/new-business.mjs"
+    "new-business": "node scripts/new-business.mjs",
+    "outreach:map-pack": "node --import tsx scripts/launch-outreach.ts",
+    "generate:sample-kit": "node --import tsx scripts/generate-sample-kit.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

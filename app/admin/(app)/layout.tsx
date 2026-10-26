@@ -23,7 +23,8 @@ export default async function AdminAppLayout({ children }: { children: ReactNode
 
   // Theme is persisted in a cookie so the server can render the right class on the
   // first paint (no flash). The toggle (AdminNav) updates the cookie + DOM class.
-  const theme = cookies().get("admin-theme")?.value === "dark" ? "dark" : "light";
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("admin-theme")?.value === "dark" ? "dark" : "light";
 
   return (
     <div className={`admin-root min-h-screen bg-slate-50/40 lg:flex ${theme === "dark" ? "dark" : ""}`}>

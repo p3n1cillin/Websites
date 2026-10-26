@@ -6,6 +6,7 @@ import { executeWorkflowForSeed, prospectEntryStatus } from "@/lib/workflow-engi
 import { getProspectsForOrg } from "@/lib/prospects";
 import { dispatchDueFollowUps } from "@/lib/outreach-cadence";
 import { runAutopilot } from "@/lib/autopilot";
+import { maybeSendOperatorDigest } from "@/lib/operator-digest";
 import { getOrgById } from "@/lib/orgs";
 
 export const runtime = "nodejs";
@@ -65,6 +66,7 @@ async function handle(request: Request): Promise<Response> {
   let followUpsSent = 0;
   let demosBuilt = 0;
   let discovered = 0;
+  let digest: string | null = null;
   const orgIds = [...new Set(workflows.map((wf) => wf.orgId))];
   for (const orgId of orgIds) {
     try {
@@ -74,6 +76,10 @@ async function handle(request: Request): Promise<Response> {
         followUpsSent += ap.outreachSent;
         demosBuilt += ap.demosBuilt;
         discovered += ap.discovered;
+        // Weekly operator digest — best-effort, gated inside by loop_state.
+        const d = await maybeSendOperatorDigest({ id: org.id, name: org.name });
+        if (d.sent) digest = "sent";
+        else if (!digest) digest = d.reason;
       } else {
         const res = await dispatchDueFollowUps({ id: orgId, name: "" });
         followUpsSent += res.sent;
@@ -88,6 +94,7 @@ async function handle(request: Request): Promise<Response> {
     workflows: workflows.length,
     runs,
     autopilot: { discovered, demosBuilt, followUpsSent },
+    digest,
   });
 }
 

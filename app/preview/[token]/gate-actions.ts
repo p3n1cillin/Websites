@@ -20,7 +20,8 @@ export async function submitPreviewPassword(formData: FormData): Promise<void> {
   if (!expected) redirect(`/preview/${token}`);
 
   if (password === expected) {
-    cookies().set(gateCookie(token), "ok", {
+    const cookieStore = await cookies();
+    cookieStore.set(gateCookie(token), "ok", {
       httpOnly: true,
       sameSite: "lax",
       path: `/preview/${token}`,

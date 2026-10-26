@@ -13,9 +13,9 @@ import {
 import { setOrgStripeCustomer } from "@/lib/orgs";
 
 /** Absolute base URL for Stripe redirect targets. */
-function baseUrl(): string {
+async function baseUrl(): Promise<string> {
   if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, "");
-  const h = headers();
+  const h = await headers();
   const host = h.get("x-forwarded-host") ?? h.get("host") ?? "localhost:3000";
   const proto = h.get("x-forwarded-proto") ?? "http";
   return `${proto}://${host}`;
@@ -46,7 +46,7 @@ export async function startCheckout(formData: FormData): Promise<void> {
       await setOrgStripeCustomer(org.id, customerId);
     }
 
-    const base = baseUrl();
+    const base = await baseUrl();
     const session = await createCheckoutSession({
       customerId,
       priceId: priceId!,
@@ -72,7 +72,8 @@ export async function openPortal(): Promise<void> {
 
   let url: string;
   try {
-    const session = await createPortalSession(org.stripeCustomerId!, `${baseUrl()}/admin/billing`);
+    const base = await baseUrl();
+    const session = await createPortalSession(org.stripeCustomerId!, `${base}/admin/billing`);
     url = session.url;
   } catch (err) {
     console.error("[billing] portal failed:", err);

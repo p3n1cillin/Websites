@@ -36,9 +36,11 @@ import TestimonialsQuote from "./testimonials/TestimonialsQuote";
 import CtaGradient from "./cta/CtaGradient";
 import CtaSplit from "./cta/CtaSplit";
 
+import React from "react";
+
 /** Every section variant has the same props contract. */
 export type SiteSectionProps = { business: Business; dna: DesignDNA };
-export type SiteSection = (props: SiteSectionProps) => JSX.Element | null;
+export type SiteSection = (props: SiteSectionProps) => React.ReactNode;
 
 export const heroRegistry: Record<HeroVariant, SiteSection> = {
   fullbleed: HeroFullbleed,

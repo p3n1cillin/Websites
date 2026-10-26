@@ -10,8 +10,8 @@ import { createServerClient } from "@supabase/ssr";
  * distinct from lib/supabase/client.ts, which is the zero-dependency PostgREST
  * layer the public sites use for published reads + service-role writes.
  */
-export function createSupabaseServerClient() {
-  const cookieStore = cookies();
+export async function createSupabaseServerClient() {
+  const cookieStore = await cookies();
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 

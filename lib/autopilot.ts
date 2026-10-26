@@ -13,6 +13,7 @@ import { dispatchDueFollowUps } from "./outreach-cadence";
 import { enrichOrgContacts } from "./contact-enrichment";
 import { buildBusinessGraph } from "./discovery-graph";
 import { buildEmpirePortfolio } from "./empire";
+import { GOAL_MRR_PENCE, buildGoalStatus, deriveTuning } from "./goal-engine";
 import {
   getOpportunitiesForOrg,
   pursueOpportunity,
@@ -43,10 +44,17 @@ export interface AutopilotResult {
   venturesAdvanced: number;
   blocked: string[];
   notes: string[];
+  /** Closed-loop control: where this org stands vs the £1,000/mo goal. */
+  goal: {
+    currentMrrPence: number;
+    gapPence: number;
+    topAction: string | null;
+    tuning: { minActivePipeline: number; demosPerRun: number; outreachMax: number };
+  };
 }
 
-const MIN_ACTIVE_PIPELINE = 15; // top up discovery below this
-const DEMOS_PER_RUN = 3; // bound expensive agent chains per tick
+const MIN_ACTIVE_PIPELINE = 15; // legacy floor — superseded by goal-engine tuning below
+const DEMOS_PER_RUN = 3; // legacy bound — superseded by goal-engine tuning below
 
 export interface AutopilotOrg {
   orgId: string;
@@ -64,6 +72,12 @@ export async function runAutopilot(org: AutopilotOrg): Promise<AutopilotResult> 
     venturesAdvanced: 0,
     blocked: [],
     notes: [],
+    goal: {
+      currentMrrPence: 0,
+      gapPence: GOAL_MRR_PENCE,
+      topAction: null,
+      tuning: { minActivePipeline: MIN_ACTIVE_PIPELINE, demosPerRun: DEMOS_PER_RUN, outreachMax: 50 },
+    },
   };
 
   const [prospects, previews, retainers, businesses] = await Promise.all([
@@ -73,10 +87,23 @@ export async function runAutopilot(org: AutopilotOrg): Promise<AutopilotResult> 
     getBusinessesForOrg(org.orgId),
   ]);
 
+  // --- 0. GOAL ENGINE — closed-loop control -----------------------------------
+  // Measure gap-to-goal from the REAL funnel, then let it set this run's
+  // throughput (discovery headroom, demo builds, outreach batch size). Far from
+  // goal → the loop pushes harder; at/near goal → it throttles to save spend.
+  const status = buildGoalStatus(prospects, previews, retainers);
+  const tuning = deriveTuning(status);
+  res.goal = {
+    currentMrrPence: status.currentMrrPence,
+    gapPence: status.gapPence,
+    topAction: status.nextActions[0]?.title ?? null,
+    tuning,
+  };
+
   const active = prospects.filter((p) => p.status !== "won" && p.status !== "lost");
 
   // --- 1. DISCOVERY — top the pipeline up by expanding existing footholds -------
-  if (active.length < MIN_ACTIVE_PIPELINE && prospects.length > 0) {
+  if (active.length < tuning.minActivePipeline && prospects.length > 0) {
     try {
       const brief = buildExpansionBrief(prospects, { minOpportunity: 40 });
       if (brief.areas.length > 0) {
@@ -109,7 +136,7 @@ export async function runAutopilot(org: AutopilotOrg): Promise<AutopilotResult> 
   );
   const demoTargets = active
     .filter((p) => !hasActivePreview.has(p.id))
-    .slice(0, DEMOS_PER_RUN);
+    .slice(0, tuning.demosPerRun);
   for (const p of demoTargets) {
     try {
       await runAgent({
@@ -155,7 +182,7 @@ export async function runAutopilot(org: AutopilotOrg): Promise<AutopilotResult> 
 
   // --- 3. OUTREACH — send everything that's due (never fakes a send) ------------
   try {
-    const dispatch = await dispatchDueFollowUps({ id: org.orgId, name: org.orgName });
+    const dispatch = await dispatchDueFollowUps({ id: org.orgId, name: org.orgName }, { max: tuning.outreachMax });
     res.outreachSent = dispatch.sent;
     res.outreachSkipped = dispatch.skipped;
     if (dispatch.skipped > 0) {

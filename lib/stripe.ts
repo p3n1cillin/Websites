@@ -156,6 +156,58 @@ export async function createRetainerCheckout(input: {
   });
 }
 
+/**
+ * One-off Checkout (mode=payment) for self-serve DIGITAL PRODUCTS (e.g. the Map Pack
+ * Kit). Inline price_data, no pre-created prices. `metadata` carries the order inputs
+ * (Stripe caps: 50 keys, 500 chars/value) so fulfilment needs no database row: the
+ * success page re-reads the paid session and generates from its metadata.
+ */
+export async function createOneOffCheckout(input: {
+  amountPence: number;
+  productName: string;
+  productDescription?: string;
+  metadata: Record<string, string>;
+  customerEmail?: string | null;
+  successUrl: string;
+  cancelUrl: string;
+}): Promise<{ id: string; url: string }> {
+  return stripeRequest("/checkout/sessions", {
+    mode: "payment",
+    customer_email: input.customerEmail || undefined,
+    line_items: [
+      {
+        quantity: 1,
+        price_data: {
+          currency: "gbp",
+          unit_amount: input.amountPence,
+          product_data: {
+            name: input.productName,
+            description: input.productDescription || undefined,
+          },
+        },
+      },
+    ],
+    metadata: input.metadata,
+    payment_intent_data: {
+      metadata: { kind: input.metadata.kind ?? "digital" },
+      receipt_email: input.customerEmail || undefined,
+    },
+    allow_promotion_codes: true,
+    success_url: input.successUrl,
+    cancel_url: input.cancelUrl,
+  });
+}
+
+/** List recent Checkout sessions (newest first) — admin sales view. */
+export async function listCheckoutSessions(limit = 100): Promise<StripeCheckoutSession[]> {
+  const res = await stripeRequest<{ data: StripeCheckoutSession[] }>(
+    "/checkout/sessions",
+    { limit: Math.min(100, Math.max(1, limit)) },
+    "GET"
+  );
+  return res.data;
+}
+
 export async function createPortalSession(
   customerId: string,
   returnUrl: string
@@ -242,4 +294,9 @@ export interface StripeCheckoutSession {
   metadata: Record<string, string> | null;
   subscription: string | null;
   customer: string | null;
+  /** Unix seconds. */
+  created?: number;
+  livemode?: boolean;
+  customer_email?: string | null;
+  customer_details?: { email?: string | null; name?: string | null } | null;
 }

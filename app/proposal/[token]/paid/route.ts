@@ -13,11 +13,12 @@ export const dynamic = "force-dynamic";
 
 export async function GET(
   req: Request,
-  { params }: { params: { token: string } }
+  { params }: { params: Promise<{ token: string }> }
 ): Promise<Response> {
+  const { token } = await params;
   const sessionId = new URL(req.url).searchParams.get("session_id");
   if (sessionId) {
     await confirmProposalPaymentBySession(sessionId);
   }
-  return NextResponse.redirect(`${SITE_URL}/proposal/${params.token}?paid=1`);
+  return NextResponse.redirect(`${SITE_URL}/proposal/${token}?paid=1`);
 }

@@ -1,0 +1,897 @@
+{
+  "input": {
+    "businessName": "Hartley Plumbing & Heating",
+    "trade": "Plumber and heating engineer",
+    "town": "Warrington",
+    "areas": "Lymm, Stockton Heath, Great Sankey, Birchwood, Culcheth",
+    "services": "Boiler servicing, boiler repairs, new boiler installation, leak repairs, bathroom installation, radiator installation, power flushing",
+    "usp": "Family-run, no call-out charge, fixed written quote before any work starts, tidy and respectful in your home",
+    "phone": "",
+    "website": "",
+    "reviewLink": "",
+    "tone": "friendly"
+  },
+  "tier": "complete",
+  "orderDate": "2026-10-07T21:12:44.062Z",
+  "sections": {
+    "website": {
+      "id": "website",
+      "generatedAt": "2026-10-07T21:12:49.049Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "metaTitle": "Plumber & Heating Engineer in Warrington | Hartley",
+        "metaDescription": "Hartley Plumbing & Heating in Warrington. Boiler servicing, repairs, installation and more. No call-out charge. Free quote. Get in touch.",
+        "heroHeadline": "Local plumber you can trust",
+        "heroSubheading": "Family-run plumbing and heating for Warrington and the surrounding area. Boiler work, leak repairs, bathroom and radiator installation.",
+        "about": [
+          "Hartley Plumbing & Heating is a family-run business serving Warrington and nearby towns. We handle everything from boiler servicing and repairs to new installations, leak repairs, and bathroom work. Our aim is simple: turn up on time, do the job properly, and treat your home with respect.",
+          "We don't charge for call-outs. Before we start any work, you'll get a fixed written quote so there are no surprises. We're tidy, honest, and happy to explain what needs doing and why.",
+          "Whether it's a radiator that needs fitting, a power flush to improve your heating efficiency, or a new boiler installation, we're here to help. Give us a ring for a free quote."
+        ],
+        "areaParagraph": "We're based in Warrington and regularly work across Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. If you're in or near any of these areas and need a plumber or heating engineer, get in touch for a free, no-obligation quote.",
+        "ctas": [
+          "Get a free quote",
+          "Call us today",
+          "Book a boiler service",
+          "Request a visit",
+          "Arrange an appointment"
+        ]
+      }
+    },
+    "qa": {
+      "id": "qa",
+      "generatedAt": "2026-10-07T21:12:53.539Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "items": [
+          {
+            "q": "Do you charge for a call-out or initial visit?",
+            "a": "No, there's no call-out charge. We'll come out, assess the job, and give you a fixed written quote before we start any work. That way you know exactly what you're paying."
+          },
+          {
+            "q": "Can you service my boiler?",
+            "a": "Yes, we provide annual boiler servicing to keep your heating running safely and efficiently. Regular servicing helps spot problems early and can extend your boiler's life."
+          },
+          {
+            "q": "What areas do you cover?",
+            "a": "We're based in Warrington and cover Lymm, Stockton Heath, Great Sankey, Birchwood, and Culcheth. If you're unsure whether your area's included, just get in touch."
+          },
+          {
+            "q": "My boiler is broken. Can you repair it?",
+            "a": "Yes, we handle boiler repairs for most systems. We'll diagnose the fault and give you a fixed written quote before proceeding, so there are no surprises."
+          },
+          {
+            "q": "Do you install new boilers?",
+            "a": "We do. Whether you need to replace an old boiler or upgrade your system, we'll discuss your options, provide a fixed quote, and handle the installation professionally."
+          },
+          {
+            "q": "I have a leak somewhere in my home. Can you help?",
+            "a": "Yes, leak repairs are one of our core services. We'll find the source of the problem and fix it properly. Call us out and we'll give you a fixed written quote before starting work."
+          },
+          {
+            "q": "Can you install new radiators?",
+            "a": "Absolutely. We install radiators as part of heating system upgrades or replacements. We'll assess your needs, provide a fixed quote, and fit them to a high standard."
+          },
+          {
+            "q": "What's power flushing and why might I need it?",
+            "a": "Power flushing cleans out sludge and debris from your heating system pipes and radiators. It can improve heating efficiency, reduce cold spots on radiators, and help your boiler run more effectively."
+          },
+          {
+            "q": "Do you do bathroom installations?",
+            "a": "Yes, bathroom installation is one of our services. We handle the plumbing side of things to make sure everything's fitted correctly and works as it should."
+          },
+          {
+            "q": "Will you make a mess or be respectful in my home?",
+            "a": "Absolutely. We're tidy and respectful in your home as standard. We know it's your space, and we treat it with care during every job."
+          },
+          {
+            "q": "How does the quoting process work?",
+            "a": "We visit, assess the work needed, and provide a fixed written quote before we start anything. No surprises, no hidden charges. You know the cost upfront."
+          },
+          {
+            "q": "Are you a family-run business?",
+            "a": "Yes, we're family-run, which means we take pride in our reputation and look after our customers properly. We're not a huge corporate outfit, just local tradespeople you can rely on."
+          },
+          {
+            "q": "What if I need emergency repairs?",
+            "a": "We handle urgent plumbing and heating issues. Contact us directly to discuss your situation and we'll do our best to help you quickly."
+          },
+          {
+            "q": "Can you help with a heating system that's not warming the house evenly?",
+            "a": "Yes. Uneven heating is often caused by sludge in the system or radiator issues. We can diagnose the problem and recommend solutions like power flushing or radiator installation."
+          },
+          {
+            "q": "How can I book a visit?",
+            "a": "Get in touch with us directly to arrange a visit. We'll come out at a time that suits you, assess the work, and provide your fixed written quote before any work starts."
+          }
+        ]
+      }
+    },
+    "profile": {
+      "id": "profile",
+      "generatedAt": "2026-10-07T21:12:55.628Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "primaryCategory": "Plumber",
+        "secondaryCategories": [
+          "Heating contractor",
+          "Boiler service and repair",
+          "Gas engineer"
+        ],
+        "openingLine": "Family-run plumbing and heating in Warrington with no call-out charge.",
+        "description": "Hartley Plumbing & Heating is a family-run business serving Warrington, Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. We handle everything from boiler servicing and repairs to new installations, leak fixes, bathroom suites and radiator work. What sets us apart is straightforward pricing - no call-out charge and a fixed written quote before we start any job. We're respectful in your home and take pride in leaving things tidy. Whether you need an emergency repair or planned work, we're here to help.",
+        "services": [
+          {
+            "name": "Boiler servicing",
+            "description": "Annual boiler service to maintain efficiency, spot problems early and keep your warranty valid. We'll check safety, performance and give you peace of mind."
+          },
+          {
+            "name": "Boiler repairs",
+            "description": "Fast diagnosis and repair of faulty boilers, from no heat to leaks and strange noises. We aim to get you back up and running quickly."
+          },
+          {
+            "name": "New boiler installation",
+            "description": "Complete boiler replacement with advice on the right model for your home and budget. We handle removal of the old unit and full commissioning."
+          },
+          {
+            "name": "Leak repairs",
+            "description": "We locate and fix leaks in pipes, radiators and fittings throughout your home, from slow drips to urgent bursts."
+          },
+          {
+            "name": "Bathroom installation",
+            "description": "Full bathroom suite fitting including basins, toilets, baths, showers and tiling work. We'll plan the job carefully and respect your home."
+          },
+          {
+            "name": "Radiator installation",
+            "description": "Supply and fit new radiators to replace old ones or add extra heat to rooms. We can advise on sizing and positioning for best performance."
+          },
+          {
+            "name": "Power flushing",
+            "description": "Deep clean your central heating system to remove sludge and improve boiler efficiency. Ideal if your radiators are cold at the bottom or heating is patchy."
+          }
+        ],
+        "attributes": [
+          "No call-out fees",
+          "Free estimates",
+          "Onsite services",
+          "Same-day repairs available",
+          "Bathroom installation",
+          "Boiler installation"
+        ],
+        "keywords": [
+          "plumber Warrington",
+          "boiler repair Warrington",
+          "heating engineer Warrington",
+          "plumber Lymm",
+          "boiler service Stockton Heath",
+          "new boiler installation Warrington",
+          "emergency plumber Warrington",
+          "bathroom installation Warrington",
+          "radiator installation Warrington",
+          "power flushing Warrington",
+          "leak repair Warrington",
+          "heating engineer Lymm"
+        ],
+        "checklist": [
+          "Upload a photo of the team or business van to humanise the profile and show you're established.",
+          "Add your service areas in the 'Service area' section to cover Warrington, Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth.",
+          "Create a post highlighting your no call-out charge policy to set you apart from competitors.",
+          "Add 3-5 photos of recent work: boiler installation, bathroom suite, radiator fit - real jobs build trust.",
+          "Encourage past customers to leave reviews by asking on invoices or follow-up messages.",
+          "Fill in all opening hours accurately, including whether you offer same-day emergency callouts.",
+          "Add a post offering a free boiler health check or fixed-price service call to drive enquiries.",
+          "Ensure your phone number and website link are correct and clickable in the 'Contact' section.",
+          "Write a short 'About' section mentioning you're family-run and have been trading since [year].",
+          "Check and respond to any existing reviews, even if there's just one - shows you're active and care."
+        ]
+      }
+    },
+    "social": {
+      "id": "social",
+      "generatedAt": "2026-10-07T21:12:57.238Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "facebookBio": "Family-run plumbing and heating in Warrington, Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. No call-out charge. Fixed quotes before work starts.",
+        "instagramBio": "Plumbing & heating for Warrington and surrounding areas\nFamily-run, no call-out charge\nFixed quotes before work",
+        "nextdoorIntro": "Hi neighbours. We're Hartley Plumbing & Heating, a family-run business serving Warrington and the surrounding villages. Whether you need a boiler service, leak repair, new radiators or a bathroom overhaul, we're here to help. No call-out charge, and we'll give you a fixed written quote before we start any work. We take pride in keeping your home tidy and treating it with respect. Give us a call when you need us.",
+        "captions": [
+          {
+            "platform": "Facebook",
+            "text": "Boiler playing up? Don't panic. We can usually get to you quickly and sort it out without fuss. Whether it's a service, repair or a new installation, we'll give you a fixed written quote upfront so there are no surprises. No call-out charge either.",
+            "hashtags": [
+              "#WarringtonPlumber",
+              "#HeatingEngineer",
+              "#BoilerRepair",
+              "#LocalTrade"
+            ]
+          },
+          {
+            "platform": "Instagram",
+            "text": "New radiators transform a room. We've just finished installing a fresh set in a Stockton Heath home, and the difference in warmth is night and day. If your heating needs an upgrade, we're just a call away. Fixed quote, no call-out charge.",
+            "hashtags": [
+              "#RadiatorInstallation",
+              "#HeatingUpgrade",
+              "#Warrington",
+              "#LocalPlumber"
+            ]
+          },
+          {
+            "platform": "Facebook",
+            "text": "Leaks are never convenient, but they don't have to be a nightmare. We get to the root of the problem, fix it properly and leave your home as tidy as we found it. Family-run and straightforward, that's how we work. Call us today.",
+            "hashtags": [
+              "#LeakRepair",
+              "#Plumber",
+              "#WarringtonServices",
+              "#EmergencyPlumbing"
+            ]
+          },
+          {
+            "platform": "Instagram",
+            "text": "Bathroom renovation in Lymm. Taps, shower, new suite, the full works. We handle everything from start to finish, keep the mess to a minimum and treat your space with respect. Get in touch for a free quote.",
+            "hashtags": [
+              "#BathroomInstallation",
+              "#Lymm",
+              "#Renovation",
+              "#HomeImprovement"
+            ]
+          },
+          {
+            "platform": "Facebook",
+            "text": "Power flushing isn't glamorous, but it works. If your radiators are cold at the bottom or your heating's not running as well as it should, this could be the answer. We'll explain what's happening and give you a fixed price upfront.",
+            "hashtags": [
+              "#PowerFlushing",
+              "#HeatingProblems",
+              "#Warrington",
+              "#PlumbingTips"
+            ]
+          },
+          {
+            "platform": "Instagram",
+            "text": "Meet the team behind Hartley Plumbing & Heating. We're family-run, we know the Warrington area inside out, and we're proud to look after our neighbours' homes. No call-out charge, fixed quotes, and we respect your space.",
+            "hashtags": [
+              "#FamilyBusiness",
+              "#LocalTrade",
+              "#Warrington",
+              "#PlumbingTeam"
+            ]
+          },
+          {
+            "platform": "Facebook",
+            "text": "Boiler service season is here. A quick annual check can catch small problems before they become big ones and keep your warranty valid. We'll do the job properly and leave you with peace of mind. No call-out charge.",
+            "hashtags": [
+              "#BoilerService",
+              "#MaintenanceTips",
+              "#Heating",
+              "#WarringtonPlumber"
+            ]
+          },
+          {
+            "platform": "Instagram",
+            "text": "New boiler installed in Great Sankey. Modern, efficient and ready to keep the home warm all winter. We handle the whole job, from removal of the old unit to full commissioning. Fixed quote, no surprises.",
+            "hashtags": [
+              "#NewBoiler",
+              "#GreatSankey",
+              "#Installation",
+              "#Warrington"
+            ]
+          },
+          {
+            "platform": "Facebook",
+            "text": "Why choose Hartley? We're local, we're family-run, and we don't charge a call-out fee. Every job comes with a fixed written quote before we start, and we'll leave your home tidy and respected. That's the Hartley promise.",
+            "hashtags": [
+              "#LocalBusiness",
+              "#Plumbing",
+              "#Heating",
+              "#WarringtonCommunity"
+            ]
+          },
+          {
+            "platform": "Instagram",
+            "text": "Winter heating check. Cold spots, strange noises, or just want to make sure everything's running right? We cover Warrington, Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. Ring us for a no-cost call-out.",
+            "hashtags": [
+              "#HeatingCheck",
+              "#WinterReady",
+              "#LocalCoverage",
+              "#PlumbingServices"
+            ]
+          }
+        ]
+      }
+    },
+    "posts_q1": {
+      "id": "posts_q1",
+      "generatedAt": "2026-10-07T21:13:03.563Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "posts": [
+          {
+            "title": "Boiler check before winter kicks in",
+            "type": "Tip",
+            "body": "October's the sweet spot for a boiler service. Winter's coming and you don't want a breakdown when temperatures drop. Our engineers in Warrington will check your heating's running safely and efficiently. A service now costs far less than an emergency repair in January. Book your slot before the rush starts.",
+            "cta": "Book",
+            "photoIdea": "Close-up of an engineer's hands checking a boiler gauge during a routine service.",
+            "date": "12 Oct 2026"
+          },
+          {
+            "title": "Radiator not heating properly?",
+            "type": "FAQ",
+            "body": "If some radiators stay cold while others work fine, you've likely got a blockage or air trapped inside. Power flushing clears debris that builds up over years and restores heat flow. We've done this across Lymm and Stockton Heath with brilliant results. Warm radiators, lower bills. Worth a conversation.",
+            "cta": "Learn more",
+            "photoIdea": "A radiator being tested with a thermal imaging camera to show cold spots.",
+            "date": "19 Oct 2026"
+          },
+          {
+            "title": "Leaks don't get better on their own",
+            "type": "Update",
+            "body": "A small drip under the sink or behind the toilet might seem harmless, but it wastes water and can cause real damage to your home. Our leak repairs in Great Sankey and Birchwood are straightforward and we give you a fixed written quote before we start. No surprises.",
+            "cta": "Call now",
+            "photoIdea": "An engineer pointing to a pipe joint under a sink where a leak is occurring.",
+            "date": "26 Oct 2026"
+          },
+          {
+            "title": "November bathroom refresh",
+            "type": "Project spotlight",
+            "body": "We just finished a lovely bathroom installation in [area] for a family wanting more space and a modern feel. From the first chat through to final tiling, we kept everything tidy and worked around their schedule. If you're thinking about an upgrade, a free quote costs nothing. Let's talk about what you're after.",
+            "cta": "Get offer",
+            "photoIdea": "A finished bathroom showing new suite and tiling, taken from the doorway to show the full room.",
+            "date": "2 Nov 2026"
+          },
+          {
+            "title": "New boiler? We'll get it right",
+            "type": "Offer",
+            "body": "Thinking about a new boiler? You need the right size for your home and a proper installation that's safe and efficient. We're family-run and based right here in Warrington, so we understand what our customers need. Get a fixed written quote with no call-out charge and no pressure.",
+            "cta": "Get offer",
+            "photoIdea": "A new boiler unit photographed from the side, showing its modern compact design.",
+            "date": "9 Nov 2026"
+          },
+          {
+            "title": "Boiler repairs that don't break the bank",
+            "type": "Tip",
+            "body": "A fault light or strange noise doesn't always mean a new boiler. Most issues can be repaired and we'll diagnose the problem honestly. Our engineers across Culcheth and beyond give you a fixed quote before starting work, so there are no hidden costs. Call us in and we'll take a proper look.",
+            "cta": "Call now",
+            "photoIdea": "An engineer reading a boiler's fault code display on the front panel.",
+            "date": "16 Nov 2026"
+          },
+          {
+            "title": "Radiators for the whole house",
+            "type": "Update",
+            "body": "Whether you need one new radiator or you're upgrading your whole system, radiator installation is a job we handle well. We'll help you choose the right size and type for each room, fit it properly, and make sure it heats evenly. Lymm and Stockton Heath homeowners get the same quality work as everyone else.",
+            "cta": "Learn more",
+            "photoIdea": "A newly installed radiator on a wall, photographed straight-on to show its clean finish.",
+            "date": "23 Nov 2026"
+          },
+          {
+            "title": "Power flushing explained",
+            "type": "FAQ",
+            "body": "What's power flushing? It's a deep clean of your heating system using specialist equipment to blast out sludge and rust that clogs pipes and radiators. Over time, this debris builds up and makes your boiler work harder and your bills higher. A flush restores efficiency and can add years to your system's life.",
+            "cta": "Learn more",
+            "photoIdea": "A power flushing machine connected to pipes, showing the dark contaminated water being flushed out.",
+            "date": "30 Nov 2026"
+          },
+          {
+            "title": "Christmas prep: heating sorted",
+            "type": "Seasonal",
+            "body": "Family coming over for Christmas? Make sure your heating's up to the job. If you've noticed cold spots or your boiler's been struggling, now's the time to sort it. We're still taking bookings through December in Warrington, Birchwood and Great Sankey. Don't spend Christmas shivering.",
+            "cta": "Book",
+            "photoIdea": "A warm, cosy living room with a working radiator and family gathered around, shot from a corner.",
+            "date": "7 Dec 2026"
+          },
+          {
+            "title": "New Year, new bathroom?",
+            "type": "Seasonal",
+            "body": "January's when many people start planning home improvements. A new bathroom adds comfort and value. We've fitted bathrooms across Warrington and the surrounding areas, always keeping your home clean and respecting your space. If you're thinking about it, a free quote's the first step.",
+            "cta": "Get offer",
+            "photoIdea": "A fresh, modern bathroom with neutral tiles and good lighting, photographed from above the bath looking towards the door.",
+            "date": "14 Dec 2026"
+          },
+          {
+            "title": "Boiler servicing: what happens",
+            "type": "Behind the scenes",
+            "body": "During a boiler service, we check the burner, inspect pipes, test water pressure, clean the heat exchanger and run a full safety check. Takes about an hour and you'll get a report of what we found. We do this across Stockton Heath, Culcheth and Lymm. Regular servicing keeps your boiler safe and efficient.",
+            "cta": "Book",
+            "photoIdea": "An engineer with a boiler manual and inspection checklist, pointing to different parts of the unit.",
+            "date": "21 Dec 2026"
+          },
+          {
+            "title": "Leak repairs in the New Year",
+            "type": "Update",
+            "body": "New Year can bring new problems. Freezing temperatures and old pipes don't always mix well. If you spot a leak, don't wait. Our engineers in Great Sankey and beyond respond quickly with a fixed written quote before any work starts. No call-out charge, no fuss.",
+            "cta": "Call now",
+            "photoIdea": "Water droplets falling from a pipe joint, captured close-up to show the leak clearly.",
+            "date": "28 Dec 2026"
+          },
+          {
+            "title": "Spring plumbing check",
+            "type": "Tip",
+            "body": "January's a good time to walk around your home and look for any signs of trouble. Check under sinks, around toilets, in the airing cupboard and in the loft. Small leaks spotted early save thousands in damage. If you find anything worrying, give us a ring. We cover Warrington and all the surrounding areas.",
+            "cta": "Call now",
+            "photoIdea": "Someone crouching under a sink with a torch, inspecting pipes for signs of moisture or corrosion.",
+            "date": "4 Jan 2027"
+          }
+        ]
+      }
+    },
+    "reviews": {
+      "id": "reviews",
+      "generatedAt": "2026-10-07T21:13:05.056Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "requests": [
+          {
+            "channel": "SMS",
+            "label": "Right after the job",
+            "text": "Hi [Customer name], thanks for choosing Hartley Plumbing & Heating. We'd love to know how we got on. If you've got a moment, please share your thoughts here: [Review link]"
+          },
+          {
+            "channel": "SMS",
+            "label": "A few days later (if no review yet)",
+            "text": "[Customer name], hope everything's running smoothly after our visit. Your feedback really helps us. Leave a review: [Review link]"
+          },
+          {
+            "channel": "WhatsApp",
+            "label": "Right after the job",
+            "text": "Hi [Customer name], thanks for having us round. We'd be grateful if you could leave a quick review of your experience with Hartley Plumbing & Heating. It only takes a moment: [Review link]"
+          },
+          {
+            "channel": "WhatsApp",
+            "label": "A week later (if no review yet)",
+            "text": "Hi [Customer name], just checking everything's still working well? If you're happy with the job, we'd really appreciate a review. It helps other local families find us. [Review link]"
+          },
+          {
+            "channel": "Email",
+            "label": "Within 24 hours of completion",
+            "text": "Subject: Thanks for choosing Hartley Plumbing & Heating\n\nHi [Customer name],\n\nThanks for letting us in to help with your heating and plumbing today. We hope everything's working as it should be.\n\nIf you're happy with the work, we'd be really grateful if you could leave a quick review. It only takes a couple of minutes and means the world to a family-run business like ours.\n\n[Review link]\n\nCheers,\nThe Hartley team"
+          },
+          {
+            "channel": "In person",
+            "label": "At the end of the job",
+            "text": "Thanks very much for having us, [Customer name]. Before we head off, if you're pleased with how everything's gone, we'd really appreciate it if you could leave us a review online. It helps us grow and lets other families in the area know they can trust us. Just follow this link when you get a moment: [Review link]"
+          }
+        ],
+        "replies": [
+          {
+            "scenario": "5 stars, mentions no call-out charge",
+            "stars": 5,
+            "text": "Thanks so much, [Customer name]. We're glad the no call-out charge made things straightforward for you. It's the way we've always done it, fair pricing from the start. Really appreciate the review."
+          },
+          {
+            "scenario": "5 stars, mentions fixed quote or transparent pricing",
+            "stars": 5,
+            "text": "That's brilliant to hear, [Customer name]. Giving you a fixed written quote before we start is just common sense to us, no surprises, no stress. Thanks for the lovely feedback."
+          },
+          {
+            "scenario": "5 stars, mentions tidiness or respect for the home",
+            "stars": 5,
+            "text": "Thank you, [Customer name]. Leaving your home as clean and tidy as we found it is the least you should expect. We're really glad you felt respected and looked after. Cheers for the review."
+          },
+          {
+            "scenario": "5 stars, mentions family-run or local business",
+            "stars": 5,
+            "text": "Lovely to hear, [Customer name]. Being a family business means we treat your home like our own. Your support means everything to us. Many thanks for taking the time to review."
+          },
+          {
+            "scenario": "5 stars, mentions boiler repair or service",
+            "stars": 5,
+            "text": "Thanks, [Customer name]. We're pleased your boiler's running reliably again. Keeping it well-serviced saves hassle down the line. Really appreciate the review."
+          },
+          {
+            "scenario": "5 stars, mentions bathroom or radiator work",
+            "stars": 5,
+            "text": "Brilliant, [Customer name]. We're glad your bathroom looks great and your radiators are heating up nicely. Thanks so much for the five-star review."
+          },
+          {
+            "scenario": "5 stars, general positive feedback",
+            "stars": 5,
+            "text": "That's wonderful, [Customer name]. We loved working on your home and we're delighted everything's up and running. Thanks for the kind words, really does brighten our day."
+          },
+          {
+            "scenario": "4 stars, positive but minor issue mentioned",
+            "stars": 4,
+            "text": "Thanks, [Customer name]. We're really pleased you're happy overall. If there's anything we could've done better, please do get in touch. We'd love the chance to make it right."
+          },
+          {
+            "scenario": "4 stars, general positive feedback",
+            "stars": 4,
+            "text": "Thanks so much for the review, [Customer name]. We're glad the work went well and we appreciate you taking the time to share your feedback. It helps us keep improving."
+          },
+          {
+            "scenario": "4 stars, mentions timekeeping or professionalism",
+            "stars": 4,
+            "text": "Cheers, [Customer name]. We're pleased you found us professional and reliable. Your feedback is really valuable to us. Thanks for the review."
+          },
+          {
+            "scenario": "3 stars, mentions a minor issue or area for improvement",
+            "stars": 3,
+            "text": "Thanks for the feedback, [Customer name]. We're glad the core work was done well, and we take on board what you've mentioned. If you'd like to chat through anything, we're always happy to help put things right."
+          },
+          {
+            "scenario": "3 stars, lukewarm but civil feedback",
+            "stars": 3,
+            "text": "Thanks for reviewing us, [Customer name]. We're pleased the job got done, but we'd like to understand if anything fell short of what you'd hoped for. Feel free to give us a ring so we can chat it through."
+          },
+          {
+            "scenario": "1–2 stars, calm and professional (no defensiveness)",
+            "stars": 1,
+            "text": "Thanks for taking the time to review, [Customer name]. We're sorry you weren't fully satisfied. We'd really like to understand what went wrong and put it right. Please do get in touch so we can make this better."
+          },
+          {
+            "scenario": "1–2 stars, take offline and invite dialogue",
+            "stars": 2,
+            "text": "Thanks, [Customer name]. We appreciate the honest feedback and we're sorry you had that experience. We'd like the chance to understand what happened and to help. Please give us a call when you're free."
+          },
+          {
+            "scenario": "1–2 stars, professional, neutral, no argument",
+            "stars": 1,
+            "text": "We're sorry you had a poor experience, [Customer name]. That's not the standard we aim for. We'd really value the chance to talk through what happened and see how we can make it right. Please reach out."
+          }
+        ],
+        "tips": [
+          "Build review requests into your handover routine: before you leave a job, ask every customer in person if they'd be willing to leave a review, and give them the link or write it down. Makes it immediate and personal.",
+          "Send a warm, brief text or WhatsApp within an hour of finishing, while the job is fresh in their mind. Keep it friendly and low-pressure: 'If you're happy with how it went, we'd love a review.' People respond better to genuine tone than sales talk.",
+          "In your job paperwork (invoice, quote, receipt), add a small line at the bottom with your Google review link and a simple 'If you're pleased with the work, we'd love your feedback.' No hard sell, just make it easy to find.",
+          "After a boiler service or repair, follow up with a text a week later: 'Just checking everything's running smoothly? If so, a review really helps us.' Timing it after they've had chance to see the work in action builds confidence.",
+          "Encourage your team to mention reviews in conversation during jobs. Keep it natural: 'We really rely on word-of-mouth and reviews from customers like you.' Family-run businesses can lean on that authenticity, people trust recommendations from real families.",
+          "If a customer compliments you during a job ('You've been really tidy,' 'That was a fair quote'), capture that moment: 'Thanks! If you'd be willing to mention that in a review, it'd mean the world to us.' Positive energy in the moment translates to action.",
+          "Create a simple system: add customer phone numbers to a spreadsheet and set calendar reminders to send follow-ups after 5–7 days if you haven't seen a review yet. Persistence is kind when it's brief and genuine."
+        ]
+      }
+    },
+    "posts_q3": {
+      "id": "posts_q3",
+      "generatedAt": "2026-10-07T21:13:07.185Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "posts": [
+          {
+            "title": "Spring boiler check: what to look for",
+            "type": "Tip",
+            "body": "As we head into warmer months, now's the perfect time to check your boiler isn't working harder than it should. Listen for unusual noises, check your pressure gauge sits between 1 and 2 bar, and feel if radiators heat evenly. If something feels off, a quick boiler service could save you money later and catch problems early. We're covering Warrington, Lymm and beyond. Get in touch for a fixed written quote with no call-out charge.",
+            "cta": "Get offer",
+            "photoIdea": "Close-up of a hand pointing at a boiler pressure gauge reading.",
+            "date": "12 Apr 2027"
+          },
+          {
+            "title": "Leak repairs in Warrington",
+            "type": "Project spotlight",
+            "body": "This week we were out in [area] fixing a persistent leak that had been causing damp under a kitchen sink. The owner had been living with it for months, worried about the cost. We traced the source, repaired it properly, and sent a fixed written quote before touching a spanner. No surprises, no call-out charge. If you've got a drip that won't quit, we cover Warrington, Stockton Heath and Great Sankey. Let's sort it.",
+            "cta": "Call now",
+            "photoIdea": "A plumber's hands tightening a pipe joint under a sink with a wrench.",
+            "date": "19 Apr 2027"
+          },
+          {
+            "title": "Why radiators need flushing",
+            "type": "Tip",
+            "body": "Over time, sludge and rust build up inside your radiators. You'll notice cold spots, uneven heating, or your boiler working overtime. Power flushing clears out all that debris and helps your heating run efficiently again. It's one of those jobs that makes a real difference but often gets overlooked. We do power flushing right here in Warrington and the surrounding villages. Ready to feel the warmth return?",
+            "cta": "Learn more",
+            "photoIdea": "A radiator being drained during a power flush, showing discoloured water.",
+            "date": "26 Apr 2027"
+          },
+          {
+            "title": "Bank holiday plumbing tips",
+            "type": "Tip",
+            "body": "With the May bank holiday coming up, now's not the time to discover a leak or boiler fault. Run a quick check: test your taps for drips, listen to your boiler, and make sure your radiators feel warm. If you spot anything odd before the holiday, give us a ring. We're a family-run business in Warrington and we know how annoying it is to need a plumber when everywhere's shut. Peace of mind is worth a call.",
+            "cta": "Call now",
+            "photoIdea": "A kitchen tap dripping slowly into a sink.",
+            "date": "3 May 2027"
+          },
+          {
+            "title": "New boiler installation: what to expect",
+            "type": "FAQ",
+            "body": "Thinking about a new boiler? Here's what happens: we'll give you a fixed written quote upfront, no call-out charge. Then we'll disconnect your old boiler safely, fit the new one, test everything thoroughly, and show you how to use it. The whole job usually takes a day. We'll keep your home tidy and leave everything clean. We install new boilers across Warrington, Lymm, Birchwood and beyond. Questions? We're here to help.",
+            "cta": "Book",
+            "photoIdea": "A new boiler mounted on a kitchen wall, freshly installed and gleaming.",
+            "date": "10 May 2027"
+          },
+          {
+            "title": "Summer bathroom refresh in Great Sankey",
+            "type": "Project spotlight",
+            "body": "Last month we completed a full bathroom installation in Great Sankey. The owners wanted a modern, clean space without the stress. We handled the lot: plumbing, radiator work, and all the finishing touches. Fixed quote before we started, no surprises, and we left the place spotless. If you're thinking of upgrading your bathroom this summer, we're here to make it straightforward. Give us a call for a quote.",
+            "cta": "Get offer",
+            "photoIdea": "A newly installed bathroom with contemporary suite, clean tiles and modern fixtures.",
+            "date": "17 May 2027"
+          },
+          {
+            "title": "Radiator installation: room by room",
+            "type": "Tip",
+            "body": "Adding a radiator to a cold room or replacing an old one doesn't have to be complicated. We size it properly, fit it level, and balance your whole heating system so everything works together. Whether it's a bedroom, hallway, or extension in Culcheth or Stockton Heath, we'll make sure it heats efficiently without making your boiler work harder. Need a radiator fitted? We'll give you a fixed quote with no call-out charge.",
+            "cta": "Book",
+            "photoIdea": "A new chrome radiator mounted on a wall, with a measuring tape beside it.",
+            "date": "24 May 2027"
+          },
+          {
+            "title": "Boiler servicing: the annual health check",
+            "type": "Tip",
+            "body": "Your boiler's like your car: regular servicing keeps it running smoothly and safely. We check all the parts, clean the burner, test for gas leaks, and make sure everything's working as it should. It takes about an hour and costs less than waiting for a breakdown during winter. We're covering Warrington and the surrounding areas. Book your annual service now before the autumn rush.",
+            "cta": "Book",
+            "photoIdea": "An engineer holding a boiler service checklist while inspecting a wall-mounted boiler.",
+            "date": "31 May 2027"
+          },
+          {
+            "title": "Boiler repair or replace: which is right?",
+            "type": "FAQ",
+            "body": "When your boiler breaks down, the question is: fix it or replace it? If it's over 15 years old, a new one often makes sense. Newer boilers use less energy and are more reliable. If it's younger and the repair is straightforward, we'll fix it. We always give you a fixed written quote before any work starts, so you know exactly what you're paying. No call-out charge. We're based in Warrington and serve Lymm, Birchwood and beyond.",
+            "cta": "Get offer",
+            "photoIdea": "Two boilers side by side: an old one and a modern, compact new one.",
+            "date": "7 Jun 2027"
+          },
+          {
+            "title": "Summer holiday: checking your heating",
+            "type": "Update",
+            "body": "Heading away for the summer? Before you go, it's worth checking your heating system is ticking over properly. A small leak or boiler fault can turn into a big problem if no one's home. We can do a quick once-over in Warrington, Stockton Heath or Great Sankey. Peace of mind costs less than the repair bill when you return. Give us a call before you pack.",
+            "cta": "Call now",
+            "photoIdea": "A family suitcase packed and ready by a front door, with a boiler visible in the background.",
+            "date": "14 Jun 2027"
+          },
+          {
+            "title": "Leak detection and repair",
+            "type": "Tip",
+            "body": "A small drip today becomes water damage tomorrow. The tricky part is finding where the leak is coming from. We use our experience to trace it quickly, then fix it properly. Whether it's under a sink, behind a wall, or in your radiator system, we'll sort it. We're a family-run business in Warrington, Lymm and the surrounding villages. If you've spotted a damp patch or heard dripping, don't leave it. Call us for a fixed quote.",
+            "cta": "Call now",
+            "photoIdea": "A close-up of a water droplet forming on a copper pipe joint.",
+            "date": "21 Jun 2027"
+          },
+          {
+            "title": "Heating system balance: even warmth everywhere",
+            "type": "Tip",
+            "body": "Some radiators hot, others lukewarm? Your system probably needs balancing. We adjust the valves so water flows evenly to every radiator, and every room heats properly. It's often the answer when you're paying for heat that's not reaching you. Power flushing and balancing together work wonders. We do this work right across Warrington and Birchwood. Ready to feel the difference?",
+            "cta": "Learn more",
+            "photoIdea": "An engineer's hands adjusting a radiator valve with a special balancing tool.",
+            "date": "28 Jun 2027"
+          },
+          {
+            "title": "July maintenance: keep your system running",
+            "type": "Update",
+            "body": "Mid-summer might feel like an odd time to think about your heating, but it's actually the best time to book maintenance. We're less busy, we can fit you in quickly, and any issues are sorted before autumn. A boiler service, leak check, or radiator balance now means no emergencies later. We're family-run, no call-out charge, and always give a fixed written quote. Covering Warrington, Culcheth and all the surrounding areas. Book your check-up today.",
+            "cta": "Book",
+            "photoIdea": "A plumber checking gauges on a boiler during a summer service visit.",
+            "date": "5 Jul 2027"
+          }
+        ]
+      }
+    },
+    "posts_q2": {
+      "id": "posts_q2",
+      "generatedAt": "2026-10-07T21:13:07.517Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "posts": [
+          {
+            "title": "New Year, New Boiler?",
+            "type": "Tip",
+            "body": "If your heating's been playing up over winter, January's a good time to sort it. A boiler service costs far less than an emergency repair, and we'll spot any issues before they become costly. We're based in Warrington but cover Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. No call-out charge, and we'll give you a fixed written quote before we start any work. Get your boiler checked.",
+            "cta": "Book",
+            "photoIdea": "A warm living room with a radiator gently radiating heat on a cold morning.",
+            "date": "11 Jan 2027"
+          },
+          {
+            "title": "Leak Under Your Sink?",
+            "type": "FAQ",
+            "body": "A dripping pipe or puddle under the sink is never normal, even if it seems small. Left alone, leaks cause water damage and waste money. The good news: most leak repairs don't take long and cost far less than dealing with the damage later. We're a family-run business serving Warrington and the surrounding areas. We'll get to the root of it quickly and fix it properly. Don't wait.",
+            "cta": "Call now",
+            "photoIdea": "A close-up of a pipe joint with a small water droplet, showing the kind of leak a homeowner might spot.",
+            "date": "18 Jan 2027"
+          },
+          {
+            "title": "Radiator Not Heating Up?",
+            "type": "Tip",
+            "body": "Cold spots on your radiators, especially at the bottom, usually mean air or sludge is trapped inside. A power flush clears the system and gets your heating working efficiently again. It's one of those jobs that makes a real difference to warmth and bills. We service homes across Warrington, Stockton Heath, Great Sankey, Birchwood, Lymm and Culcheth. Let's get your radiators working properly.",
+            "cta": "Learn more",
+            "photoIdea": "Someone's hand touching a radiator that's only warm at the top, showing the problem.",
+            "date": "25 Jan 2027"
+          },
+          {
+            "title": "February Boiler Check",
+            "type": "Update",
+            "body": "Winter's not over yet. February can bring the coldest snaps, and a boiler failure right now is miserable and expensive. A service takes about an hour and gives you peace of mind that your heating is safe and efficient. We're local to Warrington and cover all the nearby villages. No call-out charge, and we'll tell you exactly what we're doing before we do it. Book your service.",
+            "cta": "Book",
+            "photoIdea": "An engineer's hands checking a boiler gauge or control panel during a routine service.",
+            "date": "1 Feb 2027"
+          },
+          {
+            "title": "New Boiler Installation",
+            "type": "Project spotlight",
+            "body": "We've just finished installing a new boiler in [area] for [customer name/family]. The old one had seen better days, and the new system is quieter, more efficient and comes with a proper warranty. The whole job went smoothly because we took time to explain what we were doing and kept the house tidy throughout. If your boiler's ageing or unreliable, a replacement often pays for itself in lower bills within a few years. Let's talk about your options.",
+            "cta": "Get offer",
+            "photoIdea": "A newly installed boiler in a kitchen or utility room, showing clean pipework and a proud homeowner nearby.",
+            "date": "8 Feb 2027"
+          },
+          {
+            "title": "Bathroom Upgrade Ideas",
+            "type": "Tip",
+            "body": "Thinking about a bathroom refresh? If you're planning new taps, a shower or radiator changes, that's where we come in. We handle the heating and plumbing side so everything works safely and looks neat. We've done plenty of bathroom projects across Lymm, Warrington and the surrounding areas. A well-planned bathroom not only feels better but adds real value to your home. Get in touch for a chat about what you're thinking.",
+            "cta": "Learn more",
+            "photoIdea": "A freshly renovated bathroom corner showing new radiator, taps or shower installation.",
+            "date": "15 Feb 2027"
+          },
+          {
+            "title": "Spring Clean Your Heating",
+            "type": "Seasonal",
+            "body": "As the weather warms up, it's the perfect time to get your heating system checked and cleaned before autumn comes round again. A power flush removes sludge and improves efficiency. We'll give everything a once-over and make sure it's all in good shape. Based in Warrington, we cover Stockton Heath, Great Sankey, Birchwood, Culcheth and Lymm. Spring's quieter for us, so we can often fit you in quickly.",
+            "cta": "Book",
+            "photoIdea": "An engineer flushing a heating system, showing the contrast between dirty and clean water.",
+            "date": "22 Feb 2027"
+          },
+          {
+            "title": "Leaky Tap Wasting Water?",
+            "type": "FAQ",
+            "body": "A tap that drips continuously wastes hundreds of litres a year and pushes your water bill up. Most dripping taps are a simple fix, usually just a new washer or cartridge. It's worth sorting sooner rather than later. We cover Great Sankey, Warrington, Birchwood and the surrounding areas. No call-out charge, and we'll give you a fixed price before we start. Let's stop that waste.",
+            "cta": "Call now",
+            "photoIdea": "A close-up of a kitchen or bathroom tap with a visible drip or water droplet.",
+            "date": "1 Mar 2027"
+          },
+          {
+            "title": "Radiator Installation Done Right",
+            "type": "Project spotlight",
+            "body": "We've just added new radiators to a bedroom in [area], and it's made a huge difference to the comfort and warmth of the space. Choosing the right size radiator matters, too small and the room never gets warm, too large and you waste energy. We take time to get it right and make sure the pipes are run neatly. If cold bedrooms or uneven heating is your problem, let's talk about where radiators would help most.",
+            "cta": "Learn more",
+            "photoIdea": "A newly installed radiator on a bedroom wall, perhaps with someone adjusting the valve or showing the neat pipework.",
+            "date": "8 Mar 2027"
+          },
+          {
+            "title": "Clocks Go Forward This Weekend",
+            "type": "Seasonal",
+            "body": "As we spring forward into British Summer Time, it's a good time to think about your heating. You might start turning the boiler down for the warmer months. Before you do, make sure it's serviced and ready. A boiler that's been neglected over winter might surprise you with a breakdown in autumn. We're based in Warrington and serve Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. Get ahead of the game.",
+            "cta": "Book",
+            "photoIdea": "A thermostat being adjusted down, with spring sunlight visible through a window.",
+            "date": "15 Mar 2027"
+          },
+          {
+            "title": "Boiler Repair or Replacement?",
+            "type": "FAQ",
+            "body": "When your boiler breaks down, the first question is usually repair or replace? If it's over [X] years old and repair costs are climbing, replacement often makes sense. A new boiler is more efficient, more reliable and usually comes with a warranty. We'll be honest about whether a repair will hold or if replacement is the better choice. Family-run, local to Warrington and the surrounding villages. We'll give you a fixed quote before anything happens.",
+            "cta": "Call now",
+            "photoIdea": "An older boiler and a newer one side by side, or an engineer discussing options with a homeowner.",
+            "date": "22 Mar 2027"
+          },
+          {
+            "title": "Spring Plumbing Checkup",
+            "type": "Update",
+            "body": "Spring's a great time to check for leaks and damage that winter might have caused. Frozen pipes, pressure changes and temperature swings can reveal weak spots. A quick once-over now can save you from nasty surprises later. We serve Warrington, Culcheth, Birchwood, Great Sankey, Stockton Heath and Lymm. No call-out charge, and we'll give you a clear written quote for any work needed. Let's make sure your plumbing's in good shape.",
+            "cta": "Book",
+            "photoIdea": "An engineer checking pipes under a sink or in a cupboard, looking for any signs of moisture or damage.",
+            "date": "29 Mar 2027"
+          },
+          {
+            "title": "Ready for Easter?",
+            "type": "Seasonal",
+            "body": "Easter holidays mean the house gets busy with family and friends visiting. If your heating, hot water or bathroom isn't up to scratch, now's the time to sort it. New radiators, a boiler service or bathroom work all take time to plan and fit. We're based in Warrington and cover Lymm, Stockton Heath, Great Sankey, Birchwood and Culcheth. Give us a ring for a chat about what you need before the holidays arrive.",
+            "cta": "Call now",
+            "photoIdea": "A busy family bathroom or kitchen with multiple taps running, or a cosy living room with the heating on.",
+            "date": "5 Apr 2027"
+          }
+        ]
+      }
+    },
+    "posts_q4": {
+      "id": "posts_q4",
+      "generatedAt": "2026-10-07T21:13:09.507Z",
+      "model": "claude-haiku-4-5-20251001",
+      "costPence": 1,
+      "regens": 0,
+      "content": {
+        "posts": [
+          {
+            "title": "Summer boiler checks before holidays",
+            "type": "Tip",
+            "body": "Before you head off on summer holiday, give your boiler a thought. A quick service now means no nasty surprises when you return, and peace of mind whilst you're away. We've seen plenty of boilers struggle after weeks of neglect in the heat. A small investment now could save you hundreds later. If you're in Warrington or nearby, we can fit you in quickly with no call-out charge. Get your boiler checked before you go.",
+            "cta": "Book",
+            "photoIdea": "A boiler in a modern kitchen or utility room, with holiday luggage or a calendar visible nearby.",
+            "date": "12 Jul 2027"
+          },
+          {
+            "title": "Bathroom refurb? We handle the lot",
+            "type": "Project spotlight",
+            "body": "Just finished a lovely bathroom installation in [area] for a family who wanted everything done properly. From pipework and heating to the final fit, we managed the whole job, no need to juggle different tradespeople. That's what family-run means to us: taking proper care of every detail so you can relax. We're tidy, we're respectful of your home, and we give you a fixed written quote before we start. If you're planning a bathroom upgrade in Stockton Heath, Lymm or anywhere nearby, let's chat.",
+            "cta": "Get offer",
+            "photoIdea": "Before-and-after of a completed bathroom installation, or a close-up of new radiator and pipework in a bathroom setting.",
+            "date": "19 Jul 2027"
+          },
+          {
+            "title": "Is your heating system losing pressure?",
+            "type": "FAQ",
+            "body": "A boiler that keeps losing pressure is usually telling you something. It could be a small leak somewhere in the system, maybe a radiator valve, a pipe joint, or even the boiler itself. Ignoring it won't fix it, and it'll only cost more later. In Birchwood, Great Sankey and across Warrington, we've spotted and repaired dozens of pressure leaks. Don't wait for a cold snap. Let's find where the problem is and sort it.",
+            "cta": "Call now",
+            "photoIdea": "Close-up of a boiler pressure gauge showing a low reading.",
+            "date": "26 Jul 2027"
+          },
+          {
+            "title": "August bank holiday: we're here",
+            "type": "Update",
+            "body": "Bank holiday Monday and the kids are home, if your heating or water packs up, don't worry. We're still operating around the August bank holiday, so if you need urgent help in Warrington or the surrounding areas, give us a ring. No call-out charge, remember, so you're not paying extra just to get someone round. We'll give you a fixed written quote before we touch anything.",
+            "cta": "Call now",
+            "photoIdea": "A family in a home setting, perhaps checking a radiator or thermostat, suggesting peace of mind.",
+            "date": "2 Aug 2027"
+          },
+          {
+            "title": "Power flushing: clearing blocked systems",
+            "type": "Tip",
+            "body": "If your heating is patchy, some radiators hot, others cold, your system might be clogged with sludge and debris built up over years. Power flushing blasts the whole network clean and gets your heat flowing evenly again. It's not glamorous, but it works. We do this regularly for homes in Culcheth and across Warrington, and customers are always surprised by the difference. Warm radiators and lower bills follow. Worth asking about if your heating's been a bit sluggish.",
+            "cta": "Learn more",
+            "photoIdea": "A radiator being worked on, or a heating engineer's equipment in action, showing the power flushing process.",
+            "date": "9 Aug 2027"
+          },
+          {
+            "title": "New boiler? Fixed quote, no surprises",
+            "type": "Offer",
+            "body": "Thinking about a new boiler installation? We'll come round, assess your system properly, and give you a fixed written quote before we start. No hidden charges, no call-out fee, no guesswork. We'll explain what you need and why, then get on with it. We're family-run and we've been doing this for long enough to know what works. If you're in Lymm, Stockton Heath or Warrington, ring us for a quote.",
+            "cta": "Get offer",
+            "photoIdea": "A modern condensing boiler installed in a utility room or kitchen, looking neat and professional.",
+            "date": "16 Aug 2027"
+          },
+          {
+            "title": "Back-to-school prep: heating ready?",
+            "type": "Seasonal",
+            "body": "September's round the corner and the mornings are getting cooler. Before the kids go back to school and routines get busy, now's the time to check your boiler and heating are working properly. A boiler service takes an hour or so and catches problems early. We've seen a spike in call-outs every September from homes that skipped this step. Don't be one of them. Book in now while we've still got summer slots available across Warrington and nearby.",
+            "cta": "Book",
+            "photoIdea": "A child getting ready for school in a warm, comfortable home with a visible radiator in the background.",
+            "date": "23 Aug 2027"
+          },
+          {
+            "title": "Leak under your sink? We'll find it",
+            "type": "Update",
+            "body": "Water pooling under the kitchen sink or bathroom? Could be a loose joint, a worn washer, or a pinhole in the pipe. Left alone, it'll rot the cabinet and waste water. We find and repair leaks across Great Sankey, Birchwood, Warrington and beyond. Most jobs are straightforward once you know what you're looking at. Give us a call, no call-out charge, and we'll track it down and fix it properly.",
+            "cta": "Call now",
+            "photoIdea": "A plumber's hands working on pipes under a sink, or a close-up of a leaking joint being repaired.",
+            "date": "30 Aug 2027"
+          },
+          {
+            "title": "Radiator not heating? Here's why",
+            "type": "FAQ",
+            "body": "A cold radiator while others are hot usually means air's trapped inside. Bleeding the radiator, opening the small valve at the top to let the air out, often fixes it in seconds. If that doesn't work, the system might need balancing or power flushing. In Culcheth and Warrington, this is one of the most common calls we get. It's quick to fix and makes a real difference to comfort. If you're not sure how to bleed a radiator, we can show you or do it for you.",
+            "cta": "Learn more",
+            "photoIdea": "A close-up of a radiator bleed valve being opened with a radiator key.",
+            "date": "6 Sept 2027"
+          },
+          {
+            "title": "Boiler repair or new installation?",
+            "type": "Tip",
+            "body": "If your boiler's over 15 years old and keeps breaking down, repair costs add up fast. Sometimes a new, efficient boiler makes more sense than throwing money at an old one. We'll give you honest advice, whether that's a repair or a full installation. We're family-run and we'd rather tell you the truth than chase a quick job. If you're in Stockton Heath, Lymm or Warrington and wondering what to do, let's talk it through.",
+            "cta": "Get offer",
+            "photoIdea": "An older boiler alongside a modern, compact new boiler, showing the size and efficiency difference.",
+            "date": "13 Sept 2027"
+          },
+          {
+            "title": "Clocks go back: heating season starts",
+            "type": "Seasonal",
+            "body": "As we head into autumn and the clocks go back, heating season is properly here. If you haven't had your boiler serviced this year, now's the time. A service catches wear and tear before winter hits, keeps your system running efficiently, and gives you confidence when the weather turns. We serve Warrington, Lymm, Great Sankey and all the surrounding areas. Book your service now and avoid the autumn rush.",
+            "cta": "Book",
+            "photoIdea": "An autumn scene outside a home window, with the heating system visible inside, suggesting the transition to winter.",
+            "date": "20 Sept 2027"
+          },
+          {
+            "title": "Winter prep: radiator installation",
+            "type": "Update",
+            "body": "Thinking about adding an extra radiator to a cold room before winter? Now's the moment to do it. We install radiators across Birchwood, Culcheth, Warrington and beyond, connecting them properly to your existing system so they heat evenly with everything else. A fixed written quote, no call-out charge, and we'll leave your home tidy. If you've got a chilly corner that needs warmth, let's sort it before the frost arrives.",
+            "cta": "Get offer",
+            "photoIdea": "A newly installed radiator in a room corner, with a thermometer or comfort indicator nearby.",
+            "date": "27 Sept 2027"
+          },
+          {
+            "title": "October heating checks: peace of mind",
+            "type": "Tip",
+            "body": "October's a good month to get your heating sorted before winter really bites. Boiler service, leak repairs, radiator balance, power flushing, whatever your system needs. We're family-run, we charge no call-out fee, and we give you a fixed written quote before we start. No surprises, just straightforward work done properly. If you're in Warrington or nearby and want your heating ready for the cold months ahead, get in touch.",
+            "cta": "Call now",
+            "photoIdea": "A family enjoying a warm, comfortable home interior in autumn light, with a radiator clearly visible.",
+            "date": "4 Oct 2027"
+          }
+        ]
+      }
+    }
+  }
+}

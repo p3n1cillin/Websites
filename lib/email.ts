@@ -104,6 +104,46 @@ export async function sendOutreachEmail(input: {
   }
 }
 
+/**
+ * Transactional email to a CUSTOMER (e.g. digital-product delivery link). Sent from
+ * OUTREACH_FROM_EMAIL (must be on a Resend-verified domain to reach real inboxes).
+ * Returns true only when Resend accepted it; never throws.
+ */
+export async function sendTransactionalEmail(input: {
+  to: string;
+  subject: string;
+  text: string;
+}): Promise<boolean> {
+  if (!RESEND_API_KEY || !input.to) return false;
+  const brandName = process.env.NEXT_PUBLIC_BRAND_NAME || "Empire Digital";
+  const html = input.text
+    .split(/\n{2,}/)
+    .map((p) => `<p>${esc(p).replace(/\n/g, "<br/>").replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1">$1</a>')}</p>`)
+    .join("\n");
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from: `${brandName} <${OUTREACH_FROM_EMAIL}>`,
+        to: [input.to],
+        reply_to: OUTREACH_REPLY_TO || undefined,
+        subject: input.subject,
+        html,
+        text: input.text,
+      }),
+    });
+    if (!res.ok) {
+      console.error("[email] transactional send failed:", res.status, await safeText(res));
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.error("[email] transactional send threw:", err);
+    return false;
+  }
+}
+
 function esc(s: string): string {
   return s
     .replace(/&/g, "&amp;")
