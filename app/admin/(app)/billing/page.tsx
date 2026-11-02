@@ -1,6 +1,6 @@
 import { requireOrg } from "@/lib/auth";
 import { getInvoicesForOrg } from "@/lib/orgs";
-import { PAID_PLANS, orgEntitlement } from "@/lib/plans";
+import { PAID_PLANS, orgEntitlement, trialDaysLeft } from "@/lib/plans";
 import { stripeConfigured } from "@/lib/stripe";
 import type { Invoice } from "@/lib/types";
 import { startCheckout, openPortal } from "./actions";
@@ -47,10 +47,7 @@ export default async function BillingPage({
       : searchParams.error;
   const notice = noticeKey ? NOTICES[noticeKey] : undefined;
 
-  const trialLeft =
-    org.plan === "trial" && org.trialEndsAt
-      ? Math.max(0, Math.ceil((new Date(org.trialEndsAt).getTime() - Date.now()) / 86_400_000))
-      : null;
+  const trialLeft = org.plan === "trial" ? trialDaysLeft(org.trialEndsAt) : null;
 
   return (
     <div className="space-y-8">

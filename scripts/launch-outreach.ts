@@ -24,7 +24,7 @@ try {
 
 async function main() {
   const isSend = process.argv.includes("--send");
-  const { sbSelect, sbInsert, sbUpdate } = await import("../lib/supabase/client");
+  const { sbSelect, sbUpdate } = await import("../lib/supabase/client");
   const { findTradeForCategory } = await import("../lib/kit/seo-trades");
   const { SITE_URL } = await import("../lib/seo");
   const { emailConfigured, sendTransactionalEmail } = await import("../lib/email");
@@ -47,7 +47,14 @@ async function main() {
   const org = orgs[0];
   console.log(`Organization: ${org.name} (${org.id})`);
 
-  const prospects = await sbSelect<any>({
+  const prospects = await sbSelect<{
+    id: string;
+    name: string;
+    email: string | null;
+    category: string | null;
+    city: string | null;
+    source: { industry?: string } | null;
+  }>({
     query: `prospects?org_id=eq.${org.id}&order=opportunity_score.desc`,
     tier: "service",
   });

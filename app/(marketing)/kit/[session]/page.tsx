@@ -1,9 +1,14 @@
+import type { ComponentProps } from "react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getPaidKitOrder, loadKitSections } from "@/lib/kit/order";
-import { TIERS, type SectionId } from "@/lib/kit/catalog";
+import { TIERS } from "@/lib/kit/catalog";
 import KitViewer from "./KitViewer";
 import sampleKitData from "@/lib/kit/sample-kit.json";
+
+type ViewerProps = ComponentProps<typeof KitViewer>;
+type SampleKit = Pick<ViewerProps, "tier" | "input"> & { sections: ViewerProps["initialSections"] };
 
 interface PageProps {
   params: Promise<{ session: string }>;
@@ -32,14 +37,14 @@ export default async function KitPage({ params }: PageProps) {
 
   // Dedicated sample preview route
   if (session === "sample") {
-    const sample = sampleKitData as any;
+    const sample = sampleKitData as unknown as SampleKit;
     return (
       <div className="bg-slate-50 min-h-screen pb-20">
         <div className="border-b border-amber-200 bg-amber-50 px-4 py-2 text-center text-xs font-medium text-amber-800">
           Showing real sample output generated for a local trade business.{" "}
-          <a href="/map-pack-kit#order" className="underline font-bold hover:text-amber-950">
+          <Link href="/map-pack-kit#order" className="underline font-bold hover:text-amber-950">
             Order your own customized kit for £19 / £29 →
-          </a>
+          </Link>
         </div>
         <KitViewer
           sessionId="sample"

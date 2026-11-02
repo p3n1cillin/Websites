@@ -25,7 +25,6 @@ import {
   setPreviewPasswordAction,
   onboardProspectAction,
   createProposalAction,
-  sendProposalAction,
   markProposalAcceptedAction,
 } from "./actions";
 import { buildLeadIntelReport } from "@/lib/lead-intel";

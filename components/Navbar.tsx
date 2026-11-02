@@ -19,6 +19,7 @@ export default function Navbar({
   const base = `/${business.slug}`;
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [menuPath, setMenuPath] = useState(pathname);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -28,8 +29,12 @@ export default function Navbar({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close the mobile menu whenever the route changes.
-  useEffect(() => setOpen(false), [pathname]);
+  // Close the mobile menu whenever the route changes (adjusted during render,
+  // not in an effect, so there is no extra render with the stale menu open).
+  if (menuPath !== pathname) {
+    setMenuPath(pathname);
+    setOpen(false);
+  }
 
   const links = [
     { href: base, label: "Home" },

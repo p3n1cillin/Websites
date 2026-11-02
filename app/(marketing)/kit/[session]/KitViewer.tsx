@@ -1,11 +1,10 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   type SectionId,
   SECTION_LABELS,
-  TIERS,
   type KitTier,
   type KitInput,
 } from "@/lib/kit/catalog";
@@ -40,7 +39,6 @@ export default function KitViewer({
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [generatingSection, setGeneratingSection] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
   // Find any missing sections that need generation
   const missingSections = requiredSections.filter((s) => !sections[s]);
@@ -78,33 +76,15 @@ export default function KitViewer({
     return () => {
       cancelled = true;
     };
+    // Re-run only when a section lands or the session changes; generatingSection
+    // guards against starting a second loop while one is in flight.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [missingSections.length, sessionId]);
 
   const copyText = (key: string, text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);
-  };
-
-  const handleRegenerate = async (sectionId: SectionId) => {
-    setGeneratingSection(sectionId);
-    setErrorMessage(null);
-    try {
-      const res = await fetch(
-        `/api/kit/${encodeURIComponent(sessionId)}/${encodeURIComponent(sectionId)}?regenerate=1`,
-        { method: "POST" }
-      );
-      const data = await res.json();
-      if (data.status === "ready" && data.section) {
-        setSections((prev) => ({ ...prev, [sectionId]: data.section }));
-      } else {
-        setErrorMessage(data.message || "Could not regenerate this section.");
-      }
-    } catch {
-      setErrorMessage("Network error during regeneration.");
-    } finally {
-      setGeneratingSection(null);
-    }
   };
 
   // Compile all posts across quarters or monthly

@@ -1,8 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import OrderForm from "./OrderForm";
-import Reveal from "../Reveal";
-import { TIERS, gbpPrice } from "@/lib/kit/catalog";
 
 export const metadata: Metadata = {
   title: "Map Pack Kit — Google Business Profile Content & SEO Kit for UK Trades",

@@ -1,8 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { parseKitInput, toMetadata, TIERS } from "../lib/kit/catalog";
+import { parseKitInput, toMetadata } from "../lib/kit/catalog";
 import { nextMonday, scheduleFor, sanitize } from "../lib/kit/content";
-import { SEO_TRADES, getTradeBySlug } from "../lib/kit/seo-trades";
+import { SEO_TRADES, getTradeBySlug, findTradeForCategory } from "../lib/kit/seo-trades";
 
 test("parseKitInput validates required fields", () => {
   const bad = parseKitInput({});
@@ -101,7 +101,6 @@ test("SEO_TRADES has unique slugs and definitions", () => {
 });
 
 test("findTradeForCategory matches singular, plural, and partial trade names", () => {
-  const { findTradeForCategory } = require("../lib/kit/seo-trades");
   const t1 = findTradeForCategory("plumber");
   assert.equal(t1?.slug, "plumbers");
 

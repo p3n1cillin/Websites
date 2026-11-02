@@ -61,7 +61,7 @@ export default async function PortalPage({ params }: { params: { token: string }
             </a>
           ) : (
             <span className="rounded-lg bg-amber-50 px-4 py-2 text-sm font-medium text-amber-700">
-              Your site is being finalised — we'll let you know the moment it's live.
+              Your site is being finalised — we&apos;ll let you know the moment it&apos;s live.
             </span>
           )}
         </div>
@@ -93,7 +93,7 @@ export default async function PortalPage({ params }: { params: { token: string }
       <section className="mt-10 rounded-2xl border border-slate-200 bg-white p-6">
         <h2 className="text-lg font-semibold text-slate-900">Request a change</h2>
         <p className="mt-1 text-sm text-slate-500">
-          Want something updated? Let us know and we'll take care of it.
+          Want something updated? Let us know and we&apos;ll take care of it.
         </p>
         <div className="mt-4">
           <RequestForm token={portal.token} />

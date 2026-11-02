@@ -181,6 +181,8 @@ export default async function CommandCenterPage() {
   const URGENCY_DOT = { high: "bg-red-500", medium: "bg-amber-500", low: "bg-slate-300" } as const;
 
   // ---- NEXUS: the agency as a living station, every node a real entity ----------
+  // Server component: rendered per request, so the clock is read once per request.
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const within = (iso: string, ms: number) => now - new Date(iso).getTime() <= ms;
   const DAY = 86_400_000;

@@ -21,10 +21,10 @@ export function blogTag(slug: string): string {
   return `blog:${slug}`;
 }
 
-/** Next 15/16 compatible wrapper for revalidateTag. */
+/** revalidateTag that never throws (e.g. when called outside a request). */
 export function safeRevalidateTag(tag: string): void {
   try {
-    (revalidateTag as any)(tag, "default");
+    revalidateTag(tag, "default");
   } catch {
     /* safe fallback */
   }

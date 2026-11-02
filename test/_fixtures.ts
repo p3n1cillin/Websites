@@ -89,5 +89,6 @@ export function makeAudit(overrides: Partial<WebsiteAudit> = {}): WebsiteAudit {
     contactEmail: null,
     issues: ["Not mobile-friendly", "No clear call-to-action"],
     at: new Date().toISOString(),
+    ...overrides,
   };
 }

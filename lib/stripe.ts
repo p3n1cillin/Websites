@@ -277,6 +277,8 @@ export function verifyStripeEvent(
 export interface StripeEvent {
   id: string;
   type: string;
+  // The object's shape depends on the event type; the webhook narrows it per case.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: { object: Record<string, any> };
 }
 
