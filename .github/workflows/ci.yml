@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npm run typecheck
+      - run: npm test
+      # The build needs no secrets: pages that read Supabase or Stripe do so
+      # at request time. If that changes, provide placeholders here.
+      - run: npm run build
+      # Production dependencies only; the remaining moderate advisories are in
+      # the ESLint toolchain and only have major-version fixes.
+      - run: npm audit --omit=dev --audit-level=high
+      # `npm run lint` is not gated yet: main has 27 existing lint errors.
