@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { cookies } from "next/headers";
 import { requireOrg } from "@/lib/auth";
+import { trialDaysLeft } from "@/lib/plans";
 import AdminNav from "./AdminNav";
 
 /**
@@ -14,12 +15,7 @@ import AdminNav from "./AdminNav";
 export default async function AdminAppLayout({ children }: { children: ReactNode }) {
   const org = await requireOrg();
 
-  const trialLeft = org.trialEndsAt
-    ? Math.max(
-        0,
-        Math.ceil((new Date(org.trialEndsAt).getTime() - Date.now()) / 86_400_000)
-      )
-    : null;
+  const trialLeft = trialDaysLeft(org.trialEndsAt);
 
   // Theme is persisted in a cookie so the server can render the right class on the
   // first paint (no flash). The toggle (AdminNav) updates the cookie + DOM class.

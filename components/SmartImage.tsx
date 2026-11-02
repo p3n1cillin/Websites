@@ -17,11 +17,13 @@ export default function SmartImage({
   blurDataURL = BLUR_DATA_URL,
   sizes,
   fill,
+  alt,
   ...props
 }: ImageProps) {
   return (
     <Image
       {...props}
+      alt={alt}
       fill={fill}
       placeholder={placeholder}
       blurDataURL={blurDataURL}

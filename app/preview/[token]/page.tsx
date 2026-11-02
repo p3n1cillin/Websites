@@ -66,7 +66,7 @@ export default async function PreviewPage({
       {/* Sales framing — clearly a free demo built for them, not their live site. */}
       <div className="bg-slate-900 px-4 py-2 text-center text-xs text-white sm:text-sm">
         ✨ This is a free demo website we designed for <strong>{business.name}</strong> — like it?
-        Get in touch and we'll get it live for you.
+        Get in touch and we&apos;ll get it live for you.
       </div>
       {comparison && <ComparisonBanner businessName={business.name} comparison={comparison} />}
       <Navbar business={business} showBlog={false} />

@@ -106,6 +106,12 @@ export interface Entitlement {
   reason?: string;
 }
 
+/** Whole days left on a trial (0 once expired), or null when no end date is set. */
+export function trialDaysLeft(trialEndsAt?: string | null): number | null {
+  if (!trialEndsAt) return null;
+  return Math.max(0, Math.ceil((new Date(trialEndsAt).getTime() - Date.now()) / 86_400_000));
+}
+
 /**
  * What an org is currently entitled to. Trials are active until they expire;
  * paid plans are active while Stripe reports `active` or `trialing`.

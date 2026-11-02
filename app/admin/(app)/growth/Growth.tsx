@@ -8,7 +8,6 @@ import {
   type ExperimentSlot,
   type ExperimentStatus,
 } from "@/lib/types";
-import type { WinnerAnalysis } from "@/lib/experiments";
 import {
   createExperimentAction,
   analyseExperimentAction,

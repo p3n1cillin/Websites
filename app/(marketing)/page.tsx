@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
-import { brand, PRICING, gbp } from "@/lib/brand";
+import { PRICING, gbp } from "@/lib/brand";
 import { SERVICE_PAGES } from "@/lib/seo-content";
 import Reveal from "./Reveal";
 

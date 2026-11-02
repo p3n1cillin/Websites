@@ -7,6 +7,10 @@
  */
 
 import type { AgentDefinition, AgentKind } from "./types";
+
+// Each agent has its own input/output types, so the registry erases them.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyAgentDefinition = AgentDefinition<any, any>;
 import { pingAgent } from "./ping";
 import { designAgent } from "./design";
 import { qaAgent } from "./qa";
@@ -19,7 +23,7 @@ import { successAgent } from "./success";
 import { seoGrowthAgent } from "./seo-growth";
 import { conversionAgent } from "./conversion";
 
-const REGISTRY: Partial<Record<AgentKind, AgentDefinition<any, any>>> = {
+const REGISTRY: Partial<Record<AgentKind, AnyAgentDefinition>> = {
   ping: pingAgent,
   discovery: discoveryAgent, // 1 (Phase D)
   market: marketAgent, // 2 (Phase D)
@@ -34,13 +38,13 @@ const REGISTRY: Partial<Record<AgentKind, AgentDefinition<any, any>>> = {
   // All 10 production agents now registered.
 };
 
-export function getAgentDefinition(kind: AgentKind): AgentDefinition<any, any> | undefined {
+export function getAgentDefinition(kind: AgentKind): AnyAgentDefinition | undefined {
   return REGISTRY[kind];
 }
 
 /** All registered agents (for the Agent Control Centre listing). */
-export function listAgentDefinitions(): AgentDefinition<any, any>[] {
-  return Object.values(REGISTRY).filter(Boolean) as AgentDefinition<any, any>[];
+export function listAgentDefinitions(): AnyAgentDefinition[] {
+  return Object.values(REGISTRY).filter(Boolean) as AnyAgentDefinition[];
 }
 
 export function isAgentRegistered(kind: AgentKind): boolean {

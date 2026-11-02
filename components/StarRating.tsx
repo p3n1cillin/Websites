@@ -1,3 +1,5 @@
+import { useId } from "react";
+
 interface StarRatingProps {
   value: number;
   /** Tailwind size class, e.g. "h-5 w-5". */
@@ -7,7 +9,7 @@ interface StarRatingProps {
 
 function Star({ fill }: { fill: number }) {
   // fill: 0..1 fraction of the star to colour.
-  const id = `star-${Math.random().toString(36).slice(2)}`;
+  const id = `star-${useId().replace(/[^A-Za-z0-9_-]/g, "")}`;
   return (
     <svg viewBox="0 0 20 20" className="inline-block" aria-hidden="true">
       <defs>
